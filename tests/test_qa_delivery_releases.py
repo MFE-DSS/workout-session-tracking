@@ -337,3 +337,57 @@ def test_built_receipt_demands_artifact_ids_checksum_and_native_binding():
     e["artifact"]["source"]["native_sha"] = "b" * 40
     with pytest.raises(ValueError):
         validate_candidate(c, e)
+
+
+def ota_artifact(action, state, assets_digest):
+    """Complete synthetic OTA evidence reaches the actual distribution decision."""
+    c, e = approved()
+    c["action"] = action
+    e["previous_native"] = deepcopy(c)
+    e["previous_native"]["source"]["js_sha"] = "b" * 40
+    c["state"] = state
+    c["eas"].update(
+        build_id="edc4b258-cfcf-49c3-8991-883902030576",
+        build_url="https://expo.dev/accounts/grimais/projects/auren-vnext-lab/builds/edc4b258-cfcf-49c3-8991-883902030576",
+    )
+    c["artifact"] = {"sha256": "f" * 64, "url": "https://expo.dev/artifacts/test-only-update"}
+    c["js"] = {
+        "update_group": "6a09751d-028f-4878-b4ea-dd658ac59ebe",
+        "update_id": "80e3c598-c0f4-4496-a65b-f1f08b2968b0",
+        "assets_sha256": assets_digest,
+    }
+    e["artifact"] = {
+        **deepcopy(c["artifact"]),
+        "native": deepcopy(c["native"]),
+        "source": deepcopy(c["source"]),
+        "js": deepcopy(c["js"]),
+        **deepcopy(c["eas"]),
+    }
+    e["installation"] = {
+        "source": deepcopy(c["source"]),
+        "native": deepcopy(c["native"]),
+        "js": deepcopy(c["js"]),
+        "reference": "synthetic-installed-client-observation",
+    }
+    return c, e
+
+
+@pytest.mark.parametrize("action", ["UPDATE", "ROLLBACK"])
+@pytest.mark.parametrize("state", ["BUILT", "VERIFIED", "ROLLED_BACK"])
+@pytest.mark.parametrize("digest", ["a" * 63, "z" * 64, "unknown"])
+def test_ota_distribution_refuses_malformed_assets_digest_even_when_evidence_matches(
+    action, state, digest
+):
+    c, e = ota_artifact(action, state, digest)
+    with pytest.raises(ValueError, match="qa_release_refused"):
+        validate_candidate(c, e)
+
+
+@pytest.mark.parametrize("action", ["UPDATE", "ROLLBACK"])
+@pytest.mark.parametrize("state", ["BUILT", "VERIFIED", "ROLLED_BACK"])
+def test_valid_ota_artifact_checksum_reaches_distributable_receipt(action, state):
+    c, e = ota_artifact(action, state, "a" * 64)
+    normalized = validate_candidate(c, e)
+    assert normalized["distributable"] is True
+    assert normalized["pending"] == []
+    assert normalized["js"]["assets_sha256"] == "a" * 64

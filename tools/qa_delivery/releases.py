@@ -224,8 +224,10 @@ def validate_candidate(raw, evidence):
                     and artifact["build_url"] == eas["build_url"]
                 )
                 if c["action"] != "BUILD_APK":
-                    for name in ("update_group", "update_id", "assets_sha256"):
+                    for name in ("update_group", "update_id"):
                         _require(_text(c["js"][name]) and artifact["js"][name] == c["js"][name])
+                    _require(_hex(c["js"]["assets_sha256"], 64))
+                    _require(artifact["js"]["assets_sha256"] == c["js"]["assets_sha256"])
                 if c["state"] in {"VERIFIED", "ROLLED_BACK"}:
                     installation = evidence["installation"]
                     _require(installation["source"] == c["source"])
