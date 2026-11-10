@@ -85,3 +85,40 @@ un build Android inclus sous quota relu, installation/upgrade, updateQA et rollb
 sur client installé. Diffusion aux appareils externes, DATA et production restent
 des autorisations distinctes. Le résultat opérationnel exigé par REL-03 n'est pas
 COMPLETE et le change ne doit pas être archivé comme tel avant ces preuves.
+
+## Actualisation avant PR — 10 novembre
+
+Le suivi PENDING ci-dessus décrit son instant de publication. Le correctif final
+fonctionnel est74481af5698ca45899a1510e189cc0b186ce1e66, parentf02acf4.
+La revue globale indépendante puis sa seule relecture ciblée ont confirmé deux
+Important corrigés et **Critical0/Important0** : ancre privée de tuples immuables
+propriétaires vérifiée dans la DB active et toutes les copies de preuve ; inspection
+complète des métadonnées EAS project/account et refus des overrides preview,
+y compris tardifs. La relecture couvre les14fichiers du fix et les preuves de tests,
+sans prétendre une seconde exécution indépendante ou une qualification externe.
+
+Ancre : capture explicite en maintenance, jamais à l'activation ; digest lié à
+configuration/cible/preuve chiffrée, tuples absents des reçus publics. Ajouts et
+rotations auth/SCI restent possibles ; suppression/rebind des tuples ancrés ferme
+l'admission et exige une décision DATA/maintenance future. Ce mécanisme ne prouve
+pas une identité universellement infalsifiable. Pour EAS, les trois noms synchronisés
+sont refusés s'ils sont liés uniquement à d'autres environnements ; choix conservateur,
+pas affirmation que le SDK les modifierait toujours. Les autres secrets hors preview
+restent intacts, leurs valeurs ne sont pas demandées.
+
+Résultats locaux finaux : **339tests broad affectés passants/62.76s**, Ruff15fichiers,
+format, budget260≤548, protocole, Bandit ciblé passants. RED initial12échecs/1témoin,
+rejeu régression28échecs/2refus indépendants conservés, raffinement EAS12RED→13GREEN.
+Le sweep root a réellement terminé les72fichiers restants :72/72PASS, exit0,
+pic2053MiB<budget2300. Les427fichiers d'origine sont ainsi couverts entre les deux
+passes, sans rerun des355premiers ; nouveaux tests couverts par leurs broad dédiés.
+Aucune CI GitHub ou Sonar final n'est encore revendiquée à cet instant.
+
+Rulings de sortie : M1/M2 différés conservés ; Render/Docker/montage/capacité/TLS,
+arrêt du writer/export physique, store privé/droits/coût/custodie/rotation,
+policy/quota/SDK distants réels, APK/installation/OTA/rollback et appareils physiques
+restent non qualifiés. Les avis npm29 ne sont pas un audit d'innocuité. Les choix
+self-review effectif/directUser/republish connu/hébergement manuel ne donnent aucune
+permission supplémentaire. CI/base/Sonar/mergeabilité seront relus au HEAD exact.
+Le change reste actif et **BLOCKED_EXTERNAL / NON_DISTRIBUTABLE** après livraison
+du seul code ; aucun archivage COMPLETE ni déploiement implicite.
