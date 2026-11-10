@@ -13,6 +13,7 @@ import os
 import re
 import shutil
 import subprocess
+from contextlib import closing
 from copy import deepcopy
 from datetime import datetime
 from pathlib import Path
@@ -20,7 +21,8 @@ from urllib.parse import quote
 
 import httpx
 
-from tools.qa_delivery.database import _verify_backup, verify_database
+from tools.qa_delivery.database import _verify_backup, connect_readonly, verify_database
+from tools.qa_delivery.ownership import validate_anchor, verify_ownership
 from tools.qa_delivery.releases import (
     classify_update,
     metadata_environment,
@@ -266,6 +268,23 @@ def proof_digest(root):
     return digest(hashes)
 
 
+def verify_proof_ownership(root, c, names):
+    # The independently reviewed public target pins the private captured tuples.
+    # Never recapture from a fresh backup: that would admit a swapped volume.
+    target = c["target"]
+    anchor = json.loads((Path(root) / "ownership-anchor.json").read_text())
+    validate_anchor(anchor, target["environment_id"], target["ownership_anchor_sha256"])
+    for name in names:
+        with closing(connect_readonly(Path(root) / name)) as db:
+            db.execute("BEGIN")
+            verify_ownership(
+                db,
+                anchor,
+                environment_id=target["environment_id"],
+                expected_digest=target["ownership_anchor_sha256"],
+            )
+
+
 def verify_continuity(root, c):
     """Integrity is observed; historical writer stop remains OPERATOR_ATTESTED.
 
@@ -289,6 +308,7 @@ def verify_continuity(root, c):
         require(receipt["target"] == c["target"], "qa_continuity_target_mismatch")
         backup = _verify_backup(root / "backup.db")
         restored = verify_database(root / "restored.db")
+        verify_proof_ownership(root, c, ("backup.db", "restored.db"))
         require(
             restored == {k: v for k, v in backup.items() if k != "database_sha256"},
             "qa_continuity_restore_mismatch",
@@ -366,6 +386,7 @@ def verify_release_backup(root, c, package, gate, acquired):
             )
         snapshot = _verify_backup(root / "release-backup.db")
         exported = _verify_backup(root / "release-export.db")
+        verify_proof_ownership(root, c, ("release-backup.db", "release-export.db"))
         require(snapshot == exported, "qa_release_backup_export_snapshot_mismatch")
         preparation_id = record["preparation_run_id"]
         current_id = int(gate.env["GITHUB_RUN_ID"])
@@ -489,6 +510,7 @@ def observe_target(c, proof, token, client):
         require(
             version["source_sha"] == t["source_sha"]
             and version["environment_id"] == t["environment_id"]
+            and version["ownership_anchor_sha256"] == t["ownership_anchor_sha256"]
             and version["server_schema"] == c["compatibility"]["server_schema"]
             and version["api_contracts"] == [c["compatibility"]["api"]]
             and version["inventory"] == c["compatibility"]["inventory"]
@@ -610,15 +632,17 @@ def check_channel(raw, c):
 def check_remote_environment(c, token, client):
     """Read exact CLI27.2 GraphQL shape before env:set can merge environments.
 
-    Only names/scopes/environment bindings are read, never variable values.
+    Complete project/account metadata is read, never variable values. Every
+    preview binding must be one of our three exclusively owned public strings;
+    unknown controls and unreadable secrets fail closed, regardless of name.
     This is a read-only GraphQL query, despite its HTTP POST transport.
     """
     try:
         names = ["EXPO_PUBLIC_QA_NATIVE_SHA", "EXPO_PUBLIC_QA_JS_SHA", "EXPO_PUBLIC_API_URL"]
-        query = "query QAEnvironmentBindings($id:String!,$names:[String!]) { app { byId(appId:$id) { environmentVariables(filterNames:$names) { name scope environments visibility type } ownerAccount { environmentVariables(filterNames:$names) { name scope environments visibility type } } } } }"
+        query = "query QAEnvironmentBindings($id:String!) { app { byId(appId:$id) { environmentVariables { name scope environments visibility type } ownerAccount { environmentVariables { name scope environments visibility type } } } } }"
         response = client.post(
             "https://api.expo.dev/graphql",
-            json={"query": query, "variables": {"id": c["eas"]["project_id"], "names": names}},
+            json={"query": query, "variables": {"id": c["eas"]["project_id"]}},
             headers={"Authorization": f"Bearer {token}"},
             follow_redirects=False,
             timeout=15,
@@ -629,19 +653,36 @@ def check_remote_environment(c, token, client):
         )
         app = response.json()["data"]["app"]["byId"]
         shared = app["ownerAccount"]["environmentVariables"]
+        project = app["environmentVariables"]
         require(
-            not any(v["name"] in names and "preview" in v["environments"] for v in shared),
-            "qa_eas_environment_account_shared",
+            isinstance(shared, list) and isinstance(project, list), "qa_eas_environment_unknown"
         )
-        for variable in app["environmentVariables"]:
-            if variable["name"] in names and "preview" in variable["environments"]:
+        seen = set()
+        for scope, variables in (("SHARED", shared), ("PROJECT", project)):
+            for variable in variables:
+                require(isinstance(variable, dict), "qa_eas_environment_unknown")
+                bindings = variable["environments"]
                 require(
-                    variable["scope"] == "PROJECT"
-                    and variable["environments"] == ["preview"]
+                    isinstance(bindings, list) and all(isinstance(v, str) for v in bindings),
+                    "qa_eas_environment_unknown",
+                )
+                name = variable["name"]
+                # Our synchronized names must remain exclusively owned preview
+                # records even if a conflicting record has no preview link yet.
+                # Other names scoped solely elsewhere are read-only and untouched.
+                if "preview" not in bindings and name not in names:
+                    continue
+                require(
+                    scope == "PROJECT"
+                    and name in names
+                    and name not in seen
+                    and variable["scope"] == "PROJECT"
+                    and bindings == ["preview"]
                     and variable["visibility"] == "PUBLIC"
                     and variable["type"] == "STRING",
-                    "qa_eas_environment_linked_outside_preview",
+                    "qa_eas_environment_unapproved_preview_binding",
                 )
+                seen.add(name)
     except (httpx.HTTPError, KeyError, TypeError, ValueError):
         raise ValueError("qa_eas_environment_bindings_unqualified") from None
 

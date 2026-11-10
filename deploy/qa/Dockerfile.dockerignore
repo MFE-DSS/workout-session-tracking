@@ -3,6 +3,7 @@
 qa-config.json
 qa-access.json
 qa-auth-secret
+qa-ownership-anchor.json
 .git
 .env
 .env.*

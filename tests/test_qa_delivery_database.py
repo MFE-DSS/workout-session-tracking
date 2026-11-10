@@ -298,3 +298,43 @@ def test_restore_interphase_source_write_cannot_replace_validated_manifest_ident
     assert qa_database.read_bytes() == original_source
     output = capsys.readouterr()
     assert output.out == "" and "private-" not in output.err
+
+
+def test_explicit_anchor_capture_cli_reads_only_and_emits_private_tuples_outside_source(
+    qa_database, tmp_path
+):
+    from tools.qa_delivery.ownership import anchor_digest, load_anchor
+
+    private = tmp_path / "private-anchor"
+    private.mkdir(mode=0o700)
+    output = private / "ownership-anchor.json"
+    original = qa_database.read_bytes()
+    command = [
+        sys.executable,
+        "-m",
+        "tools.qa_delivery.ownership",
+        str(qa_database),
+        "--environment-id",
+        "qa-rel03",
+        "--output",
+        str(output),
+    ]
+    result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, timeout=15)
+    assert result.returncode == 0, result.stderr
+    anchor = json.loads(output.read_text())
+    digest = json.loads(result.stdout)["ownership_anchor_sha256"]
+    assert digest == anchor_digest(anchor)
+    assert output.stat().st_mode & 0o777 == 0o600
+    assert load_anchor(output, environment_id="qa-rel03", expected_digest=digest) == anchor
+    assert anchor["users"][0][:2] == [42, "qa02-assigned"]
+    assert anchor["device_sessions"][0][:2] == ["device-preserved", 42]
+    assert anchor["blueprint_source_events"][0][0] == "subject-preserved"
+    assert "private-hash" not in output.read_text() and "private-refresh" not in output.read_text()
+    assert "qa02-assigned" not in result.stdout and "device-preserved" not in result.stdout
+    assert qa_database.read_bytes() == original
+    again = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, timeout=15)
+    assert again.returncode != 0
+    assert json.loads(output.read_text()) == anchor
+    output.chmod(0o644)
+    with pytest.raises(ValueError, match="qa_ownership_anchor_invalid"):
+        load_anchor(output, environment_id="qa-rel03", expected_digest=digest)

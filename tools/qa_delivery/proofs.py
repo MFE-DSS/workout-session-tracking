@@ -27,6 +27,7 @@ REQUIRED = frozenset(
         "backup.db.manifest.json",
         "restored.db",
         "cutover.json",
+        "ownership-anchor.json",
         "previous-native.json",
         "release-backup.db",
         "release-backup.db.manifest.json",

@@ -8,11 +8,20 @@ from contextlib import closing
 from pathlib import Path
 
 from tools.qa_delivery.database import SCHEMA, connect_readonly, verify_database
+from tools.qa_delivery.ownership import verify_ownership
 
 CONTRACT = "first-session-runtime/3.0.0"
 
 
-def read_version(db_path: Path, *, environment_id: str, source_sha: str, bundle_root: Path) -> dict:
+def read_version(
+    db_path: Path,
+    *,
+    environment_id: str,
+    source_sha: str,
+    bundle_root: Path,
+    ownership_anchor: dict,
+    ownership_anchor_sha256: str,
+) -> dict:
     from app.services.plan_v3.packaging import bundle_manifest, execute_science
 
     try:
@@ -22,6 +31,13 @@ def read_version(db_path: Path, *, environment_id: str, source_sha: str, bundle_
             raise ValueError
         verify_database(db_path)
         with closing(connect_readonly(db_path)) as db:
+            db.execute("BEGIN")
+            verify_ownership(
+                db,
+                ownership_anchor,
+                environment_id=environment_id,
+                expected_digest=ownership_anchor_sha256,
+            )
             row = db.execute(
                 "SELECT generation,state,publication_json,packaging_digest FROM first_plan_runtime_authorities WHERE profile_key=?",
                 (CONTRACT,),
@@ -62,6 +78,7 @@ def read_version(db_path: Path, *, environment_id: str, source_sha: str, bundle_
             "schema_version": "qa-backend/1.0.0",
             "data_scope": "SYNTHETIC_ONLY",
             "environment_id": environment_id,
+            "ownership_anchor_sha256": ownership_anchor_sha256,
             "source_sha": source_sha,
             "server_schema": SCHEMA,
             "api_contracts": [CONTRACT],

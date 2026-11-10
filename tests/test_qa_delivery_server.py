@@ -58,14 +58,18 @@ def upstream():
 
 
 def config(db, bundle, port=8140):
+    from tools.qa_delivery.ownership import anchor_digest, capture_anchor
     from tools.qa_delivery.server import QAConfig
 
+    anchor = capture_anchor(db, "qa-rel03-isolated")
     return QAConfig(
         db_path=db,
         bundle_root=bundle,
         environment_id="qa-rel03-isolated",
         source_sha="a" * 40,
         backend_port=port,
+        ownership_anchor=anchor,
+        ownership_anchor_sha256=anchor_digest(anchor),
         access={"signup_users": ["qa02-assigned"], "login_users": ["qa02-assigned"]},
     )
 
@@ -94,7 +98,15 @@ async def test_version_is_current_redacted_and_withdrawal_does_not_remove_transp
         assert (await client.get("/__qa_health")).status_code == 200
         assert (await client.get("/api/mobile/v3/me/first-session-handoff")).status_code == 200
         assert all(
-            x not in response.text for x in ["private-", str(qa_database), "owner", "approval_ref"]
+            x not in response.text
+            for x in [
+                "private-",
+                str(qa_database),
+                "qa02-assigned",
+                "device-preserved",
+                "subject-preserved",
+                "approval_ref",
+            ]
         )
 
 
@@ -267,6 +279,12 @@ def test_valid_cli_configuration_does_not_seed_or_start_and_ambient_secret_is_no
     access = tmp_path / "access.json"
     access.write_text('{"signup_users":[],"login_users":[]}')
     access.chmod(0o600)
+    from tools.qa_delivery.ownership import anchor_digest, capture_anchor
+
+    anchor = capture_anchor(qa_database, "qa-rel03-isolated")
+    anchor_file = tmp_path / "ownership-anchor.json"
+    anchor_file.write_text(json.dumps(anchor))
+    anchor_file.chmod(0o600)
     path = tmp_path / "config.json"
     path.write_text(
         json.dumps(
@@ -277,6 +295,8 @@ def test_valid_cli_configuration_does_not_seed_or_start_and_ambient_secret_is_no
                 "source_sha": subprocess.check_output(
                     ["git", "-C", str(ROOT), "rev-parse", "HEAD"], text=True
                 ).strip(),
+                "ownership_anchor_file": str(anchor_file),
+                "ownership_anchor_sha256": anchor_digest(anchor),
                 "secret_file": str(secret),
                 "access_file": str(access),
                 "data_scope": "SYNTHETIC_ONLY",
@@ -443,3 +463,119 @@ async def test_liveness_remains_only_process_signal_if_database_disappears(
         assert response.status_code == 200
         assert response.json() == {"alive": True, "data_ready": False}
         assert (await client.get("/__qa_version")).status_code == 503
+
+
+@pytest.mark.anyio
+@pytest.mark.parametrize(
+    "damage",
+    [
+        "owner",
+        "device",
+        "subject",
+        "device_owner",
+        "subject_owner",
+        "delete_device",
+        "delete_subject",
+        "user_created_at",
+    ],
+)
+async def test_admitted_anchor_is_checked_on_business_health_and_version_after_startup(
+    qa_database, bundle, upstream, damage
+):
+    from tools.qa_delivery.server import create_qa_app
+
+    app = create_qa_app(config(qa_database, bundle, upstream[0]))
+    with sqlite3.connect(qa_database) as db:
+        if damage in {"device_owner", "subject_owner"}:
+            db.execute(
+                "INSERT INTO users (id,username,password_hash,is_active) VALUES (43,'qa02-other','other-hash',1)"
+            )
+        db.execute(
+            {
+                "device_owner": "UPDATE device_sessions SET user_id=43",
+                "subject_owner": "UPDATE blueprint_source_events SET owner_id=43",
+                "owner": "UPDATE users SET username='qa02-foreign' WHERE id=42",
+                "device": "UPDATE device_sessions SET id='foreign-device'",
+                "subject": "UPDATE blueprint_source_events SET id='foreign-subject'",
+                "delete_device": "DELETE FROM device_sessions",
+                "delete_subject": "DELETE FROM blueprint_source_events",
+                "user_created_at": "UPDATE users SET created_at='2040-01-01 00:00:00' WHERE id=42",
+            }[damage]
+        )
+    async with httpx.AsyncClient(
+        transport=httpx.ASGITransport(app), base_url="https://qa.invalid"
+    ) as client:
+        for path in ["/__qa_version", "/__qa_health", "/api/mobile/v1/me/sessions"]:
+            response = await client.get(path)
+            assert response.status_code == 503
+            assert "foreign" not in response.text and str(qa_database) not in response.text
+    assert upstream[1] == []
+
+
+@pytest.mark.anyio
+async def test_admitted_anchor_survives_growth_password_rotation_revocation_and_science_change(
+    qa_database, bundle, upstream
+):
+    from tools.qa_delivery.server import create_qa_app
+
+    cfg = config(qa_database, bundle, upstream[0])
+    app = create_qa_app(cfg)
+    with sqlite3.connect(qa_database) as db:
+        db.execute(
+            "INSERT INTO users (id,username,password_hash,is_active) VALUES (43,'qa02-new','new-hash',1)"
+        )
+        db.execute(
+            "UPDATE users SET password_hash='rotated',session_epoch=7,is_active=0 WHERE id=42"
+        )
+        db.execute(
+            "UPDATE device_sessions SET refresh_hash='rotated',session_epoch=7,last_used_at=CURRENT_TIMESTAMP,revoked_at=CURRENT_TIMESTAMP"
+        )
+        db.execute(
+            "INSERT INTO device_sessions (id,user_id,refresh_hash,session_epoch,last_used_at) VALUES ('new-device',43,'hash',0,CURRENT_TIMESTAMP)"
+        )
+        db.execute(
+            "INSERT INTO blueprint_source_events (id,owner_id,source_revision,request_id,body_digest,kind,payload_json) VALUES ('new-subject',42,2,'new-command','new-digest','CONTEXT_OPENED','{}')"
+        )
+        db.execute("UPDATE first_plan_runtime_authorities SET generation=4,state='DISABLED'")
+    # Restart with the original admitted anchor, never recapture new rows.
+    restarted = create_qa_app(cfg)
+    for current in (app, restarted):
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(current), base_url="https://qa.invalid"
+        ) as client:
+            response = await client.get("/__qa_version")
+            assert response.status_code == 200
+            assert response.json()["ownership_anchor_sha256"] == cfg.ownership_anchor_sha256
+            assert response.json()["authority"]["generation"] == 4
+            assert (
+                "subject-preserved" not in response.text and "device-preserved" not in response.text
+            )
+            assert "qa02-assigned" not in response.text
+            assert (await client.get("/__qa_health")).status_code == 200
+            assert (await client.get("/api/mobile/v1/me/sessions")).status_code == 200
+
+
+@pytest.mark.parametrize("damage", ["missing", "unknown_digest", "malformed", "other_environment"])
+def test_unknown_or_malformed_admission_cannot_start_facade_or_writer(
+    qa_database, bundle, monkeypatch, tmp_path, damage
+):
+    from dataclasses import replace
+
+    from tools.qa_delivery import server
+
+    cfg = config(qa_database, bundle)
+    if damage == "missing":
+        cfg = replace(cfg, ownership_anchor={})
+    elif damage == "unknown_digest":
+        cfg = replace(cfg, ownership_anchor_sha256="a" * 64)
+    elif damage == "malformed":
+        cfg = replace(cfg, ownership_anchor={**cfg.ownership_anchor, "device_sessions": []})
+    else:
+        cfg = replace(cfg, environment_id="qa-other")
+    monkeypatch.setattr(
+        server.subprocess, "Popen", lambda *a, **kw: pytest.fail("writer started before admission")
+    )
+    with pytest.raises(ValueError):
+        server.create_qa_app(cfg)
+    with pytest.raises(ValueError):
+        server.supervise(cfg, "test-secret", tmp_path / "config", 8080)

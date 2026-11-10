@@ -90,6 +90,7 @@ def evidence(c):
             "schema_version": "qa-target-attestation/1.0.0",
             "state": "ATTESTED",
             "environment_id": "qa-rel03",
+            "ownership_anchor_sha256": "e" * 64,
             "url": "https://qa-rel03.onrender.com",
             "data_scope": "SYNTHETIC_ONLY",
             "availability": "STABLE",
@@ -391,3 +392,18 @@ def test_valid_ota_artifact_checksum_reaches_distributable_receipt(action, state
     assert normalized["distributable"] is True
     assert normalized["pending"] == []
     assert normalized["js"]["assets_sha256"] == "a" * 64
+
+
+@pytest.mark.parametrize("anchor", [None, "", "a" * 63, "unknown", {}, [], True])
+def test_target_requires_independently_reviewed_opaque_ownership_anchor(anchor):
+    c, e = approved()
+    c["target"]["ownership_anchor_sha256"] = anchor
+    with pytest.raises(ValueError):
+        validate_candidate(c, e)
+
+
+def test_public_target_cannot_carry_private_ownership_tuples():
+    c, e = approved()
+    c["target"]["ownership_anchor"] = {"users": [[42, "qa02-private"]]}
+    with pytest.raises(ValueError):
+        validate_candidate(c, e)

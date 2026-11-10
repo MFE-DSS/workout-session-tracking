@@ -61,7 +61,8 @@ may be needed; no fake fallback policy exists and no credential is requested her
 Render is read through documented service/deploy GET APIs: dedicated repository,
 branch, non-suspended single instance, private disk, auto-deploy off, actual live
 deploy commit and URL must match the approved target. Real TLS GET health/version
-must match the pinned source, environment, schema, bundle and current authority
+must match the pinned source, environment, ownership_anchor_sha256, schema, bundle
+and current authority
 state/generation/publication. Redirects/errors/unknowns stop release. WITHDRAWN
 can be transport healthy; this grants no scientific readiness.
 
@@ -69,6 +70,12 @@ can be transport healthy; this grants no scientific readiness.
 
 The allowlisted private staging directory contains:
 
+- ownership-anchor.json: the previously admitted private ownership tuples; its
+  canonical digest and environment must equal the independently reviewed target
+  and current version. The same original subset is verified in historical
+  backup/restored and fresh release backup/export copies. It is never captured
+  from a new snapshot by the publisher; normal journal/auth/SCI changes do not
+  rebind it. See the portable server protocol for capture and deletion limits;
 - backup.db with its exact backup.db.manifest.json, verified by the whole-DB
   verifier, plus a restored.db copy with identical schema/table/continuity digests;
 - previous-native.json: the actual prior native receipt and artifact checksum;
@@ -233,9 +240,19 @@ mandatory. No force-end rollout flag exists.
 
 For build/update, only EXPO_PUBLIC_QA_NATIVE_SHA, EXPO_PUBLIC_QA_JS_SHA and
 EXPO_PUBLIC_API_URL are synchronized to project-scoped preview variables. A
-read-only GraphQL query using the installed CLI schema first rejects account-shared
-or preview+other-environment bindings: CLI env:set would otherwise preserve those
-links. Mutation responses must confirm exact public values and preview-only scope.
+read-only GraphQL query using the installed CLI schema inspects **all** project
+and account binding metadata without filterNames or any variable values. It
+rejects every other preview binding, including profile selectors, export controls
+such as EXPO_NO_CLIENT_ENV_VARS and unreadable secrets. Even the three owned names
+must be PUBLIC STRING, project-only, and linked exclusively to preview. These
+owned names are also refused when an existing binding is only in production or
+development, at either scope; a sync never adopts or changes that record. Account
+preview variables and preview+other-environment links are refused. Bindings solely
+in other environments are left unchanged. This strict policy may require future
+operator review of existing preview configuration; it never automatically deletes
+or modifies unexpected variables. CLI env:set would otherwise preserve shared
+links, and EAS update --environment preview would load unchecked export controls.
+Mutation responses must confirm exact public values and preview-only scope.
 Thus cloud builders receive the same metadata rather than losing local process.env.
 Existing QA02/pilot profiles remain unchanged. A partial env sync failure stops
 without automatic retry; the operator reviews that state before a fresh dispatch.
@@ -245,7 +262,10 @@ wait, JSON and non-interactive flags. Update uses Android/channelqa/environmentp
 Rollback republishes only the independently verified known-good QA group, Android,
 destination-channelqa; embedded rollback is not implemented or claimed. No
 production channel, generic shell command or arbitrary provider mutation exists.
-Final policy/approval/source gates are re-acquired immediately before first writes.
+Final policy/approval/source, target, runtime rollout and complete preview metadata
+gates are re-acquired immediately before first writes. External configuration is
+not transactionally locked by this client; operator control of remote settings
+remains required during the authorized release.
 
 A successful command returns SUBMITTED_NOT_DISTRIBUTABLE plus actual allowlisted
 EAS response observations. It never invents BUILT/VERIFIED from success booleans.

@@ -81,6 +81,24 @@ def _target(target, compatibility):
     _require(target.get("data_scope") == "SYNTHETIC_ONLY")
     _require(re.fullmatch(r"qa-[a-z0-9_-]{3,60}", target.get("environment_id", "")))
     _require(stable_qa_url(target.get("url")) and _hex(target.get("source_sha"), 40))
+    _require(_hex(target.get("ownership_anchor_sha256"), 64))
+    _require(
+        set(target)
+        == {
+            "schema_version",
+            "state",
+            "availability",
+            "data_scope",
+            "environment_id",
+            "url",
+            "source_sha",
+            "compatibility",
+            "backup_reference",
+            "continuity_reference",
+            "deployment_reference",
+            "ownership_anchor_sha256",
+        }
+    )
     _require(target.get("compatibility") == compatibility)
     for key in ("backup_reference", "continuity_reference", "deployment_reference"):
         _require(_text(target.get(key)))

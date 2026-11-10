@@ -267,7 +267,13 @@ def test_docker_copy_closure_excludes_render_root_secrets_in_tracked_context(tmp
 pytest_plugins = ["test_qa_delivery_database"]
 
 
-def test_activation_runs_real_task1_schema_bundle_and_secret_validation(tmp_path, qa_database):
+@pytest.mark.parametrize(
+    "damage",
+    ["corrupt", "owner", "device", "subject", "swapped_volume", "missing_anchor", "rebound_anchor"],
+)
+def test_activation_runs_real_task1_schema_bundle_and_secret_validation(
+    tmp_path, qa_database, damage
+):
     from tools.plan_calibration_runtime_bundle import build_bundle
     from tools.qa_delivery.bootstrap import activation_command
 
@@ -283,9 +289,17 @@ def test_activation_runs_real_task1_schema_bundle_and_secret_validation(tmp_path
         json.dumps({"signup_users": ["qa02-assigned"], "login_users": ["qa02-assigned"]})
     )
     secret.write_text("synthetic-test-only-secret-of-sufficient-length")
+    from tools.qa_delivery.ownership import anchor_digest, capture_anchor
+
+    anchor = capture_anchor(qa_database, "qa-bootstrap-test")
+    anchor_file = tmp_path / "ownership-anchor.json"
+    anchor_file.write_text(json.dumps(anchor))
+    anchor_file.chmod(0o600)
     config.write_text(
         json.dumps(
             {
+                "ownership_anchor_file": str(anchor_file),
+                "ownership_anchor_sha256": anchor_digest(anchor),
                 "data_scope": "SYNTHETIC_ONLY",
                 "db_path": str(qa_database),
                 "bundle_root": str(bundle),
@@ -303,6 +317,32 @@ def test_activation_runs_real_task1_schema_bundle_and_secret_validation(tmp_path
     raw["source_sha"] = source
     activation.write_text(json.dumps(raw))
     assert activation_command(activation, config, "8080")[2] == "tools.qa_delivery.server"
-    qa_database.write_bytes(b"broken-database")
+    if damage == "corrupt":
+        qa_database.write_bytes(b"broken-database")
+    elif damage == "missing_anchor":
+        anchor_file.unlink()
+    elif damage == "rebound_anchor":
+        anchor["users"][0][1] = "qa02-foreign"
+        anchor_file.write_text(json.dumps(anchor))
+        # Config and activation marker still pin the original independently.
+    else:
+        import shutil
+        import sqlite3
+
+        target = qa_database
+        if damage == "swapped_volume":
+            target = tmp_path / "foreign.db"
+            shutil.copyfile(qa_database, target)
+        with sqlite3.connect(target) as db:
+            db.execute(
+                {
+                    "owner": "UPDATE users SET username='qa02-otherenv' WHERE id=42",
+                    "device": "UPDATE device_sessions SET id='otherenv-device'",
+                    "subject": "UPDATE blueprint_source_events SET id='otherenv-subject'",
+                    "swapped_volume": "UPDATE users SET username='qa02-foreign-volume' WHERE id=42",
+                }[damage]
+            )
+        if damage == "swapped_volume":
+            target.replace(qa_database)
     with pytest.raises(ValueError, match="qa_activation_refused"):
         activation_command(activation, config, "8080")

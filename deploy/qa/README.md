@@ -9,8 +9,9 @@ Build only after code/CI approval, using a **tracked Git archive of the exact
 approved SHA** locally, never the ambient checkout (which may contain private
 files). The managed Render alternative uses only its trusted tracked Git checkout
 at the approved deploy commit, with the explicit COPY closure and Dockerfile-specific
-ignore file; Render root secret filenames must remain qa-config.json, qa-access.json
-and qa-auth-secret, outside all COPY sources. Pass that same SHA as `--build-arg SOURCE_SHA=<approved SHA>` to
+ignore file; Render root secret filenames must remain qa-config.json, qa-access.json,
+qa-auth-secret and qa-ownership-anchor.json, outside all COPY sources. Pass that
+same SHA as `--build-arg SOURCE_SHA=<approved SHA>` to
 `docker build -f deploy/qa/Dockerfile -`. Startup compares configured source with
 the immutable image marker; checkout validation compares Git HEAD. A clean,
 merged source remains a separate release preflight requirement. No image build
@@ -33,9 +34,11 @@ Provide an absolute-path configuration file, mounted privately at
   "data_scope": "SYNTHETIC_ONLY",
   "db_path": "/var/lib/qa/qa.db",
   "bundle_root": "/opt/science",
-  "environment_id": "qa-rel03-isolated",
+  "environment_id": "qa-rel03",
   "source_sha": "<exact 40 lowercase hex deployed Git SHA>",
   "access_file": "/etc/secrets/qa-access.json",
+  "ownership_anchor_file": "/etc/secrets/qa-ownership-anchor.json",
+  "ownership_anchor_sha256": "<independently reviewed canonical anchor digest>",
   "secret_file": "/etc/secrets/qa-auth-secret"
 }
 ```
@@ -58,7 +61,8 @@ python -m tools.qa_delivery.server --config /etc/secrets/qa-config.json --valida
 `/__qa_health` verifies the whole DB schema/integrity/FKs, real bundle and upstream
 transport. `/__qa_version` reads current SCI generation/state on every request.
 Full DB row digests and SCI execution occur only at startup and health/version;
-ordinary mobile calls check admitted schema cheaply, then rely on the canonical
+ordinary mobile calls check the admitted ownership tuples and schema, then rely
+on the canonical
 V3 consumer's fresh authority guards. No generation is cached as current.
 WITHDRAWN/DISABLED remains transport healthy; no scientific READY is fabricated.
 Neither endpoint exposes owner, token, secret, path or approval ref. All canonical
@@ -66,6 +70,42 @@ forwarding remains closed to non-mobile paths, unassigned auth and real email.
 QA02 byte/size/deadline/redirect/rate/concurrency guards are reused unchanged.
 Private child output is suppressed; public failures are deliberately redacted.
 A failed health response is not a proof of current scientific permission.
+
+## Existing ownership admission (future explicit maintenance only)
+
+Before the first approved cutover, an operator must explicitly capture an anchor
+from the existing admitted synthetic DB, into a new file in a private0700 directory:
+
+```sh
+python -m tools.qa_delivery.ownership /private/admitted-qa.db --environment-id qa-rel03 --output /private/staging/ownership-anchor.json
+```
+
+This command reads the DB without mutation and prints only its canonical JSON
+digest. It refuses output inside source and existing destinations. No startup,
+activation or publication code captures/rebinds an anchor. Under the future
+external GO, mount the captured file as private0600 qa-ownership-anchor.json;
+independently pin the printed digest in private config and the reviewed release
+target's ownership_anchor_sha256. The activation marker's existing config digest
+binds the source/environment and this pin. Changing a DB path or replacing a
+volume does not change the admitted tuples. The supervisor rechecks immediately
+before spawning the writer, and the facade checks on every admitted request.
+Version exposes only the opaque digest. Keep full tuples out of public Git,
+Actions artifacts, candidate/target/version and logs; they belong only in private
+runtime configuration and the encrypted proof as ownership-anchor.json.
+
+The captured subset is users(id, username, created_at), device_sessions(id,
+user_id, created_at), and existing append-only blueprint_source_events(id,
+owner_id, source_revision, request_id, body_digest, kind, recorded_at). Current
+QA uses fixed assigned synthetic usernames and has no exposed account deletion
+flow. Password hashes, session epochs, refresh hashes, last-used/revocation
+fields, new users/devices/journal rows and SCI authority generation/state are
+excluded. Original tuples must remain present; this is not a frozen all-row
+digest. It deliberately refuses legitimate future deletion/rename/rebinding of
+anchored rows until a separately approved DATA/maintenance procedure establishes
+new admission. IDs/timestamps are existing continuity witnesses, not a globally
+unique, tamper-proof UUID or production lifetime identity guarantee. An exact
+clone with identical captured tuples is indistinguishable by this witness;
+whole-DB manifests still independently prove point-in-time copying.
 
 ## Complete SQLite backup and restore in a new copy
 

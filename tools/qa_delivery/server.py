@@ -27,6 +27,7 @@ from starlette.routing import Mount, Route
 
 from tools.qa_delivery.database import ROOT, SCHEMA, _expected_schema, _schema, connect_readonly
 from tools.qa_delivery.identity import read_version
+from tools.qa_delivery.ownership import load_anchor, verify_ownership
 from tools.release_qa_gateway import WindowBudget, allowed_path, create_gateway, failure
 
 
@@ -38,6 +39,8 @@ class QAConfig:
     source_sha: str
     access: dict = field(default_factory=dict)
     backend_port: int = 8140
+    ownership_anchor: dict = field(default_factory=dict)
+    ownership_anchor_sha256: str = ""
 
 
 async def _liveness_only(request, call_next):
@@ -60,6 +63,8 @@ def create_qa_app(config: QAConfig) -> Starlette:
             environment_id=config.environment_id,
             source_sha=config.source_sha,
             bundle_root=config.bundle_root,
+            ownership_anchor=config.ownership_anchor,
+            ownership_anchor_sha256=config.ownership_anchor_sha256,
         )
 
     # Full attestation once before exposing this app. No startup seeds/migrations.
@@ -69,6 +74,12 @@ def create_qa_app(config: QAConfig) -> Starlette:
     def schema_available():
         with closing(connect_readonly(config.db_path)) as db:
             db.execute("BEGIN")
+            verify_ownership(
+                db,
+                config.ownership_anchor,
+                environment_id=config.environment_id,
+                expected_digest=config.ownership_anchor_sha256,
+            )
             if (
                 db.execute("SELECT version_num FROM alembic_version").fetchall() != [(SCHEMA,)]
                 or _schema(db) != expected_schema
@@ -187,11 +198,14 @@ def _load_config(path):
         "access_file",
         "secret_file",
         "data_scope",
+        "ownership_anchor_file",
+        "ownership_anchor_sha256",
     }
     if set(raw) != expected or raw["data_scope"] != "SYNTHETIC_ONLY":
         raise ValueError("qa_config_invalid")
     paths = {
-        key: Path(raw[key]) for key in ("db_path", "bundle_root", "access_file", "secret_file")
+        key: Path(raw[key])
+        for key in ("db_path", "bundle_root", "access_file", "secret_file", "ownership_anchor_file")
     }
     if any(not p.is_absolute() for p in paths.values()):
         raise ValueError("qa_config_invalid")
@@ -210,6 +224,12 @@ def _load_config(path):
         environment_id=raw["environment_id"],
         source_sha=raw["source_sha"],
         access=json.loads(paths["access_file"].read_text()),
+        ownership_anchor=load_anchor(
+            paths["ownership_anchor_file"],
+            environment_id=raw["environment_id"],
+            expected_digest=raw["ownership_anchor_sha256"],
+        ),
+        ownership_anchor_sha256=raw["ownership_anchor_sha256"],
     )
     create_gateway({}, access=config.access)  # Validate assigned synthetic names.
     read_version(
@@ -217,6 +237,8 @@ def _load_config(path):
         environment_id=config.environment_id,
         source_sha=config.source_sha,
         bundle_root=config.bundle_root,
+        ownership_anchor=config.ownership_anchor,
+        ownership_anchor_sha256=config.ownership_anchor_sha256,
     )
     return config, secret
 
@@ -249,6 +271,15 @@ def _require_free_loopback(port):
 
 def supervise(config, secret, config_path, port):
     """Own both child processes; loss of either stops the other and fails service."""
+    # Re-admit immediately before starting the canonical writer.
+    with closing(connect_readonly(config.db_path)) as db:
+        db.execute("BEGIN")
+        verify_ownership(
+            db,
+            config.ownership_anchor,
+            environment_id=config.environment_id,
+            expected_digest=config.ownership_anchor_sha256,
+        )
     _require_free_loopback(8140)
     children, stopping = [], False
 

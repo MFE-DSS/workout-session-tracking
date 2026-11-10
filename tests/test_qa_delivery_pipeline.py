@@ -232,6 +232,7 @@ def test_render_adapter_requires_real_provider_and_tls_identity(damage):
         "version": {
             "source_sha": SHA,
             "environment_id": t["environment_id"],
+            "ownership_anchor_sha256": t["ownership_anchor_sha256"],
             "server_schema": c["compatibility"]["server_schema"],
             "api_contracts": [c["compatibility"]["api"]],
             "inventory": c["compatibility"]["inventory"],
@@ -440,6 +441,11 @@ def release_case(tmp_path, checkout, qa_database, monkeypatch):
     c, _ = approved()
     c = pipeline.prepare(c, checkout)
     target = c["target"]
+    from tools.qa_delivery.ownership import anchor_digest, capture_anchor
+
+    anchor = capture_anchor(qa_database, target["environment_id"])
+    target["ownership_anchor_sha256"] = anchor_digest(anchor)
+    (proof / "ownership-anchor.json").write_text(json.dumps(anchor))
     sid, did = "srv-" + "a" * 20, "dep-" + "b" * 20
     target["deployment_reference"] = f"render:{sid}/{did}"
     backup_database(qa_database, proof / "backup.db")
@@ -451,6 +457,7 @@ def release_case(tmp_path, checkout, qa_database, monkeypatch):
     version = {
         "source_sha": target["source_sha"],
         "environment_id": target["environment_id"],
+        "ownership_anchor_sha256": target["ownership_anchor_sha256"],
         "server_schema": c["compatibility"]["server_schema"],
         "api_contracts": [c["compatibility"]["api"]],
         "inventory": c["compatibility"]["inventory"],
@@ -647,8 +654,10 @@ def release_case(tmp_path, checkout, qa_database, monkeypatch):
                     "data": {
                         "app": {
                             "byId": {
-                                "environmentVariables": [],
-                                "ownerAccount": {"environmentVariables": []},
+                                "environmentVariables": data.get("preview_project", []),
+                                "ownerAccount": {
+                                    "environmentVariables": data.get("preview_account", [])
+                                },
                             }
                         }
                     }
@@ -914,11 +923,7 @@ def test_remote_environment_does_not_mutate_values_linked_to_other_environments(
     def handler(request):
         assert request.method == "POST" and request.url == "https://api.expo.dev/graphql"
         query = json.loads(request.content)
-        assert set(query["variables"]["names"]) == {
-            "EXPO_PUBLIC_QA_NATIVE_SHA",
-            "EXPO_PUBLIC_QA_JS_SHA",
-            "EXPO_PUBLIC_API_URL",
-        }
+        assert "filterNames" not in query["query"] and "names" not in query["variables"]
         # Query never asks values of pre-existing environment variables.
         assert " value " not in query["query"]
         return httpx.Response(
@@ -1322,3 +1327,197 @@ def test_workflow_never_reads_or_uploads_plaintext_proof_in_public_artifacts():
         for s in steps
         if "upload-artifact" in s.get("uses", "")
     )
+
+
+@pytest.mark.parametrize("scope", ["project", "account"])
+@pytest.mark.parametrize(
+    "name,visibility",
+    [
+        ("EXPO_NO_CLIENT_ENV_VARS", "PUBLIC"),
+        ("AUREN_QA_DELIVERY", "PUBLIC"),
+        ("EXPO_PUBLIC_QA_DELIVERY", "PUBLIC"),
+        ("UNREADABLE_EXPORT_SECRET", "SECRET"),
+    ],
+)
+def test_publish_rejects_all_unapproved_preview_overrides_before_sdk(
+    release_case, scope, name, visibility
+):
+    from tools.qa_delivery.pipeline import publish
+
+    package, root, proof, gate, eas, calls, client, data = release_case
+    data["preview_" + scope] = [
+        {
+            "name": name,
+            "scope": "PROJECT" if scope == "project" else "SHARED",
+            "environments": ["preview"],
+            "visibility": visibility,
+            "type": "STRING",
+        }
+    ]
+    with client, pytest.raises(ValueError, match="qa_eas_environment"):
+        publish(package, root, proof, gate, eas, client)
+    assert calls == []
+
+
+@pytest.mark.parametrize("which", ["cutover", "release"])
+@pytest.mark.parametrize(
+    "damage", ["owner", "device", "subject", "device_owner", "subject_owner", "unknown_anchor"]
+)
+def test_publisher_rejects_valid_foreign_sqlite_copies_under_reviewed_anchor(
+    release_case, which, damage
+):
+    from tools.qa_delivery.database import backup_database, verify_database
+    from tools.qa_delivery.pipeline import digest, proof_digest, publish
+
+    package, root, proof, gate, eas, calls, client, data = release_case
+    first, second, record_name = (
+        ("backup.db", "restored.db", "cutover.json")
+        if which == "cutover"
+        else ("release-backup.db", "release-export.db", "release-backup.json")
+    )
+    record = json.loads((proof / record_name).read_text())
+    if damage == "unknown_anchor":
+        anchor = json.loads((proof / "ownership-anchor.json").read_text())
+        anchor["environment_id"] = "qa-foreign"
+        (proof / "ownership-anchor.json").write_text(json.dumps(anchor))
+    else:
+        foreign = proof.parent / "foreign.db"
+        shutil.copyfile(proof / first, foreign)
+        with sqlite3.connect(foreign) as db:
+            if damage in {"device_owner", "subject_owner"}:
+                db.execute(
+                    "INSERT INTO users (id,username,password_hash,is_active) VALUES (43,'qa02-other','other-hash',1)"
+                )
+            db.execute(
+                {
+                    "device_owner": "UPDATE device_sessions SET user_id=43",
+                    "subject_owner": "UPDATE blueprint_source_events SET owner_id=43",
+                    "owner": "UPDATE users SET username='qa02-foreign' WHERE id=42",
+                    "device": "UPDATE device_sessions SET id='foreign-device'",
+                    "subject": "UPDATE blueprint_source_events SET id='foreign-subject'",
+                }[damage]
+            )
+        verify_database(foreign)  # Structurally valid foreign DB, not corruption.
+        for name in (first, second):
+            for path in (proof / name, proof / (name + ".manifest.json")):
+                path.unlink(missing_ok=True)
+            backup_database(foreign, proof / name)
+        for name in record["files_sha256"]:
+            record["files_sha256"][name] = hashlib.sha256((proof / name).read_bytes()).hexdigest()
+        (proof / record_name).write_text(json.dumps(record))
+    package["proof_sha256"] = proof_digest(proof)
+    assert package["candidate_sha256"] == digest(package["candidate"])
+    data["actions/runs/456/approvals"][0]["comment"] = (
+        f"APPROVE_QA {package['candidate_sha256']} {package['proof_sha256']}"
+    )
+    with client, pytest.raises(ValueError, match="qa_continuity|qa_release_backup"):
+        publish(package, root, proof, gate, eas, client)
+    assert calls == []
+
+
+@pytest.mark.parametrize("when", ["initial", "final"])
+def test_preview_override_appearing_during_release_is_refused_before_any_write(release_case, when):
+    from tools.qa_delivery.pipeline import publish
+
+    package, root, proof, gate, eas, calls, client, data = release_case
+    original = client._transport.handle_request
+    metadata_queries = []
+
+    def boundary(request):
+        if (
+            request.url.host == "api.expo.dev"
+            and "QAEnvironmentBindings" in json.loads(request.content)["query"]
+        ):
+            metadata_queries.append(request)
+            if when == "initial" or len(metadata_queries) == 2:
+                data["preview_project"] = [
+                    {
+                        "name": "EXPO_NO_CLIENT_ENV_VARS",
+                        "scope": "PROJECT",
+                        "environments": ["preview"],
+                        "visibility": "PUBLIC",
+                        "type": "STRING",
+                    }
+                ]
+        return original(request)
+
+    client._transport.handle_request = boundary
+    with client, pytest.raises(ValueError, match="qa_eas_environment"):
+        publish(package, root, proof, gate, eas, client)
+    assert len(metadata_queries) == (1 if when == "initial" else 2)
+    assert not any(args[0] in {"env:set", "update", "build", "update:republish"} for args in calls)
+
+
+def test_complete_preview_metadata_clean_owned_vars_publish_without_other_environment_changes(
+    release_case,
+):
+    from tools.qa_delivery.pipeline import publish
+
+    package, root, proof, gate, eas, calls, client, data = release_case
+    data["preview_project"] = [
+        {
+            "name": name,
+            "scope": "PROJECT",
+            "environments": ["preview"],
+            "visibility": "PUBLIC",
+            "type": "STRING",
+        }
+        for name in ["EXPO_PUBLIC_QA_NATIVE_SHA", "EXPO_PUBLIC_QA_JS_SHA", "EXPO_PUBLIC_API_URL"]
+    ] + [
+        {
+            "name": "PRODUCTION_SECRET",
+            "scope": "PROJECT",
+            "environments": ["production"],
+            "visibility": "SECRET",
+            "type": "STRING",
+        }
+    ]
+    data["preview_account"] = [
+        {
+            "name": "SHARED_SECRET",
+            "scope": "SHARED",
+            "environments": ["production", "development"],
+            "visibility": "SECRET",
+            "type": "STRING",
+        }
+    ]
+    original = deepcopy((data["preview_project"], data["preview_account"]))
+    with client:
+        result = publish(package, root, proof, gate, eas, client)
+    assert result["state"] == "SUBMITTED_NOT_DISTRIBUTABLE"
+    writes = [args for args in calls if args[0] == "env:set"]
+    assert {args[args.index("--name") + 1] for args in writes} == {
+        "EXPO_PUBLIC_QA_NATIVE_SHA",
+        "EXPO_PUBLIC_QA_JS_SHA",
+        "EXPO_PUBLIC_API_URL",
+    }
+    assert all(
+        args[1] == "preview" and args[args.index("--scope") + 1] == "project" for args in writes
+    )
+    assert (data["preview_project"], data["preview_account"]) == original
+    assert calls[-1][0] == "build"
+
+
+@pytest.mark.parametrize("scope", ["project", "account"])
+@pytest.mark.parametrize("environments", [["production"], ["development"]])
+@pytest.mark.parametrize(
+    "name", ["EXPO_PUBLIC_QA_NATIVE_SHA", "EXPO_PUBLIC_QA_JS_SHA", "EXPO_PUBLIC_API_URL"]
+)
+def test_owned_sync_name_bound_only_outside_preview_is_refused_before_sdk(
+    release_case, scope, environments, name
+):
+    from tools.qa_delivery.pipeline import publish
+
+    package, root, proof, gate, eas, calls, client, data = release_case
+    data["preview_" + scope] = [
+        {
+            "name": name,
+            "scope": "PROJECT" if scope == "project" else "SHARED",
+            "environments": environments,
+            "visibility": "PUBLIC",
+            "type": "STRING",
+        }
+    ]
+    with client, pytest.raises(ValueError, match="qa_eas_environment"):
+        publish(package, root, proof, gate, eas, client)
+    assert calls == []
