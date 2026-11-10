@@ -53,12 +53,12 @@ jobs:
             [[ "$ASSET" =~ ^[1-9][0-9]*$ ]]
             [[ "$CIPHER" =~ ^[a-f0-9]{64}$ ]]
           fi
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: ${{ inputs.source_sha }}
           fetch-depth: 0
           persist-credentials: false
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.11'
       - run: pip install httpx==0.28.1
@@ -82,7 +82,7 @@ jobs:
             args+=(--expected-proof-sha256 "$EXPECTED" --proof-asset-id "$ASSET" --proof-cipher-sha256 "$CIPHER")
           fi
           python -m tools.qa_delivery.pipeline prepare --candidate docs/release/rel-03/candidate.json --operation "$operation" --output "$RUNNER_TEMP/qa-prepared.json" "${args[@]}"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         id: package
         with:
           name: qa-prepared-candidate
@@ -117,19 +117,19 @@ jobs:
       checks: read
       deployments: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: ${{ inputs.source_sha }}
           fetch-depth: 0
           persist-credentials: false
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.11'
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: '22.20.0'
       - run: pip install -r requirements-lock.txt httpx==0.28.1
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v7
         with:
           name: qa-prepared-candidate
           path: ${{ runner.temp }}/qa-package
@@ -166,7 +166,7 @@ jobs:
       - name: Remove runner private proof and AES key
         if: always()
         run: rm -rf -- "$RUNNER_TEMP/qa-proof-private"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         if: success()
         with:
           name: qa-submission-verification-pending

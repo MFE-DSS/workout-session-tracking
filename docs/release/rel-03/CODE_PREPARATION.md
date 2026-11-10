@@ -122,3 +122,11 @@ self-review effectif/directUser/republish connu/hébergement manuel ne donnent a
 permission supplémentaire. CI/base/Sonar/mergeabilité seront relus au HEAD exact.
 Le change reste actif et **BLOCKED_EXTERNAL / NON_DISTRIBUTABLE** après livraison
 du seul code ; aucun archivage COMPLETE ni déploiement implicite.
+
+CI initiale PR398/run42839224842 : lint obligatoire rouge à actionlint sur huit
+versions d'actions utilisant Node20 retiré. Le linter local1.7.12 ne signalait pas
+ce contrôle présent dans la CI1.17.1 ; aucune réussite locale n'est substituée à
+ce rouge réel. Patch minimal : versions déjà utilisées dans la CI canonique
+checkout5/python6/node6/upload6/download7, sans autre changement de workflow.
+Vérification avec le vrai linter1.17.1 téléchargé et checksum vérifié,164tests
+pipeline/transport passants ; nouveau HEAD/CI réel requis avant merge.
