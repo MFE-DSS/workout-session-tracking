@@ -1,0 +1,8 @@
+# MOB-04 — handoff consommateur
+Code livré PR401/merge205bf203, CI PR et canonique réussies. Voir CLOSEOUT pour exacts tests/Sonar/limites et statut vivant de publication.
+
+Aujourd'hui : GET `/api/mobile/v1/mission-action`, requested_path FIRST_USE ou HISTORICAL explicite ; négociation mission-action/1.0.0 et hostV3 exacts. Séance possédée/commande locale incertaine prioritaires ; client/resource AuthSession et contrat fermé. Même contrôleur PLAN/journal ; marques de réception et exclusion dans snapshot local existant, aucune nouvelle commande historique idempotente inventée. Une ancienne séance contredite ne reçoit pas une nouvelle permission depuis cache/offline. MISSION historique reste retournée directement, source sur choix explicite.
+
+Prochain build autorisé MOB-05A : partir du canonique frais, préserver RootToday/QAobserver et invariants d'auth/late/réconciliation. Leases ConnectedApp/mobile_api libérés après code401 ; SPEC_REGISTRY et suivi documentaire attendent la fusion du closeout pour éviter chevauchement. Nouveaux pixels Progress à faire accepter avant UIcommit. Réutiliser BodyMeasurement/consentements existants, pas modèle poids ou commandes entraînement depuis historique. M1 Today différé reste visible. MOB-06 réservé Maltin.
+
+L'APK QA02 déjà installé ne reçoit pas ce code par le merge. Nouvelle cible/backend/build/OTA nécessitent la voie REL-03 et sa décision externe ; réutilisation OVH proposée sous ses permissions, aucun déploiement de ce scope. DATA, physique/AX et MOB03 complet restent ouverts. Ne pas relancer SCI, calibration, compte, curation ou assets pour terminer Progress.
