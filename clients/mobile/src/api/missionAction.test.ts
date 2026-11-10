@@ -86,3 +86,9 @@ test('timeout covers JSON-body download, aborts the GET and preserves unknown tr
   await jest.advanceTimersByTimeAsync(10001);expect(await read).toEqual({state:'unknown'});
  } finally {jest.useRealTimers();}
 });
+test.each(['RESUME','HISTORICAL_READY'])('reserved SCI session marker cannot be dispatched to the legacy %s consumer',async(state)=>{
+ const s=await setup(),raw:any=state==='RESUME'?resumed():historical();
+ if(state==='RESUME')raw.payload.session.template_slug='science:v3:first-session';
+ else{raw.payload.template.slug='science:v3:first-session';raw.payload.decision.top='science:v3:first-session';raw.primary_action.template_slug='science:v3:first-session';raw.primary_action.decision.top='science:v3:first-session';}
+ s.respond(async()=>negotiatedReply(raw));expect(await s.client.read(state==='RESUME'?'FIRST_USE':'HISTORICAL',true)).toEqual({state:'unknown'});
+});

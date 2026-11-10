@@ -8,11 +8,13 @@ import { openJournal as openMemoryJournal } from '../storage/journal.web';
 import type { Journal } from '../storage/journalTypes';
 import { setCommand, substituteCommand } from '../storage/outbox';
 import { ApiFailure } from '../api/http';
+import {firstUse as mockFirstUse,negotiatedReply} from '../../test/missionActionHarness';
 import { SyncEngine } from './syncEngine';
 import type { Restored } from '../storage/journalTypes';
 
 // Réseau et SQLite sont les frontières externes ; AuthSession, SyncEngine et le reducer restent réels.
 const mockTransport = jest.fn();
+let mockMissionOwner=7;
 let mockJournal: Journal;
 let mockCredential: string | null = 'rt1.test-device.secret';
 const mockOwners = new Map<string, number>();
@@ -30,7 +32,7 @@ jest.mock('../storage/ownershipStore', () => ({ openOwnershipBook: async () => (
   bindDevice: async (d: string, u: number) => { mockOwners.set(d, u); },
 }) }));
 jest.mock('../storage/legacyInspection', () => ({ inspectLegacyJournal: () => mockInspectLegacy() }));
-jest.mock('../api/http', () => ({ ...jest.requireActual('../api/http'), createTransport: () => mockTransport }));
+jest.mock('../api/http', () => ({ ...jest.requireActual('../api/http'), createTransport: () => async(path:string,init:unknown)=>{const value=await mockTransport(path,init);if(path==='/auth/me'&&value?.id)mockMissionOwner=value.id;return value;} }));
 jest.mock('../storage/journal', () => ({ openJournal: async (name: string) => {
   mockOpened.push(name);
   return name === 'auren.db' ? mockJournal : jest.requireActual('../storage/journal.web').openJournal(name);
@@ -91,7 +93,7 @@ let root: Root;
 beforeAll(() => { ConnectedApp = require('../../ConnectedApp').default; });
 
 beforeEach(async () => {
-  mockRealSummary = false; mockShellMounts = 0;
+  mockRealSummary = false; mockShellMounts = 0;mockMissionOwner=7;
   mockCredential = 'rt1.test-device.secret';
   mockOwners.clear(); mockOwners.set('test-device', 7);
   mockJournalNames.clear(); mockJournalNames.set(7, 'auren.db');
@@ -101,11 +103,27 @@ beforeEach(async () => {
   mockJournal = await openMemoryJournal();
   mockInspectLegacy.mockReset().mockImplementation(() => mockJournal.restore());
   mockTransport.mockReset().mockImplementation(async (path: string) => {
+    if(path==='/auth/me')return{id:7,username:'Synthetic owner'};
     if (path === '/auth/refresh') return {
       access_token: 'test-access', refresh_token: 'rt1.test-device.next-secret', access_expires_in: 900,
       token_type: 'Bearer', server_now: new Date().toISOString(),
     };
     throw new ApiFailure('network');
+  });
+  // Compatibility testimony for the old workout-mechanics tests only. The
+  // production client still negotiates/decodes its exact DTO. New MOB04 cases
+  // override this RPC boundary and assert no automatic historical request.
+  jest.spyOn(global,'fetch').mockImplementation(async(url,init)=>{
+    const u=new URL(String(url),'http://test-only.invalid'),path=u.searchParams.get('requested_path')??'FIRST_USE';
+    const host=Boolean((init?.headers as Record<string,string>)?.['X-Auren-Mission-V3-Host']);
+    const m=await mockTransport('/mission'),base={...mockFirstUse(mockMissionOwner),requested_path:path,observed_at:new Date().toISOString()};
+    let raw:unknown;
+    if(m?.state==='RESUME')raw={...base,state:'RESUME',source:'OPEN_SESSION',primary_action:{kind:'RESUME_LEGACY',session_id:m.session.id},payload:{...m,execution_profile:'LEGACY_V1'}};
+    else if(path==='FIRST_USE')raw={...base,state:'UNAVAILABLE',source:'OWNED_FIRST_USE',primary_action:{kind:'REFRESH'},payload:null,reason:'RUNTIME_NOT_SERVED'};
+    else if(m?.state==='READY'&&m.executable&&m.primary_action==='START')raw={...base,state:'HISTORICAL_READY',source:'HISTORICAL_MISSION',primary_action:{kind:'START_LEGACY',template_slug:m.template.slug,decision:m.decision},payload:m};
+    else if(m?.state==='NO_MISSION')raw={...base,state:'NO_MISSION',source:'NONE',primary_action:null,payload:null};
+    else raw={...base,state:'UNAVAILABLE',source:'HISTORICAL_MISSION',primary_action:{kind:'REFRESH'},payload:null,reason:'HISTORICAL_NOT_EXECUTABLE'};
+    return negotiatedReply(raw,200,host);
   });
   root = createRoot();
 });
@@ -132,7 +150,16 @@ async function saved(state: 'acked' | 'failed', complete = false) {
   return snapshot;
 }
 
-async function boot() { await act(async () => root.render(React.createElement(ConnectedApp))); }
+async function pressMissionPrimary(){
+ const button=root.container.queryAll(n=>n.props.testID==='mission-action-primary')[0];expect(button).toBeDefined();
+ await act(async()=>button.props.onClick({nativeEvent:{},stopPropagation(){},currentTarget:1,target:1}));
+}
+async function chooseHistorical(){
+ const button=root.container.queryAll(n=>n.props.testID==='mission-action-other')[0];
+ if(button)await act(async()=>button.props.onClick({nativeEvent:{},stopPropagation:()=>{},currentTarget:1,target:1}));
+}
+// Old workout cases explicitly take the secondary source after boot, as a user.
+async function boot(historical=true) { await act(async () => root.render(React.createElement(ConnectedApp)));if(historical)await chooseHistorical(); }
 function screen(type: string) {
   const nodes = root.container.queryAll((n) => n.type === type);
   expect(nodes).toHaveLength(1);
@@ -166,7 +193,8 @@ function deferred<T>() {
   return { promise, resolve, reject };
 }
 
-function readyMission() { return { ...fixture.mission, executable: true, decision: { top: plan.template_slug } }; }
+function readyMission() { return { ...fixture.mission,template:{...fixture.mission.template,slug:plan.template_slug},executable:true,primary_action:'START',duration_estimate:null,
+ alternatives:fixture.mission.alternatives.map(a=>({...a,executable:true})),decision:{fingerprint:null,policy:'synthetic-legacy-test',top:plan.template_slug,alternatives:fixture.mission.alternatives.map(a=>a.slug)}}; }
 
 test('deux appuis avant réponse ne créent qu’une requête et le vrai écran reçoit busy', async () => {
   const pending = deferred<unknown>();
@@ -185,12 +213,12 @@ test('deux appuis avant réponse ne créent qu’une requête et le vrai écran 
     secondCall = start(plan.template_slug);
   });
   expect(mockTransport.mock.calls.filter(([path]) => path === '/sessions')).toHaveLength(1);
-  expect(screen('Mission').busy).toBe(true);
+  expect(root.container.queryAll(n=>n.props.testID==='mission-action-primary')[0].props.accessibilityState.disabled).toBe(true);
   await act(async () => { pending.resolve(plan); await firstCall!; await secondCall!; });
   expect(screen('Execution').state.plan.session_id).toBe(plan.session_id);
 });
 
-test('un démarrage échoué libère le verrou et permet une nouvelle tentative', async () => {
+test('une lecture négative ne résout pas une réponse de démarrage perdue', async () => {
   const fallback = mockTransport.getMockImplementation()!;
   let attempts = 0;
   mockTransport.mockImplementation(async (path: string) => {
@@ -204,10 +232,10 @@ test('un démarrage échoué libère le verrou et permet une nouvelle tentative'
   });
   await boot();
   await act(async () => { await screen('Mission').onStart(plan.template_slug); });
-  expect(screen('Mission').busy).toBe(false);
-  await act(async () => { await screen('Mission').onStart(plan.template_slug); });
-  expect(attempts).toBe(2);
-  expect(screen('Execution').state.plan.session_id).toBe(plan.session_id);
+  expect(attempts).toBe(1);
+  await pressMissionPrimary();
+  expect(root.container.queryAll(n=>n.type==='Mission')).toHaveLength(0);
+  expect(attempts).toBe(1);expect(renderedText(root.container)).toContain('Réception à vérifier');
 });
 
 test('la marque seule reste visible tant que le refresh du jeton n’a pas répondu', async () => {
@@ -236,12 +264,14 @@ test('Reprendre depuis le serveur attend une seule lecture et explique la repris
     }
     return fallback(path);
   });
-  await boot();
-  expect(screen('Resume').note).toMatch(/Hors ligne/);
-  const resume = screen('Resume').onResume;
-  await act(async () => { resume(); resume(); });
+  await boot(false);
+  expect(reads).toBe(0);
+  await pressMissionPrimary();
+  expect(renderedText(root.container)).toContain('connexion');
+  const resume = root.container.queryAll(n=>n.props.testID==='mission-action-primary')[0].props.onClick;
+  await act(async () => { const event={nativeEvent:{},stopPropagation(){},currentTarget:1,target:1};resume(event);resume(event); });
   expect(reads).toBe(2); // une lecture initiale échouée, une seule nouvelle demande
-  expect(screen('Resume').busy).toBe(true);
+  expect(root.container.queryAll(n=>n.props.testID==='mission-action-primary')[0].props.accessibilityState.disabled).toBe(true);
   await act(async () => { pending.resolve({ ...plan, done: {}, status: 'in_progress',
     started_at: new Date().toISOString(), ended_at: null, cursor_set_id: first.set_id,
     excluded_from_stats: false, allowed_actions: [] }); });
@@ -644,6 +674,7 @@ test('account B cannot restore account A through an undo button or its retained 
     return fallback(path);
   });
   await act(async () => screen('Login').onSubmit('b', 'test-only'));
+  await chooseHistorical();
   await act(async () => screen('Mission').onStart(plan.template_slug));
   expect(screen('Execution').state.plan.session_id).toBe(999);
   expect(screen('Execution').undo).toBeNull();
@@ -672,6 +703,7 @@ test('logout during a deferred ownership resolution cannot bind A from B proofs 
   await act(async () => screen('JournalOwnership').onChangeAccount());
   user = 8;
   await act(async () => screen('Login').onSubmit('u8', 'test-only'));
+  await chooseHistorical();
   expect(screen('Mission')).toBeDefined();
   await act(async () => delayed.resolve(legacy));
   expect(mockLegacyOwner).toBeNull();
@@ -715,6 +747,7 @@ test('native signup uses the account API once, verifies identity, and reaches th
   expect(screen('FirstUse')).toBeDefined();
   const mounts = mockShellMounts;
   await act(async () => screen('FirstUse').onToday());
+  await chooseHistorical();
   expect(screen('Mission')).toBeDefined();
   expect(mockShellMounts).toBe(mounts);
 });
@@ -831,7 +864,9 @@ test('uncertain password result can reauthenticate while owned commands remain p
 
 test('two immediate ownership checks share one verification and a late attempt cannot replace success', async () => {
   mockOwners.clear(); mockJournalNames.clear(); mockLegacyOwner = 7;
-  await boot();
+  const initialTransport=mockTransport.getMockImplementation()!;
+  mockTransport.mockImplementation((path:string)=>path==='/auth/me'?Promise.reject(new ApiFailure('network')):initialTransport(path));
+  await boot(false);
   const slow = deferred<unknown>(); const fast = deferred<unknown>();
   let verifications = 0;
   const fallback = mockTransport.getMockImplementation()!;
@@ -847,6 +882,7 @@ test('two immediate ownership checks share one verification and a late attempt c
   await act(async () => fast.resolve({ id: 8, username: 'b' }));
   await act(async () => slow.resolve({ id: 8, username: 'b' }));
   expect(mockOpened).toEqual(['auren-user-8.db']);
+  await chooseHistorical();
   expect(screen('Mission')).toBeDefined();
 });
 
@@ -925,4 +961,130 @@ test('real ConnectedApp mounts the QA provenance observer without exposing train
       if(value===undefined) delete process.env[key];else process.env[key]=value;
     }
   }
+});
+
+test('MOB04 opens Today on explicit first-use orientation, never automatically fetches legacy execution',async()=>{
+ const fallback=mockTransport.getMockImplementation()!;
+ mockTransport.mockImplementation(async(path:string)=>path==='/auth/me'?{id:7,username:'Synthetic owner'}:path==='/mission'?readyMission():fallback(path));
+ await boot(false);
+ expect(root.container.queryAll(n=>n.props.testID==='mission-action-primary')).toHaveLength(1);
+ expect(mockTransport.mock.calls.some(([path])=>String(path).includes('/execution'))).toBe(false);
+});
+
+function exactMissionRPC(raw:(path:string)=>unknown){
+ (global.fetch as jest.Mock).mockImplementation(async(url:any,init:any)=>{
+  const path=new URL(String(url),'http://test.invalid').searchParams.get('requested_path')??'FIRST_USE';
+  return negotiatedReply(raw(path),200,Boolean(init?.headers?.['X-Auren-Mission-V3-Host']));
+ });
+}
+function exactResume(){return{...mockFirstUse(),state:'RESUME',source:'OPEN_SESSION',primary_action:{kind:'RESUME_LEGACY',session_id:plan.session_id},payload:{state:'RESUME',primary_action:'RESUME',execution_profile:'LEGACY_V1',position:null,session:{id:plan.session_id,name:'Owned synthetic session',subtitle:null,template_slug:plan.template_slug,started_at:new Date().toISOString()}}};}
+test('MOB04 exact unavailable DTO does not fetch historical recommendation until the user chooses it',async()=>{
+ exactMissionRPC(path=>path==='FIRST_USE'?{...mockFirstUse(),state:'UNAVAILABLE',source:'OWNED_FIRST_USE',primary_action:{kind:'REFRESH'},payload:null,reason:'RUNTIME_NOT_SERVED'}:{...mockFirstUse(),requested_path:path,state:'HISTORICAL_READY',source:'HISTORICAL_MISSION',primary_action:{kind:'START_LEGACY',template_slug:plan.template_slug,decision:readyMission().decision},payload:readyMission()});
+ await boot(false);
+ expect(mockTransport.mock.calls.filter(([p])=>p==='/mission'||String(p).includes('/execution'))).toHaveLength(0);
+ expect(root.container.queryAll(n=>n.type==='Mission')).toHaveLength(0);
+ await chooseHistorical();expect(screen('Mission').mission.template.slug).toBe(plan.template_slug);
+ expect(mockTransport.mock.calls.filter(([p])=>p==='/sessions')).toHaveLength(0);
+});
+test('MOB04 exact owned resume reads execution only after explicit action and recovers the same session',async()=>{
+ exactMissionRPC(()=>exactResume());const fallback=mockTransport.getMockImplementation()!;
+ mockTransport.mockImplementation(async(p:string)=>p===`/sessions/${plan.session_id}/execution`?{...plan,status:'in_progress',done:{},started_at:new Date().toISOString(),ended_at:null,cursor_set_id:first.set_id,excluded_from_stats:false,allowed_actions:[]}:fallback(p));
+ await boot(false);expect(mockTransport.mock.calls.filter(([p])=>String(p).includes('/execution'))).toHaveLength(0);
+ await pressMissionPrimary();expect(screen('Execution').state.plan.session_id).toBe(plan.session_id);
+ expect(mockTransport.mock.calls.filter(([p])=>p==='/sessions')).toHaveLength(0);
+});
+test('MOB04 exact conflict never chooses an open session or sends a start',async()=>{
+ exactMissionRPC(()=>({...mockFirstUse(),state:'CONFLICT',source:'OPEN_SESSION',primary_action:null,payload:null,reason:'MULTIPLE_OPEN_SESSIONS'}));
+ await boot(false);await pressMissionPrimary();
+ expect(mockTransport.mock.calls.filter(([p])=>p==='/sessions'||p==='/mission'||String(p).includes('/execution'))).toHaveLength(0);
+ expect(renderedText(root.container)).toContain('Plusieurs séances');
+});
+test('MOB04 a lost start response reconciles the existing owned session without another POST',async()=>{
+ let created=false;exactMissionRPC(path=>created?{...exactResume(),requested_path:path}:path==='FIRST_USE'?{...mockFirstUse(),state:'UNAVAILABLE',source:'OWNED_FIRST_USE',primary_action:{kind:'REFRESH'},payload:null,reason:'RUNTIME_NOT_SERVED'}:{...mockFirstUse(),requested_path:path,state:'HISTORICAL_READY',source:'HISTORICAL_MISSION',primary_action:{kind:'START_LEGACY',template_slug:plan.template_slug,decision:readyMission().decision},payload:readyMission()});
+ const fallback=mockTransport.getMockImplementation()!;
+ mockTransport.mockImplementation(async(p:string)=>{if(p==='/sessions'){created=true;throw new ApiFailure('network');}if(p===`/sessions/${plan.session_id}/execution`)return{...plan,status:'in_progress',done:{},started_at:new Date().toISOString(),ended_at:null,cursor_set_id:first.set_id,excluded_from_stats:false,allowed_actions:[]};return fallback(p);});
+ await boot(false);await chooseHistorical();const oldStart=screen('Mission').onStart;
+ await act(async()=>oldStart(plan.template_slug));await act(async()=>oldStart(plan.template_slug));
+ expect(mockTransport.mock.calls.filter(([p])=>p==='/sessions')).toHaveLength(1);
+ await pressMissionPrimary();expect(renderedText(root.container)).toContain('Owned synthetic session');
+ await pressMissionPrimary();expect(screen('Execution').state.plan.session_id).toBe(plan.session_id);
+ expect(mockTransport.mock.calls.filter(([p])=>p==='/sessions')).toHaveLength(1);
+});
+test('REVIEW lost start stays unresolved when server still reports no open session',async()=>{
+ exactMissionRPC(path=>path==='FIRST_USE'?{...mockFirstUse(),state:'UNAVAILABLE',source:'OWNED_FIRST_USE',primary_action:{kind:'REFRESH'},payload:null,reason:'RUNTIME_NOT_SERVED'}:{...mockFirstUse(),requested_path:path,state:'HISTORICAL_READY',source:'HISTORICAL_MISSION',primary_action:{kind:'START_LEGACY',template_slug:plan.template_slug,decision:readyMission().decision},payload:readyMission()});
+ const fallback=mockTransport.getMockImplementation()!;
+ mockTransport.mockImplementation(async(p:string)=>{if(p==='/sessions')throw new ApiFailure('network');return fallback(p);});
+ await boot(false);await chooseHistorical();
+ const oldStart=screen('Mission').onStart;
+ await act(async()=>oldStart(plan.template_slug));await pressMissionPrimary();
+ const newStart=root.container.queryAll(n=>n.type==='Mission')[0]?.props.onStart;
+ if(newStart)await act(async()=>newStart(plan.template_slug));
+ expect(mockTransport.mock.calls.filter(([p])=>p==='/sessions')).toHaveLength(1);
+ expect(renderedText(root.container)).toContain('Réception à vérifier');
+});
+test('REVIEW cold offline boot offers usable refresh instead of permanent loading',async()=>{
+ const fallback=mockTransport.getMockImplementation()!;
+ mockTransport.mockImplementation(async(p:string)=>{if(p==='/auth/refresh')throw new ApiFailure('network');return fallback(p);});
+ await boot(false);
+ const primary=root.container.queryAll(n=>n.props.testID==='mission-action-primary')[0];
+ expect(primary).toBeDefined();
+ expect(primary.props.accessibilityState.disabled).toBe(false);
+});
+test('REVIEW current owned remote session replaces a stale local session at explicit resume',async()=>{
+ await saved('acked');
+ exactMissionRPC(()=>{const x=exactResume();x.primary_action.session_id=999;x.payload.session.id=999;x.payload.session.name='Current owned session';return x;});
+ const fallback=mockTransport.getMockImplementation()!;
+ mockTransport.mockImplementation(async(p:string)=>p==='/sessions/999/execution'?{...plan,session_id:999,status:'in_progress',done:{},started_at:new Date().toISOString(),ended_at:null,cursor_set_id:first.set_id,excluded_from_stats:false,allowed_actions:[]}:fallback(p));
+ await boot(false);
+ const oldResume=root.container.queryAll(n=>n.type==='Resume')[0];
+ if(oldResume)await act(async()=>oldResume.props.onResume());else await pressMissionPrimary();
+ expect(screen('Execution').state.plan.session_id).toBe(999);
+});
+
+test('REVIEW a late legacy execution cannot replace a newer owned projection',async()=>{
+ const {AppState}=require('react-native');let foreground:(state:string)=>void=()=>{};
+ jest.spyOn(AppState,'addEventListener').mockImplementation((_event:any,handler:any)=>{foreground=handler;return{remove(){}};});
+ let remoteId=plan.session_id;
+ exactMissionRPC(()=>{const x=exactResume();x.primary_action.session_id=remoteId;x.payload.session.id=remoteId;return x;});
+ const late=deferred<unknown>(),fallback=mockTransport.getMockImplementation()!;
+ mockTransport.mockImplementation(async(p:string)=>p===`/sessions/${plan.session_id}/execution`?late.promise:fallback(p));
+ await boot(false);await pressMissionPrimary();
+ remoteId=999;await act(async()=>foreground('active'));
+ await act(async()=>late.resolve({...plan,status:'in_progress',done:{},started_at:new Date().toISOString(),ended_at:null,cursor_set_id:first.set_id,excluded_from_stats:false,allowed_actions:[]}));
+ expect(root.container.queryAll(n=>n.type==='Execution')).toHaveLength(0);
+ expect(root.container.queryAll(n=>n.props.testID==='mission-action-primary')[0]).toBeDefined();
+});
+test('MOB04 lost legacy start remains durably blocked after cold restart and a negative read',async()=>{
+ exactMissionRPC(path=>path==='FIRST_USE'?{...mockFirstUse(),state:'UNAVAILABLE',source:'OWNED_FIRST_USE',primary_action:{kind:'REFRESH'},payload:null,reason:'RUNTIME_NOT_SERVED'}:{...mockFirstUse(),requested_path:path,state:'HISTORICAL_READY',source:'HISTORICAL_MISSION',primary_action:{kind:'START_LEGACY',template_slug:plan.template_slug,decision:readyMission().decision},payload:readyMission()});
+ const fallback=mockTransport.getMockImplementation()!;mockTransport.mockImplementation(async(p:string)=>{if(p==='/sessions')throw new ApiFailure('network');return fallback(p);});
+ await boot(false);await chooseHistorical();await act(async()=>screen('Mission').onStart(plan.template_slug));
+ expect((await mockJournal.restore()).snapshot).toMatchObject({mission_opening:{version:'legacy-start-uncertainty/1.0.0',template_slug:plan.template_slug}});
+ await act(async()=>root.unmount());root=createRoot();await boot(false);await pressMissionPrimary();
+ expect(renderedText(root.container)).toContain('Réception à vérifier');expect(mockTransport.mock.calls.filter(([p])=>p==='/sessions')).toHaveLength(1);
+});
+test('REREVIEW a delayed A refusal cleanup cannot replace B orientation',async()=>{
+ let owner=7,postRefused=false;const release=deferred<void>(),originalSave=mockJournal.saveSnapshot.bind(mockJournal);let cleanupStarted=false;
+ mockJournal.saveSnapshot=async(s:any)=>{if(postRefused&&!s.mission_opening){cleanupStarted=true;await release.promise;}return originalSave(s);};
+ exactMissionRPC(path=>path==='FIRST_USE'?{...mockFirstUse(owner),state:'UNAVAILABLE',source:'OWNED_FIRST_USE',primary_action:{kind:'REFRESH'},payload:null,reason:'RUNTIME_NOT_SERVED'}:{...mockFirstUse(owner),requested_path:path,state:'HISTORICAL_READY',source:'HISTORICAL_MISSION',primary_action:{kind:'START_LEGACY',template_slug:plan.template_slug,decision:readyMission().decision},payload:readyMission()});
+ const fallback=mockTransport.getMockImplementation()!;
+ mockTransport.mockImplementation(async(p:string)=>{if(p==='/sessions'){postRefused=true;throw new ApiFailure('http',400,'start_blocked');}if(p==='/auth/me')return{id:owner,username:`u${owner}`};if(p==='/auth/login')return{access_token:'access-b',refresh_token:'rt1.device-b.secret',access_expires_in:900,token_type:'Bearer',server_now:new Date().toISOString()};return fallback(p);});
+ await boot(false);await chooseHistorical();await act(async()=>screen('Mission').onStart(plan.template_slug));expect(cleanupStarted).toBe(true);
+ await act(async()=>screen('JournalControls').onSignOut());owner=8;await act(async()=>screen('Login').onSubmit('b','test-only'));
+ expect(renderedText(root.container)).not.toContain('Démarrage refusé');
+ await act(async()=>release.resolve());
+ expect(renderedText(root.container)).not.toContain('Démarrage refusé');
+});
+test('REREVIEW confirmed no open session cannot be forgotten by failed refresh before local resume',async()=>{
+ await saved('acked');
+ exactMissionRPC(()=>({...mockFirstUse(),state:'UNAVAILABLE',source:'OWNED_FIRST_USE',primary_action:{kind:'REFRESH'},payload:null,reason:'RUNTIME_NOT_SERVED'}));
+ await boot(false);
+ (global.fetch as jest.Mock).mockImplementation(async()=>{throw new ApiFailure('network');});
+ await act(async()=>screen('Resume').onResume());
+ await act(async()=>screen('Resume').onResume());
+ expect(root.container.queryAll(n=>n.type==='Execution')).toHaveLength(0);
+});
+test('MOB04 a confirmed closed local session remains excluded after offline cold restart',async()=>{
+ await saved('acked');exactMissionRPC(()=>({...mockFirstUse(),state:'UNAVAILABLE',source:'OWNED_FIRST_USE',primary_action:{kind:'REFRESH'},payload:null,reason:'RUNTIME_NOT_SERVED'}));await boot(false);
+ await act(async()=>root.unmount());root=createRoot();const fallback=mockTransport.getMockImplementation()!;mockTransport.mockImplementation(async(p:string)=>p==='/auth/refresh'?Promise.reject(new ApiFailure('network')):fallback(p));
+ await boot(false);await act(async()=>screen('Resume').onResume());expect(root.container.queryAll(n=>n.type==='Execution')).toHaveLength(0);
 });

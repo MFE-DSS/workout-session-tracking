@@ -963,3 +963,15 @@ BLOCKED_EXTERNAL**, revue globale et CI finale encore en cours à cette publicat
 Aucun hosting/spend/cutover/cloudbuild/APK/OTA ni store/clé de preuves créé ; QA02,
 DATA, physique et MOB03 complet restent ouverts. Ce reçu ne ferme ni n'archive le
 change opérationnel. Les anciennes lignes gardent leurs instants de préparation.
+
+
+## MOB04 — Today propriétaire, réalisation contrôlée du10novembre
+
+[Delta mob04-mission](../../openspec/changes/mob04-mission/proposal.md),
+[scope réconcilié](../../openspec/changes/mob04-mission/PILOT_VALUE_SCOPE.md) et
+[GO/G1 reçus](../../openspec/changes/mob04-mission/BUILD_AUTHORIZATION.md).
+Base d67f12a après REL03, réservation MOB06/Maltin préservée. Projection GET
+owner/path/profil, priorité reprise/commande à vérifier, premier parcours réel
+et recommandation historique choisie explicitement ; MISSION/SCI/journal intacts.
+GO_BUILD_CONTROLLED / G1_ACCEPTED / PIXELS_ACCEPTED_CONTROLLED (réponse opérateur du10novembre) ; aucun déploiement.
+Les résultats finaux et limites seront consignés après gates, pas anticipés ici.

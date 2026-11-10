@@ -28,6 +28,10 @@ import {FirstSessionV3Client} from './src/api/firstSessionV3';
 import {FirstUseV3Controller} from './src/api/firstUseV3';
 import {sendPlanV3Outbox} from './src/sync/planV3Sync';
 import {PlanV3Host} from './src/ui/plan/PlanV3Host';
+import {MissionActionClient,createMissionActionTransport,type MissionAction} from './src/api/missionAction';
+import {MissionActionResource} from './src/api/missionActionResource';
+import {localOpeningState,missionActionCurrent,hasLegacyStart,legacyStartMarker,markLegacyStart,clearLegacyStart,restoreExistingV3,blockLegacyResume,legacyResumeBlocked,clearLegacyResumeBlock} from './src/api/missionOpening';
+import {MissionActionHost} from './src/ui/mission/MissionActionHost';
 import { FirstPlanClient } from './src/api/firstPlan';
 import { FirstUseController } from './src/api/firstUse';
 import { FirstUseScreen } from './src/ui/account/FirstUseScreen';
@@ -131,7 +135,13 @@ function statusNote(sync: SyncStatus): { text: string; alert: boolean } | null {
 export default function ConnectedApp() {
   useEffect(() => { observeQADelivery(); }, []);
   const [planV3,setPlanV3] = useState<FirstUseV3Controller|null>(null);
-  const [planV3Open,setPlanV3Open] = useState(true);
+  const [planV3Open,setPlanV3Open] = useState(false);
+  const planV3Ref=useRef<FirstUseV3Controller|null>(null);
+  planV3Ref.current=planV3;
+  const legacyStartUnknownRef=useRef(false),closePendingRef=useRef(false);
+  const [,paintMission]=useState(0);
+  const [missionMenu,setMissionMenu]=useState(false);
+  const [missionRefusal,setMissionRefusal]=useState<string|null>(null);
   const [,setPlanV3Revision] = useState(0);
   const [state, setState] = useState<WorkoutState>(initialState);
   const stateRef = useRef(state);
@@ -189,6 +199,9 @@ export default function ConnectedApp() {
   );
   const preferencesClient = useMemo(() => new TrainingPreferencesClient(auth, transport), [auth]);
   const firstUse = useMemo(() => new FirstUseController(auth, transport, preferencesClient, new FirstPlanClient(auth, transport)), [auth, preferencesClient]);
+
+  const missionResource=useMemo(()=>new MissionActionResource(auth,new MissionActionClient(auth,transport,createMissionActionTransport(API_URL))),[auth]);
+  const currentOpening=()=>localOpeningState({legacyStartUnknown:legacyStartUnknownRef.current,closePending:closePendingRef.current,v3:planV3Ref.current?.state??null});
 
   const apply = useCallback((event: Event): WorkoutState => {
     const n = reduce(stateRef.current, event);
@@ -294,51 +307,42 @@ export default function ConnectedApp() {
 
   const onStatus = useCallback((s: SyncStatus) => {
     setSync(s);
+    const target=journalRef.current,revision=auth.revision;
+    void target?.outboxRows().then(rows=>{if(target!==journalRef.current||revision!==auth.revision)return;closePendingRef.current=rows.some(r=>r.kind==='SESSION_FINISH'||r.kind==='SESSION_ABANDON');paintMission(n=>n+1);});
     void refreshServerSets().catch(() => undefined);
-  }, [refreshServerSets]);
+  }, [auth,refreshServerSets]);
 
   // ── canonical state: the mission, and the open session if there is one ────
   const loadMission = useCallback(async () => {
-    const revision = auth.revision;
-    try {
-      const m = await api<ServerMission>('/mission');
-      if (revision !== auth.revision || !journalRef.current) return;
+    const revision=auth.revision,target=journalRef.current;
+    if(!target)return;
+    const current=()=>appAlive.current&&auth.revision===revision&&target===journalRef.current;
+    missionResource.setHost(Boolean(planV3Ref.current?.active));
+    const read=missionResource.refresh();paintMission(n=>n+1);
+    const result=await read;if(!current()||result.state==='cancelled')return;
+    const latest=missionResource.state;
+    if(result.state==='confirmed'){
+      if(latest.state!=='confirmed'||JSON.stringify(latest.value)!==JSON.stringify(result.value))return;
+      const action=result.value,local=stateRef.current;
+      if(local.plan&&['SET','REST'].includes(local.phase)){
+        const same=action.state==='RESUME'&&action.primary_action.kind==='RESUME_LEGACY'&&action.primary_action.session_id===local.plan.session_id;
+        const next=same?clearLegacyResumeBlock(local):blockLegacyResume(local);
+        await target.saveSnapshot(next);if(!current())return;
+        apply({type:'RESTORE',state:next});
+      }
+      setMission(action.state==='HISTORICAL_READY'||action.state==='RESUME'||action.state==='FIRST_SESSION_HISTORY'?action.payload as unknown as ServerMission:null);
+      const pending=legacyStartMarker(stateRef.current);
+      if(legacyStartUnknownRef.current&&action.state==='RESUME'&&pending&&action.payload.session.template_slug===pending.template_slug){
+        const clean=clearLegacyStart(stateRef.current);await target.saveSnapshot(clean);if(!current())return;
+        legacyStartUnknownRef.current=false;apply({type:'RESTORE',state:clean});
+      }
       setOffline(false);
-      setMission(m);
-      const local = stateRef.current;
-      if (m.state === 'RESUME' && m.session.template_slug === 'science:v3:first-session') {
-        // Existing owned handoff, never a scientific recommendation fallback.
-        setPaused(true);
-        return;
-      }
-      if (m.state === 'RESUME') {
-        const plan = await fetchExecution(m.session.id);
-        const target=journalRef.current;
-        const current=()=>appAlive.current&&revision===auth.revision&&target===journalRef.current;
-        const restored = target ? await target.restore() : { sets: [], outbox: [] };
-        if (!current()||plan.session_id!==m.session.id) return;
-        const latest = stateRef.current;
-        const next=reconcileSubstitutions(stateFromServer(plan, latest.phase === 'MISSION' ? null : latest, restored.sets, Date.now()), restored.outbox);
-        await target?.beginLegacy?.(next,current);
-        if(!current())return;
-        setPlanV3Open(false);
-        apply({ type: 'RESTORE', state: next });
-        setPaused(true);
-      } else if (local.phase === 'SET' || local.phase === 'REST') {
-        // the server holds no open session: it was closed elsewhere (web) or by a
-        // command already acknowledged. Pending commands stay visible in the journal.
-        apply({ type: 'RESET' });
-        setPaused(false);
-      }
-    } catch (e) {
-      if (revision !== auth.revision) return;
-      if (e instanceof ApiFailure && e.kind === 'http' && e.status === 401) {
-        setScreen('LOGIN');
-        return;
-      }
-      setOffline(true);
+    }else{
+      setMission(null);setOffline(result.state==='unknown');
+      if(result.state==='rejected'&&result.status===401)setScreen('LOGIN');
     }
-  }, [api, apply, auth, fetchExecution]);
+    paintMission(n=>n+1);
+  }, [auth,missionResource,apply]);
 
   const onAck = useCallback((row: OutboxRow, response: unknown) => {
     metric('SYNC-ACK');
@@ -349,12 +353,14 @@ export default function ConnectedApp() {
       void refreshServerSets().catch(() => undefined);
     }
     if (row.kind === 'SESSION_FINISH' || row.kind === 'SESSION_ABANDON') {
+      const revision=auth.revision,target=journalRef.current;
       void api<ServerMission>('/mission').then((m) => {
+        if(revision!==auth.revision||target!==journalRef.current||!appAlive.current)return;
         if (isStartable(m)) setNext(m as unknown as Mission);
-        if (stateRef.current.phase === 'MISSION') setMission(m);
+        if (stateRef.current.phase === 'MISSION') void loadMission();
       }).catch(() => undefined);
     }
-  }, [api, metric, refreshServerSets]);
+  }, [api, auth,metric, refreshServerSets,loadMission]);
 
   const attachJournal = useCallback(async (online: boolean): Promise<boolean> => {
     const revision = auth.revision;
@@ -390,9 +396,9 @@ export default function ConnectedApp() {
       const controller = new FirstUseV3Controller({ownerId:owned.userId,journal:j.planV3,sessions:v3Sessions,
         plan:new FirstPlanV3Client(v3Runtime),blueprint:new BlueprintV3Client(v3Runtime),calibration:new CalibrationV1Client(v3Runtime),
         newId:()=>Crypto.randomUUID(),current:active},()=>{if(active())setPlanV3Revision(value=>value+1);});
-      await controller.restore();if(!active())return false;
-      if(controller.state){setPlanV3(controller);setPlanV3Open(true);void controller.load().catch(()=>undefined);}
-    }else setPlanV3(null);
+      await restoreExistingV3(controller,j.planV3);if(!active())return false;
+      planV3Ref.current=controller;setPlanV3(controller);setPlanV3Open(false);if(controller.state)void controller.load().catch(()=>undefined);
+    }else {planV3Ref.current=null;setPlanV3(null);}
     engineRef.current = new SyncEngine(j, (row) => {
       if (!active()) return Promise.reject(new ApiFailure('http', 401, 'auth'));
       if(row.kind === 'PLAN_V3_SET'){
@@ -404,6 +410,8 @@ export default function ConnectedApp() {
     }, (status) => { if (active()) onStatus(status); }, (row, response) => { if (active()) onAck(row, response); });
     const r = await j.restore();
     if (!active()) return false;
+    legacyStartUnknownRef.current=hasLegacyStart(r.snapshot);
+    closePendingRef.current=r.outbox.some(row=>!['acked','resolved'].includes(row.state)&&(row.kind==='SESSION_FINISH'||row.kind==='SESSION_ABANDON'));
     setServerSets(serverStateFromOutbox(r.outbox));
     const statuses = substitutionStates(r.outbox, r.snapshot?.plan?.session_id);
     setSubstitutions(statuses);
@@ -413,7 +421,7 @@ export default function ConnectedApp() {
       apply({ type: 'RESTORE', state: restored });
       setPaused(restored.phase !== 'COMPLETE');
       await j.recordMetric('RELAUNCH-RESTORED-SETS', Object.values(restored.done).filter((d) => d.local === 'saved_local').length);
-    } else { apply({ type: 'RESET' }); setPaused(false); }
+    } else { apply(r.snapshot&&hasLegacyStart(r.snapshot)?{type:'RESTORE',state:r.snapshot}:{type:'RESET'}); setPaused(false); }
     if (!active()) return false;
     if (owned.quarantined) setNotice('Un ancien journal reste conservé séparément, sans être attribué à ce compte.');
     setScreen('APP');
@@ -637,13 +645,24 @@ export default function ConnectedApp() {
   }, []);
 
   const start = useCallback(async (slug: string) => {
-    if (!mission || mission.state !== 'READY' || busy || sessionActionInFlight.current) return;
+    const projection=missionResource.state;
+    if(!isStartable(mission)||busy||sessionActionInFlight.current||stateRef.current.phase!=='MISSION'||projection.state!=='confirmed'||projection.value.state!=='HISTORICAL_READY'||
+      JSON.stringify(projection.value.payload.decision)!==JSON.stringify(mission.decision)||!missionActionCurrent(projection.value,projection,currentOpening())||
+      !(slug===mission.template.slug||mission.alternatives.some(a=>a.slug===slug&&a.executable)))return;
     const generation=auth.revision,ownedJournal=journalRef.current;
     const current=()=>appAlive.current&&auth.revision===generation&&journalRef.current===ownedJournal;
     sessionActionInFlight.current = true;
     setBusy(true);
     setNotice(null);
+    let submitted=false;
     try {
+      const rows=await ownedJournal?.outboxRows()??[];
+      if(!current()||rows.some(r=>r.kind==='SESSION_FINISH'||r.kind==='SESSION_ABANDON')||!missionActionCurrent(projection.value,missionResource.state,currentOpening()))return;
+      const pending=markLegacyStart(stateRef.current,slug,Date.now());
+      apply({type:'RESTORE',state:pending});await ownedJournal?.saveSnapshot(pending);
+      const saved=await ownedJournal?.restore();if(!current())return;
+      if(JSON.stringify(legacyStartMarker(saved?.snapshot))!==JSON.stringify(legacyStartMarker(pending)))throw Error('opening_not_persisted');
+      legacyStartUnknownRef.current=true;missionResource.invalidate();paintMission(n=>n+1);submitted=true;
       const plan = await api<ExecutionPlan>('/sessions', {
         method: 'POST',
         body: {
@@ -656,6 +675,7 @@ export default function ConnectedApp() {
       const nowMs=Date.now();
       await ownedJournal?.beginLegacy?.(reduce(stateRef.current,{type:'START',plan,nowMs}),current);
       if(!current())return;
+      legacyStartUnknownRef.current=false;
       setPlanV3Open(false);
       anchorOn(plan.server_now);
       closedRef.current = null;
@@ -664,14 +684,17 @@ export default function ConnectedApp() {
       void restNotification.prepare().catch(() => undefined);
     } catch (e) {
       feedback.refused();
+      if(!current())return;
+      if(!submitted||(e instanceof ApiFailure&&e.kind==='http'&&e.status>=400&&e.status<500&&![408,429].includes(e.status))){
+        const clean=clearLegacyStart(stateRef.current);apply({type:'RESTORE',state:clean});await ownedJournal?.saveSnapshot(clean);if(!current())return;
+        legacyStartUnknownRef.current=false;setMissionRefusal(!submitted?'La demande n’a pas été envoyée : le journal local reste à vérifier.':e instanceof ApiFailure&&e.code==='start_blocked'?'Cette séance n’est pas faisable avec l’équipement déclaré.':'Le démarrage n’a pas été accepté.');await loadMission();}
       if (e instanceof ApiFailure && e.kind === 'http' && e.code === 'session_open') await loadMission();
       else if (e instanceof ApiFailure && e.code === 'start_blocked') setNotice('Cette séance n’est pas faisable avec l’équipement déclaré.');
       else setNotice('AUREN est injoignable : le démarrage attend la connexion.');
     } finally {
-      sessionActionInFlight.current = false;
-      setBusy(false);
+      if(current()){sessionActionInFlight.current=false;setBusy(false);}
     }
-  }, [anchorOn, api, apply, auth, busy, loadMission, mission]);
+  }, [anchorOn, api, apply, auth, busy, loadMission, mission,missionResource]);
 
   const validate = useCallback((setId: number) => {
     const before = stateRef.current;
@@ -835,6 +858,7 @@ export default function ConnectedApp() {
   // ── PLAT-01 — Android hardware back: never leaves the app during a workout ──
   useEffect(() => {
     const sub = BackHandler.addEventListener('hardwareBackPress', () => {
+      if(missionMenu){setMissionMenu(false);return true;}
       if (accountView) {
         if (accountView === 'preferences' || accountView === 'first-use-preferences') { preferencesExit.current?.(); return true; }
         if (!accountFlight.current) { setAccountView(null); setAccountOutcome(null); }
@@ -856,46 +880,78 @@ export default function ConnectedApp() {
       return action !== 'system';
     });
     return () => sub.remove();
-  }, [accountView, screen, paused, exitOpen, lab, signOutBlocked, requestExit, onExitChoice]);
+  }, [accountView, screen, paused, exitOpen, lab, signOutBlocked, requestExit, onExitChoice,missionMenu]);
 
-  const resume = useCallback(() => {
+  const resumeLocal = useCallback(() => {
     setPaused(false);
     const s = stateRef.current;
     if (s.phase === 'REST' && s.rest) reschedule(s, Date.now());
   }, [reschedule]);
 
-  const resumeFromServer = useCallback(async () => {
-    if (mission?.state !== 'RESUME' || sessionActionInFlight.current) return;
-    if(mission.session.template_slug==='science:v3:first-session'){
-      if(!planV3?.active){setNotice('Cette séance demande le contrat d’exécution V3.');return;}
-      await planV3.load();
-      if(planV3.active&&planV3.state?.execution?.session_id===mission.session.id)setPlanV3Open(true);
-      else setNotice('La reprise de cette séance reste à vérifier.');
+  const resumeFromServer = useCallback(async (action:MissionAction) => {
+    if(action.state!=='RESUME'||action.primary_action.kind!=='RESUME_LEGACY'||sessionActionInFlight.current)return;
+    const id=action.primary_action.session_id,generation=auth.revision,target=journalRef.current;
+    const ownerCurrent=()=>appAlive.current&&generation===auth.revision&&target===journalRef.current;
+    const current=()=>ownerCurrent()&&missionActionCurrent(action,missionResource.state,currentOpening());
+    sessionActionInFlight.current=true;setBusy(true);setMissionRefusal(null);
+    try{
+      const rows=await target?.outboxRows()??[];if(!current())return;
+      if(stateRef.current.plan&&stateRef.current.plan.session_id!==id&&rows.length){setMissionRefusal('Le journal précédent attend une confirmation. Vérifie-le avant de changer de séance.');return;}
+      const plan=await fetchExecution(id);if(!current()||plan.session_id!==id)return;
+      const restored=target?await target.restore():{sets:[],outbox:[]};if(!current())return;
+      const local=stateRef.current,next=reconcileSubstitutions(stateFromServer(plan,local.phase==='MISSION'?null:local,restored.sets,Date.now()),restored.outbox);
+      await target?.beginLegacy?.(next,current);if(!current())return;
+      setPlanV3Open(false);apply({type:'RESTORE',state:next});setPaused(false);setOffline(false);
+    }catch(error){
+      if(!current())return;
+      if(error instanceof ApiFailure&&error.kind==='network')setOffline(true);
+      else setMissionRefusal('La reprise reste à vérifier. Le journal et le parcours conservés sur cet appareil restent disponibles.');
+    }finally{if(ownerCurrent()){sessionActionInFlight.current=false;setBusy(false);}}
+  },[apply,auth,fetchExecution,missionResource]);
+
+  const verifyMission=useCallback(async()=>{
+    if(sessionActionInFlight.current)return;
+    const revision=auth.revision,target=journalRef.current;
+    const current=()=>appAlive.current&&revision===auth.revision&&target===journalRef.current;
+    setMissionRefusal(null);await engineRef.current?.kick();if(!current())return;
+    const controller=planV3Ref.current;
+    if(controller?.active)await controller.load();if(!current())return;
+    await loadMission();if(!current())return;
+    if(controller?.active&&(controller.state?.source.pending||['unknown','submitted'].includes(controller.state?.intent?.state??'')))setPlanV3Open(true);
+  },[auth,loadMission]);
+  const openMissionAction=useCallback(async(action:MissionAction)=>{
+    const revision=auth.revision,target=journalRef.current;
+    const rows=await target?.outboxRows()??[];
+    if(!appAlive.current||revision!==auth.revision||target!==journalRef.current||rows.some(r=>r.kind==='SESSION_FINISH'||r.kind==='SESSION_ABANDON')||!missionActionCurrent(action,missionResource.state,currentOpening()))return;
+    const command=action.primary_action;if(!command)return;
+    if(command.kind==='RESUME_LEGACY'){
+      await resumeFromServer(action);
       return;
     }
-    const generation=auth.revision,target=journalRef.current;
-    const current=()=>appAlive.current&&generation===auth.revision&&target===journalRef.current;
-    sessionActionInFlight.current = true;
-    setBusy(true);
-    try {
-      const plan = await fetchExecution(mission.session.id);
-      const restored = target ? await target.restore() : { sets: [], outbox: [] };
-      if(!current()||plan.session_id!==mission.session.id)return;
-      const local = stateRef.current;
-      const next=reconcileSubstitutions(stateFromServer(plan, local.phase === 'MISSION' ? null : local, restored.sets, Date.now()), restored.outbox);
-      await target?.beginLegacy?.(next,current);
-      if(!current())return;
-      setPlanV3Open(false);
-      apply({ type: 'RESTORE', state: next });
-      setPaused(false);
-      setOffline(false);
-    } catch {
-      setOffline(true);
-    } finally {
-      sessionActionInFlight.current = false;
-      setBusy(false);
-    }
-  }, [apply, auth, fetchExecution, mission, planV3]);
+    const controller=planV3Ref.current;if(!controller?.active)return;
+    if(!controller.state)await controller.restore();
+    if(!controller.state){setMissionRefusal('Le journal actif doit être réconcilié avant d’ouvrir ce parcours.');return;}
+    if(controller.state?.execution)await controller.pause();
+    await controller.load();
+    if(!controller.active||revision!==auth.revision||!missionActionCurrent(action,missionResource.state,currentOpening()))return;
+    if(command.kind==='OPEN_FIRST_USE'||('session_id' in command&&controller.state?.execution?.session_id===command.session_id))setPlanV3Open(true);
+  },[auth,mission,missionResource,resumeFromServer]);
+
+  const resume=useCallback(async()=>{
+    const read=missionResource.state;
+    if(read.state==='confirmed'){
+      if(read.value.state==='RESUME')await openMissionAction(read.value);
+      else{setMissionRefusal('La séance précédente n’est pas confirmée ouverte. Vérifie le parcours et consulte le journal.');await loadMission();}
+    }else if(read.state==='pending'||legacyResumeBlocked(stateRef.current)){
+      setMissionRefusal('La reprise de cette séance n’est pas confirmée. Actualise à la connexion ; les faits restent dans le journal.');
+      if(read.state!=='pending')await loadMission();
+    }else resumeLocal();
+  },[missionResource,openMissionAction,loadMission,resumeLocal]);
+  const readCapturedV3=useCallback(async()=>{
+    const controller=planV3Ref.current,revision=auth.revision;
+    if(!controller?.active||!controller.state?.execution)return;
+    await controller.pause();if(controller.active&&revision===auth.revision)setPlanV3Open(true);
+  },[auth]);
 
   const signOut = useCallback(async () => {
     // §8.4 — no set may disappear as a side effect of signing out: while a
@@ -911,7 +967,7 @@ export default function ConnectedApp() {
       void engineRef.current?.kick();
       return;
     }
-    setLab(false);
+    setLab(false);setMissionMenu(false);setMissionRefusal(null);missionResource.invalidate();legacyStartUnknownRef.current=false;closePendingRef.current=false;sessionActionInFlight.current=false;
     cancelRestNotification();
     if (undoTimer.current) clearTimeout(undoTimer.current); undoTimer.current = null; setUndo(null);
     engineRef.current?.stop(); engineRef.current = null;
@@ -926,7 +982,7 @@ export default function ConnectedApp() {
     setAccount(null);
     setMission(null);
     setScreen('LOGIN');
-  }, [apply, auth, cancelRestNotification]);
+  }, [apply, auth, cancelRestNotification,missionResource]);
 
   const closeBilan = useCallback(() => {
     apply({ type: 'RESET' });
@@ -988,13 +1044,15 @@ export default function ConnectedApp() {
   } else if (screen === 'APP') {
     const inWorkout = state.phase === 'SET' || state.phase === 'REST';
     if (inWorkout && paused && state.plan) {
-      const [name, subtitle] = state.plan.template_name.split(' — ');
+      const remote=missionResource.state,other=remote.state==='confirmed'&&remote.value.state==='RESUME'&&remote.value.payload.session.id!==state.plan.session_id?remote.value.payload.session:null;
+      const [name, subtitle] = (other?other.name:state.plan.template_name).split(' — ');
       body = (
         <ResumeScreen
           name={name}
           subtitle={subtitle ?? null}
-          position={localPosition(state)}
-          note={offline ? 'Hors ligne : la séance continue sur l’appareil et se synchronise au retour du réseau.' : null}
+          position={other?null:localPosition(state)}
+          busy={busy}
+          note={missionRefusal??(offline ? 'Hors ligne : la séance continue sur l’appareil et se synchronise au retour du réseau.' : null)}
           onResume={resume}
           onOpenJournal={openJournalSheet}
         />
@@ -1043,64 +1101,13 @@ export default function ConnectedApp() {
           onOpenLab={openJournalSheet}
         />
       );
-    } else if (opening === 'resume' && mission?.state === 'RESUME') {
-      const p = mission.position;
-      body = (
-        <ResumeScreen
-          name={mission.session.name}
-          subtitle={mission.session.subtitle}
-          position={p ? { exerciseIndex: p.exercise_index, exerciseTotal: p.exercise_total, setsDone: p.sets_done, setsTotal: p.sets_total, exerciseName: p.exercise_name } : null}
-          note={offline ? 'Hors ligne : la reprise attend la connexion. Les séries gardées sur l’appareil restent conservées.' : null}
-          busy={busy}
-          onResume={() => void resumeFromServer()}
-          onOpenJournal={openJournalSheet}
-        />
-      );
     } else {
       // MOB-01 — outside a workout the native shell is on screen; AUJOURD'HUI holds the MISSION or its quiet states
-      let today: React.ReactNode;
-      if (isStartable(mission)) {
-        today = (
-          <View style={{ flex: 1 }}>
-            <MissionScreen
-              mission={mission as unknown as Mission}
-              busy={busy}
-              onStart={(slug) => void start(slug)}
-              onOpenLab={openJournalSheet}
-              onSecondaryOpened={() => metric('SECONDARY-OPENED')}
-            />
-          </View>
-        );
-      } else if (mission?.state === 'READY') {
-        today = (
-          <QuietScreen
-            title={mission.template.name}
-            text={`${mission.reason.phrase} Cette séance ne se suit pas encore dans l’application.`}
-            choices={mission.alternatives.filter((a) => a.executable).map((a) => ({
-              key: a.slug, title: a.name, detail: a.phrase, onPress: () => void start(a.slug),
-            }))}
-            onOpenJournal={openJournalSheet}
-          />
-        );
-      } else if (mission?.state === 'NO_MISSION') {
-        today = (
-          <QuietScreen
-            title="Rien à proposer"
-            text="Aucune séance n’est faisable avec l’environnement déclaré aujourd’hui."
-            action={{ label: 'Actualiser', onPress: () => void loadMission() }}
-            onOpenJournal={openJournalSheet}
-          />
-        );
-      } else {
-        today = (
-          <QuietScreen
-            title={offline ? 'Hors ligne' : 'Un instant'}
-            text={notice ?? (offline ? 'La mission du jour arrive dès que la connexion revient. Rien de ce qui est enregistré ici n’est perdu.' : 'AUREN prépare la mission du jour.')}
-            action={{ label: 'Réessayer', onPress: () => void loadMission() }}
-            onOpenJournal={openJournalSheet}
-          />
-        );
-      }
+      const historical=isStartable(mission)?<View style={{flex:1}}><MissionScreen mission={mission as unknown as Mission} busy={busy}
+        onStart={slug=>void start(slug)} onOpenLab={()=>setMissionMenu(true)} onSecondaryOpened={()=>metric('SECONDARY-OPENED')}/></View>:null;
+      const today=<MissionActionHost read={missionResource.state} path={missionResource.path} local={currentOpening()} checking={busy} refusal={missionRefusal} offline={offline} onReadOwned={planV3?.state?.execution?readCapturedV3:undefined}
+        onAction={openMissionAction} onVerify={verifyMission} onSelectPath={path=>{setMissionRefusal(null);missionResource.selectPath(path);setMission(null);void loadMission();}}
+        onOpenJournal={openJournalSheet} historical={historical}/>;
       body = (
         <ShellProvider value={{ today, openJournal: openJournalSheet, siteUrl: API_URL, account: accountSettings }}>
           <ExpoRoot context={shellRoutes} />
@@ -1129,6 +1136,10 @@ export default function ConnectedApp() {
           {EXIT_OPTIONS.map((o) => (
             <SheetRow key={o.choice} title={o.label} onPress={() => onExitChoice(o.choice)} />
           ))}
+        </Sheet>
+        <Sheet visible={missionMenu&&screen==='APP'&&!accountView&&state.phase==='MISSION'} title="Journal et parcours" onClose={()=>setMissionMenu(false)}>
+          <SheetRow title="Journal local" onPress={()=>{setMissionMenu(false);setLab(true);}}/>
+          <SheetRow title="Premier parcours" onPress={()=>{setMissionMenu(false);missionResource.selectPath('FIRST_USE');setMission(null);void loadMission();}}/>
         </Sheet>
         <LabSheet
           visible={lab}

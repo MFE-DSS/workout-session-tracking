@@ -7,6 +7,7 @@ import { isStartable, type ReadyMission, type ResumeMission } from './types';
 export const MISSION_ACTION_VERSION='mission-action/1.0.0';
 export const MISSION_V3_HOST='first-session-runtime/3.0.0';
 const V3_PROFILE='first-plan-execution/3.0.0';
+const SCI_SESSION_MARKER='science:v3:first-session';
 export type MissionPath='FIRST_USE'|'HISTORICAL';
 export type HistoricalMission=Omit<ReadyMission,'reason'>&{reason:Omit<ReadyMission['reason'],'horizon'|'provenance'>&{horizon:string|null;provenance:string|null}};
 type Source='OPEN_SESSION'|'OWNED_FIRST_USE'|'HISTORICAL_MISSION'|'NONE';
@@ -62,11 +63,11 @@ function sameDecision(a:unknown,b:unknown){
 function historical(x:unknown):x is HistoricalMission {
  if(!isObject(x)||x.state!=='READY'||x.primary_action!=='START'||x.executable!==true||x.duration_estimate!==null)return false;
  const t=x.template,r=x.reason,s=x.scope;
- if(!isObject(t)||!text(t.slug)||!text(t.name)||!nullableText(t.subtitle)||!isObject(r)||!text(r.phrase)||
+ if(!isObject(t)||!text(t.slug)||t.slug===SCI_SESSION_MARKER||!text(t.name)||!nullableText(t.subtitle)||!isObject(r)||!text(r.phrase)||
    !texts(r.reasons)||!texts(r.winning)||!texts(r.limiting)||!nullableText(r.horizon)||!nullableText(r.provenance))return false;
  if(!isObject(s)||!positiveId(s.exercise_count)||!integer(s.work_set_count)||!isObject(s.first_exercise)||
    !text(s.first_exercise.name)||!nullableText(s.first_exercise.set_scheme))return false;
- if(!Array.isArray(x.alternatives)||!x.alternatives.every(a=>isObject(a)&&text(a.slug)&&text(a.name)&&text(a.phrase)&&typeof a.executable==='boolean'))return false;
+ if(!Array.isArray(x.alternatives)||!x.alternatives.every(a=>isObject(a)&&text(a.slug)&&a.slug!==SCI_SESSION_MARKER&&text(a.name)&&text(a.phrase)&&typeof a.executable==='boolean'))return false;
  if(x.zones!==undefined&&(!Array.isArray(x.zones)||!x.zones.every(z=>isObject(z)&&text(z.zone)&&text(z.label))))return false;
  const alternatives=x.alternatives;
  if(!decision(x.decision)||x.decision.top!==t.slug||!x.decision.alternatives.every((slug,i)=>isObject(alternatives[i])&&slug===alternatives[i].slug)||x.decision.alternatives.length!==alternatives.length)return false;
@@ -103,7 +104,7 @@ export function decodeMissionAction(raw:unknown,owner:number,path:MissionPath,ho
    if(!exact(a,['kind','session_id'])||!positiveId(a.session_id)||!resume(p,a.session_id))return null;
    if(x.state==='FIRST_SESSION_HISTORY')return path==='FIRST_USE'&&host&&x.source==='OWNED_FIRST_USE'&&a.kind==='OPEN_FIRST_SESSION_HISTORY'&&p.execution_profile===V3_PROFILE?x as MissionAction:null;
    if(x.source!=='OPEN_SESSION')return null;
-   return (a.kind==='RESUME_LEGACY'&&p.execution_profile==='LEGACY_V1')||(host&&a.kind==='RESUME_V3'&&p.execution_profile===V3_PROFILE)?x as MissionAction:null;
+   return (a.kind==='RESUME_LEGACY'&&p.execution_profile==='LEGACY_V1'&&p.session.template_slug!==SCI_SESSION_MARKER)||(host&&a.kind==='RESUME_V3'&&p.execution_profile===V3_PROFILE)?x as MissionAction:null;
   }
   if(x.state==='HISTORICAL_READY')return path==='HISTORICAL'&&x.source==='HISTORICAL_MISSION'&&exact(a,['kind','template_slug','decision'])&&a.kind==='START_LEGACY'&&
    historical(p)&&a.template_slug===p.template.slug&&sameDecision(a.decision,p.decision)?x as MissionAction:null;

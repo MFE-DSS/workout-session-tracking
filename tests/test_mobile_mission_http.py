@@ -1,4 +1,4 @@
-"""Actual Bearer and transport consumer; mounting stays test-local before lease."""
+"""Actual Bearer consumers through the production mobile parent router."""
 
 import pytest
 
@@ -9,10 +9,8 @@ VERSION = "mission-action/1.0.0"
 def mounted(client):
     from app.database import SessionLocal
     from app.models.user import User
-    from app.routers.mobile_mission import router
     from app.services.device_auth import open_device_session
 
-    client.app.include_router(router, prefix="/api/mobile/v1")
     with SessionLocal() as db:
         user = db.query(User).one()
         issued = open_device_session(db, user)
@@ -72,3 +70,12 @@ def test_real_domain_recommendation_has_exact_negotiated_echo(client):
     assert body["source"] == "HISTORICAL_MISSION"
     assert body["primary_action"]["template_slug"] == body["payload"]["template"]["slug"]
     assert body["primary_action"]["decision"] == body["payload"]["decision"]
+
+
+def test_production_mobile_parent_mounts_negotiated_mission_without_test_include(client):
+    response = client.get(
+        PATH + '?requested_path=FIRST_USE', headers={'X-Auren-Mission-Action': VERSION}
+    )
+    assert response.status_code == 401
+    assert response.headers['cache-control'] == 'no-store'
+    assert response.headers['www-authenticate'] == 'Bearer'
