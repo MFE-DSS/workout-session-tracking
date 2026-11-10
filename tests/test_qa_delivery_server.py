@@ -426,3 +426,20 @@ async def test_mobile_transport_does_not_repeat_full_science_preflight(
         assert (await client.get("/api/mobile/v1/me/sessions")).status_code == 200
         assert (await client.get("/__qa_health")).status_code == 503
         assert (await client.get("/__qa_version")).status_code == 503
+
+
+@pytest.mark.anyio
+async def test_liveness_remains_only_process_signal_if_database_disappears(
+    qa_database, bundle, upstream
+):
+    from tools.qa_delivery.server import create_qa_app
+
+    app = create_qa_app(config(qa_database, bundle, upstream[0]))
+    qa_database.unlink()
+    async with httpx.AsyncClient(
+        transport=httpx.ASGITransport(app), base_url="https://qa.invalid"
+    ) as client:
+        response = await client.get("/__qa_liveness")
+        assert response.status_code == 200
+        assert response.json() == {"alive": True, "data_ready": False}
+        assert (await client.get("/__qa_version")).status_code == 503

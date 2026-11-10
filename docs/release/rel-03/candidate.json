@@ -1,0 +1,44 @@
+{
+  "schema_version": "qa-release/1.0.0",
+  "release_id": "rel-03-qa",
+  "state": "PREPARED",
+  "action": "BUILD_APK",
+  "source": {
+    "native_sha": null,
+    "js_sha": null
+  },
+  "native": {
+    "app_version": "0.0.2",
+    "version_code": 3,
+    "package": "dev.auren.releaseqa02",
+    "certificate_sha256": "12b13109a2a41e2e2c0e97578364793e659a7548da4ce210d0dbd2f912f4bc75",
+    "runtime_version": null,
+    "fingerprint": null,
+    "updates_enabled": true,
+    "storage_schema_sha256": null
+  },
+  "eas": {
+    "project_id": "c7243bfc-29b3-4486-aafe-e69b9c904bbe",
+    "channel": "qa",
+    "branch": "qa",
+    "platform": "android",
+    "build_id": null,
+    "build_url": null
+  },
+  "js": {
+    "update_group": null,
+    "update_id": null,
+    "assets_sha256": null
+  },
+  "artifact": {
+    "sha256": null,
+    "url": null
+  },
+  "target": null,
+  "compatibility": {
+    "api": "first-session-runtime/3.0.0",
+    "inventory": "plan-calibration-inventory/2.0.0",
+    "server_schema": "plan_v3_20261107_01",
+    "local_schema": "first-session-local/3.0.0"
+  }
+}

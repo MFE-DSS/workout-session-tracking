@@ -40,6 +40,15 @@ class QAConfig:
     backend_port: int = 8140
 
 
+async def _liveness_only(request, call_next):
+    # Process signal only: never database/science/readiness evidence.
+    if request.method == "GET" and request.url.path == "/__qa_liveness":
+        return JSONResponse(
+            {"alive": True, "data_ready": False}, headers={"Cache-Control": "no-store"}
+        )
+    return await call_next(request)
+
+
 def create_qa_app(config: QAConfig) -> Starlette:
     gateway = create_gateway({}, backend_port=config.backend_port, access=config.access)
     stopped, active = False, 0
@@ -127,6 +136,7 @@ def create_qa_app(config: QAConfig) -> Starlette:
             active -= 1
 
     app.add_middleware(BaseHTTPMiddleware, dispatch=readiness)
+    app.add_middleware(BaseHTTPMiddleware, dispatch=_liveness_only)
     return app
 
 

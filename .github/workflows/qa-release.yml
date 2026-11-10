@@ -1,0 +1,146 @@
+name: Manual QA candidate release
+run-name: QA ${{ inputs.operation }} source ${{ inputs.source_sha }}
+on:
+  workflow_dispatch:
+    inputs:
+      operation:
+        description: Prepare is non-distributable; other operations need qa-release review
+        type: choice
+        options: [PREPARE, BUILD_APK, UPDATE, ROLLBACK]
+        default: PREPARE
+      source_sha:
+        description: Exact approved merged Git SHA; dispatch ref must point to this SHA
+        type: string
+        required: true
+      proof_run_id:
+        description: Optional immutable qa-continuity-proof artifact run (required to publish)
+        type: string
+        default: ''
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: qa-release
+  cancel-in-progress: false
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      candidate_sha256: ${{ steps.summary.outputs.candidate_sha256 }}
+      proof_sha256: ${{ steps.summary.outputs.proof_sha256 }}
+      artifact_url: ${{ steps.package.outputs.artifact-url }}
+    steps:
+      - name: Require exact dispatch source and numeric proof reference
+        env:
+          SOURCE: ${{ inputs.source_sha }}
+          PROOF_RUN: ${{ inputs.proof_run_id }}
+        run: |
+          [[ "$SOURCE" =~ ^[a-f0-9]{40}$ ]] && [[ "$SOURCE" == "$GITHUB_SHA" ]]
+          [[ -z "$PROOF_RUN" || "$PROOF_RUN" =~ ^[1-9][0-9]*$ ]]
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.source_sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install httpx==0.28.1
+      - name: Refuse missing or unprotected environment before GitHub can create it
+        if: inputs.operation != 'PREPARE'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python -c 'from tools.qa_delivery.pipeline import protected_environment; protected_environment()'
+      - name: Read optional private proof artifact without publication credentials
+        if: inputs.proof_run_id != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PROOF_RUN: ${{ inputs.proof_run_id }}
+        run: gh run download "$PROOF_RUN" --repo "$GITHUB_REPOSITORY" --name qa-continuity-proof --dir "$RUNNER_TEMP/qa-proof"
+      - name: Prepare frozen non-distributable candidate
+        env:
+          GH_TOKEN: ${{ github.token }}
+          OPERATION: ${{ inputs.operation }}
+          PROOF_RUN: ${{ inputs.proof_run_id }}
+        run: |
+          operation="$OPERATION"
+          [[ "$operation" != PREPARE ]] || operation=BUILD_APK
+          args=()
+          [[ -z "$PROOF_RUN" ]] || args+=(--proof "$RUNNER_TEMP/qa-proof")
+          python -m tools.qa_delivery.pipeline prepare --candidate docs/release/rel-03/candidate.json --operation "$operation" --output "$RUNNER_TEMP/qa-prepared.json" "${args[@]}"
+      - uses: actions/upload-artifact@v4
+        id: package
+        with:
+          name: qa-prepared-candidate
+          path: ${{ runner.temp }}/qa-prepared.json
+          retention-days: 7
+          if-no-files-found: error
+      - name: Expose exact package for the single protected candidate review
+        id: summary
+        env:
+          ARTIFACT_URL: ${{ steps.package.outputs.artifact-url }}
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          p=json.loads((Path(os.environ['RUNNER_TEMP'])/'qa-prepared.json').read_text())
+          with open(os.environ['GITHUB_OUTPUT'],'a') as out:
+              out.write(f"candidate_sha256={p['candidate_sha256']}\nproof_sha256={p['proof_sha256'] or ''}\n")
+          with open(os.environ['GITHUB_STEP_SUMMARY'],'a') as out:
+              out.write(f"PREPARED / NON_DISTRIBUTABLE\n\nReview {os.environ['ARTIFACT_URL']} including source, current canonical, target and private cutover proof.\n\nSingle qa-release approval comment (deployment authorization only): `APPROVE_QA {p['candidate_sha256']} {p['proof_sha256']}`\n")
+          PY
+  release:
+    if: inputs.operation != 'PREPARE'
+    needs: prepare
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    environment:
+      name: qa-release
+      url: ${{ needs.prepare.outputs.artifact_url }}
+    permissions:
+      contents: read
+      actions: read
+      checks: read
+      deployments: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.source_sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.20.0'
+      - run: pip install -r requirements-lock.txt httpx==0.28.1
+      - run: npm ci
+        working-directory: clients/mobile
+      - run: npm install --global eas-cli@27.2.0
+      - uses: actions/download-artifact@v4
+        with:
+          name: qa-prepared-candidate
+          path: ${{ runner.temp }}/qa-package
+      - name: Read exact private proof again
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PROOF_RUN: ${{ inputs.proof_run_id }}
+        run: |
+          [[ "$PROOF_RUN" =~ ^[1-9][0-9]*$ ]]
+          gh run download "$PROOF_RUN" --repo "$GITHUB_REPOSITORY" --name qa-continuity-proof --dir "$RUNNER_TEMP/qa-proof"
+      - name: Acquire all gates then publish only to fixed QA project/channel
+        env:
+          # Optional read-only audit token needs Administration:read to inspect
+          # branch protection when the managed token cannot. Never used to write.
+          GH_TOKEN: ${{ secrets.QA_RELEASE_AUDIT_TOKEN || github.token }}
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+        run: python -m tools.qa_delivery.pipeline publish --candidate "$RUNNER_TEMP/qa-package/qa-prepared.json" --proof "$RUNNER_TEMP/qa-proof" --output "$RUNNER_TEMP/qa-submitted.json"
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: qa-submission-verification-pending
+          path: ${{ runner.temp }}/qa-submitted.json
+          retention-days: 7

@@ -1,0 +1,16 @@
+# Additional context defense for Render's root-level secret files. Explicit COPY
+# in Dockerfile remains the image inclusion boundary. No secrets belong in Git.
+qa-config.json
+qa-access.json
+qa-auth-secret
+.git
+.env
+.env.*
+**/.env
+**/.env.*
+**/__pycache__
+**/*.pyc
+**/node_modules
+.private
+private
+.superpowers

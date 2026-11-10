@@ -1,4 +1,5 @@
-# Preparation artifact only. Build context MUST be an approved tracked Git archive.
+# Preparation only. Context: approved Git archive locally, or trusted Render
+# tracked Git checkout at the exact approved deploy commit. Never ambient files.
 FROM python:3.11.14-slim
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
 ARG SOURCE_SHA
@@ -21,7 +22,8 @@ RUN python -m tools.plan_calibration_runtime_bundle /opt/science \
     && chmod -R a-w /opt/science \
     && useradd --uid 10001 --create-home qa
 USER 10001
+RUN mkdir -m 0700 /home/qa/.ssh
 EXPOSE 8080
 STOPSIGNAL SIGTERM
-ENTRYPOINT ["python", "-m", "tools.qa_delivery.server"]
-CMD ["--config", "/run/qa/config.json"]
+ENTRYPOINT ["python", "-m", "tools.qa_delivery.bootstrap"]
+CMD ["--config", "/etc/secrets/qa-config.json", "--activation", "/var/lib/qa/activation.json"]
