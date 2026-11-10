@@ -1,0 +1,59 @@
+{
+  "schema": "release-qa-artifact/1.0.0",
+  "status": "APK_BUILT_PHYSICAL_ACCEPTANCE_PENDING",
+  "source_revision": "5ed4e0e2ad8e8d80c43dc4049a30dad7f37f5c61",
+  "backend_revision": "b8f5ffc2d6671521cbc276ab87397540aed60bb7",
+  "eas_build_id": "1c56f099-734b-4bf9-87f5-189fef95ccc5",
+  "eas_build_url": "https://expo.dev/accounts/grimais/projects/auren-vnext-lab/builds/1c56f099-734b-4bf9-87f5-189fef95ccc5",
+  "artifact_uri": "https://expo.dev/artifacts/eas/_t603K_CVDsdXKWFrGPbrK9xE6OyDuyudF0Hw5LVk9w.apk",
+  "artifact_bytes": 106411230,
+  "artifact_sha256": "75a1920a0b3143a2fae87d42d24fb8c3e9850063b8f2af00a60f850aaab46c99",
+  "application_id": "dev.auren.releaseqa02",
+  "version_name": "0.0.1",
+  "version_code": 2,
+  "min_sdk": 24,
+  "target_sdk": 36,
+  "debuggable": false,
+  "cleartext_permitted": false,
+  "signature_scheme": "v2",
+  "certificate_sha256": "12b13109a2a41e2e2c0e97578364793e659a7548da4ce210d0dbd2f912f4bc75",
+  "native_module_dex": "ExpoTopicSubscriptionModule",
+  "embedded_assets": [
+    {
+      "file": "assets/app.config",
+      "bytes": 1729,
+      "sha256": "38622a86014a730629de54691f4498ca0e7214d810adc4b40c1a59efee7c926b",
+      "has_backend": true,
+      "has_source_sha": true
+    },
+    {
+      "file": "assets/index.android.bundle",
+      "bytes": 3274168,
+      "sha256": "3a9adc431cc005e4eb435faf24330eea12134347c931528f9d4699bd98d1f8b8",
+      "has_backend": true,
+      "has_source_sha": false
+    }
+  ],
+  "eas_fingerprint": "2e2be5dd3399c282425a7f2226a34b75d2248d06",
+  "qa_target": {
+    "schemaVersion": "release-qa-target/1.0.0",
+    "state": "ATTESTED",
+    "apiUrl": "https://decorating-friendship-suggestions-current.trycloudflare.com",
+    "dataScope": "SYNTHETIC_ONLY",
+    "backendRevision": "b8f5ffc2d6671521cbc276ab87397540aed60bb7",
+    "packagingDigest": "22b066a0fb363b1bd435323269bad8a7fa47e4149f18b91e4b039e89d8352dfc",
+    "authorityGeneration": 3,
+    "availability": "TEMPORARY_OPERATOR_HOST",
+    "capturedAt": "2026-11-10T09:09:39.711225+00:00"
+  },
+  "installed_supplemental_device": {
+    "type": "EMULATOR_NOT_PHYSICAL",
+    "avd": "AUREN_RELEASE_QA02_20261110",
+    "android": 16,
+    "api": 36,
+    "install": "PASS",
+    "launch": "PASS_AUTH_SCREEN_NO_MISSING_MODULE"
+  },
+  "physical_device": "UNAVAILABLE_OPERATOR_HAS_NONE_REMOTE_TESTER_REQUIRED",
+  "production_deployment": false
+}

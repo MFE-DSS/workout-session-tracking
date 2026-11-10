@@ -7,7 +7,7 @@
 - [x] Ajouter profil/config HTTPS QA bornés et passerelle, tests de refus et préservation hors QA ; aucun cleartext/Metro.
 - [x] Préparer backend SQLite/bundle/autorité synthétiques et migrations réellement vérifiées ; retrait/restauration de test et identité HTTPS.
 - [ ] check_scope puis checks appropriés, tests consommateurs, revue indépendante et CI exacte.
-- [ ] Construire EAS internal APK ; archiver source/identité/signature/build/URI/empreintes.
+- [x] Construire EAS internal APK ; archiver source/identité/signature/build/URI/empreintes.
 ## 3. Device and delivery
 - [ ] Installer sur Android physique autorisé et vérifier absence d'exception native.
 - [ ] Exécuter la checklist avec PASS/FAIL/UNAVAILABLE et preuves séparées HTTP/émulateur/physique.
