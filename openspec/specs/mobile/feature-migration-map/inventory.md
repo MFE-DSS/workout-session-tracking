@@ -1,14 +1,14 @@
 # Inventaire des fonctions web → destination native (MOB-00)
 
 Généré depuis `inventory.yaml` (base `36b971a`) — ne pas éditer à la main.
-**39 fonctions**, **135 routes** rattachées, BLOCKED 10, DEPRECATE 1, KEEP_DOMAIN 4, REWRITE_NATIVE 19, WEB_ONLY 5.
+**39 fonctions**, **136 routes** rattachées, BLOCKED 10, DEPRECATE 1, KEEP_DOMAIN 4, REWRITE_NATIVE 19, WEB_ONLY 5.
 « (proposé) » = proposition de l'agent, à trancher par l'opérateur.
 
 ## Mission
 
 | Fonction | Statut | Destination native | Routes | Propriétaire du domaine | Dépendances | Risque |
 |---|---|---|---|---|---|---|
-| MISSION — la séance du jour et sa raison | KEEP_DOMAIN | MISSION (MissionScreen, livré) | 2 | recommendation_v3 · home · mobile_read_models.mission_read_model · session_state | — | faible — livré ; constat PLAT-01 : raison « déjà bien servi » affichée MESURÉE sur un compte sans séance |
+| MISSION — la séance du jour et sa raison | KEEP_DOMAIN | MISSION (MissionScreen, livré) | 3 | recommendation_v3 · home · mobile_read_models.mission_read_model · session_state · mission_action | — | faible — livré ; constat PLAT-01 : raison « déjà bien servi » affichée MESURÉE sur un compte sans séance |
 | Écarter une adaptation de plan proposée | REWRITE_NATIVE | MISSION | 1 | plan_adaptation_store | MOB-04 Mission | faible |
 
 ## Séance

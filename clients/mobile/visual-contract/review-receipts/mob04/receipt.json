@@ -1,0 +1,164 @@
+{
+  "schema_version": "mob04-visual-review/1.1.0",
+  "status": "PIXELS_ACCEPTED_CONTROLLED",
+  "operator_g1": "Autoriser MOB-04 et valider G1",
+  "operator_pixels": "Valider ces pixels MOB-04 contrôlés",
+  "created_at": "2026-11-10T17:20:30.603912+00:00",
+  "head": "3885a53de73b01551a909acc87699d0d5d1d5e51",
+  "canonical_reviewed": "7d35c4cb7b55198de64b8eacda4d4011ab28de4a",
+  "frames": [
+    {
+      "file": "before-qa02.png",
+      "sha256": "45c30482288156243d19915b4fa1a048217d67aebfa4cf87edeef06c3cdf2c95",
+      "source": "/private/tmp/auren-release-qa-02-evidence/native-fresh-entry.png",
+      "title": "Avant : APK QA02, entrée existante",
+      "information_source": "Référence historique Android APK, source5ed4e0e. Ni nouveau rendu ni nouvelle validation."
+    },
+    {
+      "file": "before-uxcal.png",
+      "sha256": "d684cf13a9463dfe9ef21e317a730da0d68a6aa624778f2c927bde79e2b9f619",
+      "source": "/private/tmp/auren-mob04-pilot-opening/clients/mobile/visual-contract/review-receipts/ux-cal-02/ios-390-first-home-after.png",
+      "title": "Référence acceptée UX-CAL-02",
+      "information_source": "iOS390×844. Référence datée conservée sans régénération."
+    },
+    {
+      "file": "ios-first.png",
+      "sha256": "fd8041a8eeb1713e6ebfbcf3926d4490ac68ee2de4d260b98d58b284e3fe6d9e",
+      "source": "/private/tmp/auren-pilot-value-delivery-evidence/MOB04_CONNECTED_IOS_FIRST_FINAL.png",
+      "title": "Après : Today premier parcours",
+      "information_source": "Vrai ConnectedApp iOS390×844, compte synthétique, vrais HTTP. Aucun plan/charge acquis par ouverture."
+    },
+    {
+      "file": "ios-details.png",
+      "sha256": "333deb3f917272939703ce9e3fc4fe38e82f89654df878bab2cf6fdbd4c05ec7",
+      "source": "/private/tmp/auren-pilot-value-delivery-evidence/MOB04_CONNECTED_IOS_DETAILS_FINAL.png",
+      "title": "Explication à la demande",
+      "information_source": "Vrai ConnectedApp, même orientation. Contenu de navigation, aucune recommandation scientifique."
+    },
+    {
+      "file": "ios-resume.png",
+      "sha256": "0094853522ccbf67cc1ebab6902bc6d8cf2a3ba28909fd748aad039503cba309",
+      "source": "/private/tmp/auren-pilot-value-delivery-evidence/MOB04_CONNECTED_IOS_RESUME_FINAL.png",
+      "title": "Reprise possédée prioritaire",
+      "information_source": "Vrai ConnectedApp + SQLite natif, séance5 créée par vraie API historique sur compte synthétique. Pas de création au clic Reprendre."
+    },
+    {
+      "file": "ios-execution.png",
+      "sha256": "abbea0a979ac3cd731b1968f7761ab6ae15531de366d7fea2c933ef0726b4e17",
+      "source": "/private/tmp/auren-pilot-value-delivery-evidence/MOB04_CONNECTED_IOS_EXECUTION_FINAL.png",
+      "title": "Handoff réellement consommé",
+      "information_source": "Même séance5 ouverte dans l’exécution existante ; aucune série effectuée. Référence fonctionnelle, composition d’exécution inchangée."
+    },
+    {
+      "file": "ios-historical.png",
+      "sha256": "dd7206d41ae4e15e6b51661f9a22636e30be0fa5dd12879b2ee407b4a7468e5e",
+      "source": "/private/tmp/auren-pilot-value-delivery-evidence/MOB04_CONNECTED_IOS_HISTORICAL.png",
+      "title": "Autre parcours choisi explicitement",
+      "information_source": "Vraie recommandation historique, raison/zones exactes du serveur. Aucun équivalent d’admission V3 prétendu. Géométrie MISSION inchangée."
+    },
+    {
+      "file": "ios-menu.png",
+      "sha256": "24d19608deb5c1257c718fad486a88cb81faa8dffa086dc98a869dad5f32d497",
+      "source": "/private/tmp/auren-pilot-value-delivery-evidence/MOB04_CONNECTED_IOS_MENU_FINAL.png",
+      "title": "Retour au premier parcours",
+      "information_source": "Nouveau menu subordonné Journal et parcours. Primitives existantes ; aucun footer ajouté à la carte MISSION."
+    },
+    {
+      "file": "ios-handoff.png",
+      "sha256": "f16d421fbd2e8284f4024edda72c48bd3b0841b08b36bbff838bebc5510aabe6",
+      "source": "/private/tmp/auren-pilot-value-delivery-evidence/MOB04_CONNECTED_IOS_HANDOFF.png",
+      "title": "Premier parcours existant",
+      "information_source": "Vrai ConnectedApp → contrôleur unique → host existant. Aucune qualification ou séance créée par cette entrée."
+    },
+    {
+      "file": "ios-uncertain.png",
+      "sha256": "20b8fdc331ec62226377769bb60d39a43aaecfcfbcadd30543c07ef8a90edba6",
+      "source": "/private/tmp/auren-pilot-value-delivery-evidence/MOB04_IOS_UNCERTAINTY_VISUAL_ONLY.png",
+      "title": "Réception à vérifier — témoin visuel",
+      "information_source": "Présentateur de production ; GET réel synthétique + état local START injecté pour ce rendu uniquement. Ce frame ne prouve pas une perte de réponse native. Le rejeu/non-double-POST est testé dans le vrai consommateur et SQLite."
+    },
+    {
+      "file": "android-first.png",
+      "sha256": "0ae7c3ba1a77a85ee992817c43a41e69a1619469ecde6eee7c1d362d28080fc3",
+      "source": "/private/tmp/auren-pilot-value-delivery-evidence/MOB04_ANDROID_360_FIRST_FINAL.png",
+      "title": "Android360 : même présentateur",
+      "information_source": "Présentateur de production + AuthSession/SQLite/HTTP réels dans banc hors produit. Fenêtre360×640dp, contenu592dp. Pas le ConnectedApp complet : module Expo Go absent, conservé."
+    },
+    {
+      "file": "android-resume.png",
+      "sha256": "87b2da1671283f5534d7e28ece3fac6e3ab990f531f5b167a7a7825fe2072e3d",
+      "source": "/private/tmp/auren-pilot-value-delivery-evidence/MOB04_ANDROID_360_RESUME_FINAL.png",
+      "title": "Android360 : séance possédée",
+      "information_source": "GET réel RESUME ; nom de test « Séance en cours » capturé tel quel. Présentation seulement ; le callback de reprise complet est éprouvé sur iOS et dans les tests consommateurs."
+    },
+    {
+      "file": "android-offline.png",
+      "sha256": "f432af0d42e8240375f32adb17f1234c739ee533635a7d988a861fd8ec768167",
+      "source": "/private/tmp/auren-pilot-value-delivery-evidence/MOB04_ANDROID_360_OFFLINE_FINAL.png",
+      "title": "Android360 : lecture inconnue",
+      "information_source": "Après une vraie lecture, faute transport de test. UNKNOWN n’est pas absence, aucun fallback ni nouvelle permission."
+    },
+    {
+      "file": "android-large.png",
+      "sha256": "051fa2395f627ab6e50e7c7c5b5a6882fdc50127e8cf75271cb9b2af549110e5",
+      "source": "/private/tmp/auren-pilot-value-delivery-evidence/MOB04_ANDROID_480_FONT13_FINAL.png",
+      "title": "Android480 : texte130%",
+      "information_source": "Même composant, fenêtre480×853dp / contenu805,33dp, fontScale1,3. Safe areas visibles, pas de donnée masquée par le CTA."
+    },
+    {
+      "file": "android-small-font.png",
+      "sha256": "fce57af3171369ff67ae8a340883f707ab0444c12fbab086986cc707898fec4f",
+      "source": "/private/tmp/auren-pilot-value-delivery-evidence/MOB04_ANDROID_360_FONT13_FINAL.png",
+      "title": "Android360 : texte130%",
+      "information_source": "Même composant. Le label Programmes de l’onglet existant est tronqué visuellement à cette largeur ; navigation/label complet demeurent un gate accessible, aucune baseline globale modifiée."
+    }
+  ],
+  "limits": [
+    "Synthetic controlled accounts only",
+    "Android complete ConnectedApp blocked by ExpoTopicSubscriptionModule in Expo Go; module/consumer unchanged",
+    "iOS actual ConnectedApp with test-only credential/database namespaces; no notification shim",
+    "Floating gear is Expo Go overlay, not AUREN",
+    "No physical device, full VoiceOver/TalkBack or new APK validation",
+    "Uncertainty frame is display-only local state, not proof of native lost-response flow",
+    "Locked baseline files unchanged",
+    "Native loss injection attempt did not intercept cached transport; successful legacy start observed instead; not claimed as lost-response proof"
+  ],
+  "operator_pixels_accepted_at": "2026-11-10T18:54:33.127479+00:00",
+  "operator_pixels_question_ref": "call_aa5eb315d47c4149a8609410c0ad08bb",
+  "acceptance_scope": "Controlled visual delta only; limitations unchanged; no physical/deployment acceptance",
+  "timestamp_basis": "time of recording the explicit operator reply; no exact reply timestamp supplied",
+  "source_files": [
+    {
+      "file": "clients/mobile/ConnectedApp.tsx",
+      "sha256": "2e8835d9045b5707d50fd281992a3c7f86ed0a6f15a76e268cda8f83669200b2"
+    },
+    {
+      "file": "clients/mobile/src/ui/mission/MissionActionHost.tsx",
+      "sha256": "cb25e7d395e7a0f163608cd39cdbde0c2933fe0ea97df6ab0520a30a39cfee80"
+    },
+    {
+      "file": "clients/mobile/src/api/missionAction.ts",
+      "sha256": "d35c79d80cadd154066b77553e8b78e3e4550007735d8675e094d13108e83c06"
+    },
+    {
+      "file": "clients/mobile/src/api/missionActionResource.ts",
+      "sha256": "32e58772c43a7f9741daa1cb60935399d3989ce1acee0cef86cb4820fdcab84f"
+    },
+    {
+      "file": "clients/mobile/src/api/missionOpening.ts",
+      "sha256": "4913ca9d114270e89fe6f011782478a438c1aaf95534fee8aa1049ddfb26384c"
+    },
+    {
+      "file": "app/services/mission_action.py",
+      "sha256": "c96786bd5fe11d0dd1ad4623fbc35ff3820349faeff8331d21642f38390390fe"
+    },
+    {
+      "file": "app/routers/mobile_mission.py",
+      "sha256": "bddd369e3a96c002951767fa18678b4740ae2f978432633f61491d9af2f2bead"
+    },
+    {
+      "file": "app/routers/mobile_api.py",
+      "sha256": "964ab274493fae0d7077ccc12c24d2a7d947b5e20289c23d1efd66f0ebd6acfa"
+    }
+  ]
+}

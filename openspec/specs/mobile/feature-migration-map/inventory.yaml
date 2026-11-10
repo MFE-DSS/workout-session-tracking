@@ -28,10 +28,10 @@ features:
   - id: mission-today
     feature: MISSION — la séance du jour et sa raison
     family: mission
-    routes: [GET /, GET /api/mobile/v1/mission]
-    legacy_location: "pages.index → index.html ; mobile_api.mission"
-    domain_owner: [recommendation_v3, home, mobile_read_models.mission_read_model, session_state]
-    api: "GET /api/mobile/v1/mission (existe)"
+    routes: [GET /, GET /api/mobile/v1/mission, GET /api/mobile/v1/mission-action]
+    legacy_location: "pages.index → index.html ; mobile_api.mission ; mobile_mission.mission_action"
+    domain_owner: [recommendation_v3, home, mobile_read_models.mission_read_model, session_state, mission_action]
+    api: "GET /api/mobile/v1/mission ; GET /api/mobile/v1/mission-action négocié mission-action/1.0.0"
     data: [workout_sessions, recommendation_episodes, decision_traces, training_preferences]
     user_actions: [voir la séance proposée, lire la raison, choisir une alternative, démarrer]
     native_destination: MISSION (MissionScreen, livré)
