@@ -1,0 +1,11 @@
+{
+  "schemaVersion": "release-qa-target/1.0.0",
+  "state": "ATTESTED",
+  "apiUrl": "https://decorating-friendship-suggestions-current.trycloudflare.com",
+  "dataScope": "SYNTHETIC_ONLY",
+  "backendRevision": "b8f5ffc2d6671521cbc276ab87397540aed60bb7",
+  "packagingDigest": "22b066a0fb363b1bd435323269bad8a7fa47e4149f18b91e4b039e89d8352dfc",
+  "authorityGeneration": 3,
+  "availability": "TEMPORARY_OPERATOR_HOST",
+  "capturedAt": "2026-11-10T09:09:39.711225+00:00"
+}

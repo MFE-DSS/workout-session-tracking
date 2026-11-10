@@ -921,3 +921,9 @@ consommateurs natifs déjà câblés. Scopes MOB04/05/BODY01/NUT01 préparés s�
 GO propres requis ; BODY conserve un conflit normatif correction à arbitrer.
 Aucun code/API/migration/asset/baseline/admission/activation/déploiement livré
 par cet inventaire. DATA/RELEASE physique et parité complète restent ouverts.
+
+
+## RELEASE-QA-02 — APK Android natif contrôlé
+
+10novembre2026, base canonique b8f5ffc. [Change](../../openspec/changes/release-qa-02-android-pilot/proposal.md), [design et direction distante](../../openspec/changes/release-qa-02-android-pilot/design.md), [GO reçu](../../openspec/changes/release-qa-02-android-pilot/BUILD_AUTHORIZATION.md), [checklist testeur](../release/release-qa-02/TESTER_CHECKLIST.md).
+**GO_BUILD_CONTROLLED / APK_PENDING / PHYSICAL_ACCEPTANCE_OPEN.** Profil EAS interne distinct, module notifications conservé, cible HTTPS temporaire vers seul banc synthétique et identités attribuées. Aucun serveur partagé/production, Store/OTA, donnée réelle, nouveau produit ou baseline modifiés. Vraie migration base→head et vrais SCI ; corps/délais/admission de passerelle testés, révision/artefact/signature à attester après construction. Absence d'Android personnel précisée par l'opérateur ; retour physique du bêta-testeur requis, jamais déduit de HTTP/émulateur. Les reçus de livraison porteront les résultats effectivement observés.
