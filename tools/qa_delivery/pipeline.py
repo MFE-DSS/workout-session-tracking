@@ -14,6 +14,7 @@ import re
 import shutil
 import subprocess
 from copy import deepcopy
+from datetime import datetime
 from pathlib import Path
 from urllib.parse import quote
 
@@ -308,6 +309,123 @@ def verify_continuity(root, c):
         raise ValueError("qa_continuity_verified_backup_and_cutover_required") from None
 
 
+def _observed_time(value):
+    require(isinstance(value, str), "qa_release_backup_timestamp_invalid")
+    observed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    require(observed.utcoffset() is not None, "qa_release_backup_timezone_required")
+    return observed
+
+
+def verify_release_backup(root, c, package, gate, acquired):
+    """Distinct recovery snapshot/export for this candidate, never old cutover data.
+
+    SQLite bytes/manifests and GitHub chronology are checked independently.
+    Physical off-service export and its observation remain OPERATOR_ATTESTED by
+    the human review of the exact proof hash, not inferred from a JSON boolean.
+    No arbitrary TTL or claim that a historical capture equals today's live DB.
+    """
+    try:
+        root = Path(root)
+        record = json.loads((root / "release-backup.json").read_text())
+        require(
+            record["schema_version"] == "qa-release-backup/1.0.0"
+            and record["assurance"] == "OPERATOR_ATTESTED",
+            "qa_release_backup_attestation_required",
+        )
+        require(
+            record["release_id"] == c["release_id"]
+            and record["candidate_sha256"] == package["candidate_sha256"]
+            and record["source"] == c["source"]
+            and record["target"] == c["target"],
+            "qa_release_backup_candidate_mismatch",
+        )
+        export = record["off_service_export"]
+        require(
+            export["completed"] is True and export["off_service"] is True,
+            "qa_release_backup_export_not_observed",
+        )
+        reference = export["reference"]
+        require(
+            isinstance(reference, str)
+            and 0 < len(reference) <= 512
+            and reference.strip() == reference,
+            "qa_release_backup_export_reference_required",
+        )
+        names = {
+            "release-backup.db",
+            "release-backup.db.manifest.json",
+            "release-export.db",
+            "release-export.db.manifest.json",
+        }
+        require(set(record["files_sha256"]) == names, "qa_release_backup_files_missing")
+        for name in names:
+            require(
+                record["files_sha256"][name]
+                == hashlib.sha256((root / name).read_bytes()).hexdigest(),
+                "qa_release_backup_checksum_mismatch",
+            )
+        snapshot = _verify_backup(root / "release-backup.db")
+        exported = _verify_backup(root / "release-export.db")
+        require(snapshot == exported, "qa_release_backup_export_snapshot_mismatch")
+        preparation_id = record["preparation_run_id"]
+        current_id = int(gate.env["GITHUB_RUN_ID"])
+        require(
+            type(preparation_id) is int and preparation_id > 0 and preparation_id != current_id,
+            "qa_release_backup_prior_preparation_required",
+        )
+        preparation = gate.get(f"actions/runs/{preparation_id}")
+        current = gate.get(f"actions/runs/{current_id}")
+        require(
+            preparation["id"] == preparation_id
+            and preparation["event"] == "workflow_dispatch"
+            and preparation["head_sha"] == c["source"]["js_sha"]
+            and preparation["path"] == ".github/workflows/qa-release.yml"
+            and preparation["status"] == "completed"
+            and preparation["conclusion"] == "success"
+            and preparation["run_attempt"] == 1,
+            "qa_release_backup_preparation_unverified",
+        )
+        require(
+            current["id"] == current_id and current["head_sha"] == c["source"]["js_sha"],
+            "qa_release_backup_dispatch_mismatch",
+        )
+        # PREPARE generates BUILD_APK candidates today. It anchors source/time
+        # only; UPDATE/ROLLBACK are bound exactly by the distinct record above.
+        prepared_start = _observed_time(preparation["created_at"])
+        prepared_done = _observed_time(preparation["updated_at"])
+        capture = record["capture"]
+        require(
+            prepared_start
+            <= prepared_done
+            <= _observed_time(capture["started_at"])
+            <= _observed_time(capture["completed_at"])
+            <= _observed_time(export["completed_at"])
+            <= _observed_time(export["observed_at"])
+            <= _observed_time(current["created_at"]),
+            "qa_release_backup_capture_or_export_chronology_stale",
+        )
+        deployments = gate.get("deployments?environment=qa-release&per_page=100")
+        this_deployment = acquired["approval"]["deployment_id"]
+        require(
+            any(d["id"] == this_deployment for d in deployments),
+            "qa_release_backup_current_deployment_unverified",
+        )
+        for deployment in deployments:
+            require(
+                deployment["environment"] == "qa-release", "qa_release_backup_deployment_unknown"
+            )
+            if deployment["id"] != this_deployment:
+                require(
+                    _observed_time(deployment["created_at"]) < prepared_start,
+                    "qa_release_backup_preparation_predates_previous_release",
+                )
+        return record
+    except (OSError, KeyError, TypeError, ValueError):
+        raise ValueError(
+            "qa_release_backup_fresh_capture_and_off_service_export_required"
+        ) from None
+
+
 def observe_target(c, proof, token, client):
     try:
         t, provider = c["target"], proof["provider"]
@@ -466,6 +584,17 @@ def check_channel(raw, c):
         )
         for update in branches[0]["updateGroups"]:
             require(
+                update["platform"] == "android"
+                and isinstance(update["runtime"]["version"], str)
+                and bool(update["runtime"]["version"]),
+                "qa_eas_runtime_unknown",
+            )
+            # channel:view exposes only the latest global group. Another native
+            # runtime cannot establish this installed runtime's compatibility or
+            # rollout; the exact-runtime query below is the mandatory authority.
+            if update["runtime"]["version"] != c["native"]["runtime_version"]:
+                continue
+            require(
                 "rolloutPercentage" in update and "rolloutControlUpdate" in update,
                 "qa_eas_rollout_unknown",
             )
@@ -473,14 +602,6 @@ def check_channel(raw, c):
                 update["rolloutPercentage"] in (None, 100)
                 and update["rolloutControlUpdate"] is None,
                 "qa_eas_rollout_active",
-            )
-            require(
-                update["platform"] == "android"
-                and (
-                    c["action"] == "BUILD_APK"
-                    or update["runtime"]["version"] == c["native"]["runtime_version"]
-                ),
-                "qa_eas_runtime_mismatch",
             )
     except (KeyError, TypeError, ValueError):
         raise ValueError("qa_eas_channel_or_rollout_refused") from None
@@ -618,6 +739,7 @@ def publish(package, checkout, proof_root, gate=None, eas_factory=EAS, client=No
             os.environ.get("EXPO_TOKEN") and os.environ.get("RENDER_API_KEY"),
             "qa_publish_credentials_missing",
         )
+        gate = gate or GitHubGate()
         c = package["candidate"]
         require(
             digest(c) == package["candidate_sha256"]
@@ -626,9 +748,7 @@ def publish(package, checkout, proof_root, gate=None, eas_factory=EAS, client=No
         )
         require(prepare(c, checkout) == c, "qa_publish_source_or_candidate_changed")
         require(c["target"] is not None, "qa_publish_target_unprovisioned")
-        acquired = (gate or GitHubGate()).collect(
-            c, package["candidate_sha256"], package["proof_sha256"]
-        )
+        acquired = gate.collect(c, package["candidate_sha256"], package["proof_sha256"])
         require(
             acquired["canonical_sha"] == package["canonical_sha"],
             "qa_publish_canonical_changed_prepare_again",
@@ -644,6 +764,7 @@ def publish(package, checkout, proof_root, gate=None, eas_factory=EAS, client=No
             "qa_publish_native_source_not_canonical_ancestor",
         )
         proof = verify_continuity(proof_root, c)
+        verify_release_backup(proof_root, c, package, gate, acquired)
         previous = json.loads((Path(proof_root) / "previous-native.json").read_text())
         metadata = metadata_environment(c, checkout, previous)
         environment = {
@@ -739,10 +860,13 @@ def publish(package, checkout, proof_root, gate=None, eas_factory=EAS, client=No
                 "qa_rollback_remote_identity_mismatch",
             )
         # Re-acquire policy/current canonical/approval immediately before mutations.
-        final = (gate or GitHubGate()).collect(
-            c, package["candidate_sha256"], package["proof_sha256"]
+        final = gate.collect(c, package["candidate_sha256"], package["proof_sha256"])
+        require(
+            final == acquired
+            and prepare(c, checkout) == c
+            and proof_digest(proof_root) == package["proof_sha256"],
+            "qa_publish_gate_changed",
         )
-        require(final == acquired and prepare(c, checkout) == c, "qa_publish_gate_changed")
         # Refresh mutable target/authority and runtime-specific rollout immediately
         # before writes; private cutover copies remain historical point-in-time.
         final_client = (

@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import hashlib
 import json
+import shutil
+import sqlite3
 import subprocess
 from copy import deepcopy
 from pathlib import Path
@@ -384,9 +386,7 @@ def test_real_quota_shape_fails_closed_without_paid_auto_upgrade(damage):
         check_quota(raw, "BUILD_APK")
 
 
-@pytest.mark.parametrize(
-    "damage", ["branch", "mapping", "unknown_rollout", "active_rollout", "runtime"]
-)
+@pytest.mark.parametrize("damage", ["branch", "mapping", "unknown_rollout", "active_rollout"])
 def test_sdk_channel_response_rejects_unknown_rollout_and_wrong_mapping(damage):
     from tools.qa_delivery.pipeline import check_channel
 
@@ -423,8 +423,6 @@ def test_sdk_channel_response_rejects_unknown_rollout_and_wrong_mapping(damage):
         del update["rolloutPercentage"]
     if damage == "active_rollout":
         update["rolloutPercentage"] = 50
-    if damage == "runtime":
-        update["runtime"]["version"] = "2" * 40
     with pytest.raises(ValueError, match="qa_eas"):
         check_channel({"currentPage": page}, c)
 
@@ -484,6 +482,42 @@ def release_case(tmp_path, checkout, qa_database, monkeypatch):
         "version_code": 2,
     }
     (proof / "previous-native.json").write_text(json.dumps(previous))
+    # Facts accumulated after the historical cutover. The fresh release snapshot
+    # must be independently validated; comparing it to cutover would be wrong.
+    with sqlite3.connect(qa_database) as db:
+        db.execute("UPDATE users SET password_hash='private-rotated-hash' WHERE id=42")
+    backup_database(qa_database, proof / "release-backup.db")
+    for suffix in ("", ".manifest.json"):
+        shutil.copyfile(
+            proof / ("release-backup.db" + suffix), proof / ("release-export.db" + suffix)
+        )
+    release_backup = {
+        "schema_version": "qa-release-backup/1.0.0",
+        "assurance": "OPERATOR_ATTESTED",
+        "release_id": c["release_id"],
+        "candidate_sha256": pipeline.digest(c),
+        "source": deepcopy(c["source"]),
+        "target": deepcopy(c["target"]),
+        "preparation_run_id": 455,
+        "capture": {"started_at": "2026-11-10T09:02:00Z", "completed_at": "2026-11-10T09:03:00Z"},
+        "off_service_export": {
+            "completed": True,
+            "off_service": True,
+            "reference": "private-off-service-export-receipt",
+            "completed_at": "2026-11-10T09:04:00Z",
+            "observed_at": "2026-11-10T09:05:00Z",
+        },
+        "files_sha256": {
+            name: hashlib.sha256((proof / name).read_bytes()).hexdigest()
+            for name in [
+                "release-backup.db",
+                "release-backup.db.manifest.json",
+                "release-export.db",
+                "release-export.db.manifest.json",
+            ]
+        },
+    }
+    (proof / "release-backup.json").write_text(json.dumps(release_backup))
     package = {
         "candidate": c,
         "candidate_sha256": pipeline.digest(c),
@@ -491,6 +525,22 @@ def release_case(tmp_path, checkout, qa_database, monkeypatch):
         "canonical_sha": c["source"]["js_sha"],
     }
     data = json.loads(json.dumps(github_payloads(c)).replace(SHA, c["source"]["js_sha"]))
+    data["actions/runs/456"]["created_at"] = "2026-11-10T09:06:00Z"
+    data["actions/runs/455"] = {
+        "id": 455,
+        "event": "workflow_dispatch",
+        "head_sha": c["source"]["js_sha"],
+        "path": ".github/workflows/qa-release.yml",
+        "status": "completed",
+        "conclusion": "success",
+        "run_attempt": 1,
+        "created_at": "2026-11-10T09:00:00Z",
+        "updated_at": "2026-11-10T09:01:00Z",
+    }
+    data["deployments?environment=qa-release&per_page=100"] = [
+        {"id": 99, "environment": "qa-release", "created_at": "2026-11-10T09:07:00Z"},
+        {"id": 88, "environment": "qa-release", "created_at": "2026-11-10T08:00:00Z"},
+    ]
     data["actions/runs/456/approvals"][0]["comment"] = (
         f"APPROVE_QA {package['candidate_sha256']} {package['proof_sha256']}"
     )
@@ -580,7 +630,14 @@ def release_case(tmp_path, checkout, qa_database, monkeypatch):
                     200,
                     json={
                         "data": {
-                            "app": {"byId": {"updateBranchByName": {"name": "qa", "updates": []}}}
+                            "app": {
+                                "byId": {
+                                    "updateBranchByName": {
+                                        "name": "qa",
+                                        "updates": data.get("runtime_updates", []),
+                                    }
+                                }
+                            }
                         }
                     },
                 )
@@ -706,8 +763,9 @@ def test_actual_publish_entrypoint_has_zero_mutations_when_a_gate_is_missing(
 
 
 @pytest.mark.parametrize("action", ["UPDATE", "ROLLBACK"])
+@pytest.mark.parametrize("runtime_rollout", ["none", "active", "unknown", "installed_mismatch"])
 def test_publish_ota_uses_sdk_environment_and_known_good_group_without_embedding_claim(
-    release_case, action
+    release_case, action, runtime_rollout
 ):
     from tools.qa_delivery.pipeline import digest, proof_digest, publish
 
@@ -728,6 +786,9 @@ def test_publish_ota_uses_sdk_environment_and_known_good_group_without_embedding
     }
     (proof / "previous-native.json").write_text(json.dumps(previous))
     (proof / "known-good-update.json").write_text(json.dumps(previous))
+    release_backup = json.loads((proof / "release-backup.json").read_text())
+    release_backup["candidate_sha256"] = digest(c)
+    (proof / "release-backup.json").write_text(json.dumps(release_backup))
     package["candidate_sha256"], package["proof_sha256"] = digest(c), proof_digest(proof)
     data["actions/runs/456/approvals"][0]["comment"] = (
         f"APPROVE_QA {package['candidate_sha256']} {package['proof_sha256']}"
@@ -746,11 +807,28 @@ def test_publish_ota_uses_sdk_environment_and_known_good_group_without_embedding
                     "appIdentifier": c["native"]["package"],
                     "appVersion": c["native"]["app_version"],
                     "appBuildVersion": str(c["native"]["version_code"]),
-                    "runtime": {"version": c["native"]["runtime_version"]},
+                    "runtime": {
+                        "version": "2" * 40
+                        if runtime_rollout == "installed_mismatch"
+                        else c["native"]["runtime_version"]
+                    },
                     "gitCommitHash": c["source"]["native_sha"],
                     "updateChannel": {"name": "qa"},
                     "app": {"id": c["eas"]["project_id"]},
                 }
+            if args[0] == "channel:view":
+                page = basic(*args)
+                # Installed/candidate runtime is R2=1..., but global latest remains
+                # old R1=2... after the new APK; first OTA must still reach SDK.
+                page["currentPage"]["updateBranches"][0]["updateGroups"] = [
+                    {
+                        "platform": "android",
+                        "runtime": {"version": "2" * 40},
+                        "rolloutPercentage": None,
+                        "rolloutControlUpdate": None,
+                    }
+                ]
+                return page
             if args[0] == "update:view":
                 calls.append(args)
                 return [
@@ -768,6 +846,38 @@ def test_publish_ota_uses_sdk_environment_and_known_good_group_without_embedding
 
         return eas
 
+    if action == "ROLLBACK":
+        # A known-good R2 update exists even if global latest belongs to R1.
+        data["runtime_updates"] = [
+            {
+                "runtime": {"version": c["native"]["runtime_version"]},
+                "rolloutPercentage": None,
+                "rolloutControlUpdate": None,
+            }
+        ]
+    if runtime_rollout != "none":
+        update = {
+            "runtime": {"version": c["native"]["runtime_version"]},
+            "rolloutPercentage": 50,
+            "rolloutControlUpdate": None,
+        }
+        if runtime_rollout == "unknown":
+            del update["rolloutPercentage"]
+        data["runtime_updates"] = [update]
+        with (
+            client,
+            pytest.raises(
+                ValueError,
+                match="qa_native_prior_build_identity_mismatch"
+                if runtime_rollout == "installed_mismatch"
+                else "qa_eas_rollout_current_runtime_unqualified",
+            ),
+        ):
+            publish(package, root, proof, gate, factory_with_native, client)
+        assert not any(
+            args[0] in {"env:set", "update", "update:republish", "build"} for args in calls
+        )
+        return
     with client:
         result = publish(package, root, proof, gate, factory_with_native, client)
     assert any(args[0] == "build:view" for args in calls)
@@ -835,7 +945,7 @@ def test_remote_environment_does_not_mutate_values_linked_to_other_environments(
                 check_remote_environment(c, "test-only", client)
 
 
-def test_new_apk_allows_known_previous_runtime_on_qa_but_update_does_not():
+def test_new_apk_and_its_first_update_allow_other_global_runtime_on_qa():
     from tools.qa_delivery.pipeline import check_channel
 
     c, _ = approved()
@@ -862,8 +972,7 @@ def test_new_apk_allows_known_previous_runtime_on_qa_but_update_does_not():
     }
     check_channel({"currentPage": page}, c)
     c["action"] = "UPDATE"
-    with pytest.raises(ValueError, match="qa_eas"):
-        check_channel({"currentPage": page}, c)
+    check_channel({"currentPage": page}, c)
 
 
 @pytest.mark.parametrize("damage", ["none", "unknown", "percentage", "control", "runtime"])
@@ -942,3 +1051,116 @@ def test_cli_prepare_uses_real_template_without_external_credentials(checkout, t
         subprocess.check_output(["git", "-C", str(checkout), "status", "--porcelain"], text=True)
         == ""
     )
+
+
+@pytest.mark.parametrize(
+    "damage",
+    [
+        "cutover_only",
+        "export_false",
+        "not_off_service",
+        "export_reference_missing",
+        "wrong_release",
+        "wrong_candidate",
+        "wrong_source",
+        "wrong_target",
+        "capture_before_preparation",
+        "capture_reversed",
+        "export_before_capture",
+        "export_observation_before_completion",
+        "export_observation_after_dispatch",
+        "preparation_before_previous_release",
+        "preparation_wrong_source",
+        "preparation_failed",
+        "missing_export_copy",
+        "wrong_export_hash",
+        "wrong_capture_hash",
+        "corrupt_release_backup",
+        "export_manifest_mismatch",
+        "different_valid_export",
+        "naive_timestamp",
+    ],
+)
+def test_publish_requires_distinct_fresh_release_backup_and_observed_off_service_export(
+    release_case, damage
+):
+    from tools.qa_delivery.pipeline import proof_digest, publish
+
+    package, root, proof, gate, eas, calls, client, data = release_case
+    record = json.loads((proof / "release-backup.json").read_text())
+    if damage == "cutover_only":
+        for path in proof.glob("release-*"):
+            path.unlink()
+    elif damage == "export_false":
+        record["off_service_export"]["completed"] = False
+    elif damage == "not_off_service":
+        record["off_service_export"]["off_service"] = False
+    elif damage == "export_reference_missing":
+        record["off_service_export"]["reference"] = ""
+    elif damage == "wrong_release":
+        record["release_id"] = "other-release"
+    elif damage == "wrong_candidate":
+        record["candidate_sha256"] = "b" * 64
+    elif damage == "wrong_source":
+        record["source"]["js_sha"] = "b" * 40
+    elif damage == "wrong_target":
+        record["target"]["environment_id"] = "qa-other"
+    elif damage == "capture_before_preparation":
+        record["capture"]["started_at"] = "2026-11-10T08:30:00Z"
+    elif damage == "capture_reversed":
+        record["capture"]["completed_at"] = "2026-11-10T09:01:00Z"
+    elif damage == "export_before_capture":
+        record["off_service_export"]["completed_at"] = "2026-11-10T09:02:30Z"
+    elif damage == "export_observation_before_completion":
+        record["off_service_export"]["observed_at"] = "2026-11-10T09:03:30Z"
+    elif damage == "export_observation_after_dispatch":
+        record["off_service_export"]["observed_at"] = "2026-11-10T09:06:30Z"
+    elif damage == "preparation_before_previous_release":
+        data["actions/runs/455"]["created_at"] = "2026-11-10T07:00:00Z"
+    elif damage == "preparation_wrong_source":
+        data["actions/runs/455"]["head_sha"] = "b" * 40
+    elif damage == "preparation_failed":
+        data["actions/runs/455"]["conclusion"] = "failure"
+    elif damage == "missing_export_copy":
+        (proof / "release-export.db").unlink()
+    elif damage == "wrong_export_hash":
+        record["files_sha256"]["release-export.db"] = "b" * 64
+    elif damage == "wrong_capture_hash":
+        record["files_sha256"]["release-backup.db"] = "b" * 64
+    elif damage == "corrupt_release_backup":
+        (proof / "release-backup.db").write_bytes(b"corrupt-whole-db")
+    elif damage == "export_manifest_mismatch":
+        (proof / "release-export.db.manifest.json").write_text("{}")
+    elif damage == "different_valid_export":
+        for name, original in [
+            ("release-export.db", "backup.db"),
+            ("release-export.db.manifest.json", "backup.db.manifest.json"),
+        ]:
+            shutil.copyfile(proof / original, proof / name)
+            record["files_sha256"][name] = hashlib.sha256((proof / name).read_bytes()).hexdigest()
+    elif damage == "naive_timestamp":
+        record["capture"]["started_at"] = "2026-11-10T09:02:00"
+    if damage != "cutover_only":
+        (proof / "release-backup.json").write_text(json.dumps(record))
+    package["proof_sha256"] = proof_digest(proof)
+    data["actions/runs/456/approvals"][0]["comment"] = (
+        f"APPROVE_QA {package['candidate_sha256']} {package['proof_sha256']}"
+    )
+    with client, pytest.raises(ValueError, match="qa_release_backup"):
+        publish(package, root, proof, gate, eas, client)
+    assert calls == []
+
+
+def test_fresh_release_backup_differs_from_cutover_and_has_verified_export(release_case):
+    from tools.qa_delivery.database import _verify_backup
+    from tools.qa_delivery.pipeline import publish
+
+    package, root, proof, gate, eas, calls, client, _ = release_case
+    old = _verify_backup(proof / "backup.db")
+    current = _verify_backup(proof / "release-backup.db")
+    exported = _verify_backup(proof / "release-export.db")
+    assert old["continuity_digest"] != current["continuity_digest"]
+    assert current == exported
+    with client:
+        assert publish(package, root, proof, gate, eas, client)["distributable"] is False
+    assert calls[-1][0] == "build"

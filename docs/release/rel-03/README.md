@@ -5,6 +5,11 @@ approval does not authorize hosting, spend, cutover, cloud build or APK/OTA
 publication. Target configuration remains UNPROVISIONED. No stable URL, APK,
 OTA result, provider deployment or physical-device acceptance is claimed.
 
+**CODE/PREPARATION GAP:** the repository currently has no producer/importer for
+qa-continuity-proof Actions artifacts. The workflow consumes such an artifact but
+cannot create the first one. Root must resolve and review this code gap before
+claiming independent code readiness; hosting permission alone does not fix it.
+
 ## Manual release protocol
 
 The sole distribution trigger is workflow_dispatch in qa-release.yml. It requires
@@ -81,8 +86,82 @@ artifact and hash its complete file set. It contains:
 
 No proof artifact is created, backup transferred or live writer stopped here.
 Missing/corrupt proof fails before any publishing command. All copies are private
-and synthetic; retention/off-service export is an operator responsibility. Never
+and synthetic. Daily retention/export remains an operator responsibility; the
+distinct pre-release backup/export below is an enforced publication gate. Never
 upload secrets, passwords or production/personal data to this artifact.
+
+## Required capture/export for each release
+
+Historical cutover proof is insufficient after new journal/auth facts accumulate.
+The same reviewed proof artifact must additionally contain release-backup.json,
+release-backup.db and its .manifest.json, plus release-export.db and its
+.manifest.json: the exact off-service export read back for verification. Both
+whole DB copies are checked against their complete manifests and byte hashes,
+and the export must equal this release's snapshot. Neither is compared to the
+old cutover DB or today's mutable live DB.
+
+The new record has schema_version qa-release-backup/1.0.0 and assurance
+OPERATOR_ATTESTED, and contains these required bindings:
+
+- release_id, candidate_sha256, source and target exactly match this candidate;
+- preparation_run_id identifies a successful, completed first-attempt
+  qa-release.yml workflow_dispatch at this exact source SHA;
+- capture.started_at and capture.completed_at are observed timezone-aware times;
+- off_service_export.completed and off_service are actual operator-attested true
+  facts, with its private reference, completed_at and observed_at (readback check);
+- files_sha256 pins all four exact DB/manifest files named above.
+
+The gate independently reads GitHub preparation/current run times and all prior
+qa-release deployments. Preparation creation must follow every prior QA deployment
+creation, excluding the actual current deployment. Then the completed preparation run’s last update
+(updated_at) ≤ capture start ≤ capture completion ≤ export completion ≤ export
+observation ≤ current release dispatch creation. This sequence requires a new
+preparation/capture/export after every prior release; no arbitrary TTL or daily
+backup success is inferred. Missing/false/reversed/stale/differently bound facts
+stop before env:set. Physical location and observation of off-service export are
+explicitly OPERATOR_ATTESTED under the exact protected proof-hash review, while
+SQLite/manifests/checksums and GitHub timestamps are mechanically verified.
+
+Future authorized sequence (nothing here executes it):
+
+1. At the exact approved source, dispatch operation PREPARE without a proof. Wait
+   for its successful completion and retain its real run ID/times. This automated
+   read-only job is required once per release, after the prior QA release; it adds
+   one preparation job and GitHub reads, no build/deployment/spend. PREPARE currently
+   builds a BUILD_APK candidate; this run anchors only source/time for all actions.
+2. On a clean checkout of that same SHA, obtain the exact intended candidate hash
+   before capture, using the already qualified historical/native proof directory:
+
+   ```sh
+   python -m tools.qa_delivery.pipeline prepare --candidate docs/release/rel-03/candidate.json --operation BUILD_APK --proof /private/qa-proof --output /private/build-candidate.json
+   python -m tools.qa_delivery.pipeline prepare --candidate docs/release/rel-03/candidate.json --operation UPDATE --proof /private/qa-proof --output /private/update-candidate.json
+   python -m tools.qa_delivery.pipeline prepare --candidate docs/release/rel-03/candidate.json --operation ROLLBACK --proof /private/qa-proof --output /private/rollback-candidate.json
+   ```
+
+   Run only the intended action. The output candidate_sha256 is independent of
+   the proof hash. UPDATE/ROLLBACK reuse the real previous native receipt; their
+   candidate/action need not equal the preliminary BUILD_APK preparation artifact.
+3. Under the separate approved external operation, capture the entire current QA
+   DB using `python -m tools.qa_delivery.database backup <private-current-db>
+   <private-new-release-backup.db>`, recording actual start/completion. Export that
+   DB plus manifest to the approved private off-service location, read it back as
+   release-export.db plus its renamed manifest and record actual completion/check
+   observations. Record observed facts/hashes in release-backup.json, bound to the
+   intended action's candidate from step2 and real preparation run from step1.
+4. Include these files with historical cutover/native proof in the private
+   operator-controlled qa-continuity-proof artifact. **This step is currently a
+   CODE/PREPARATION GAP:** no supported producer/importer exists in this repository.
+   GitHub has no `gh run upload` command or manual Actions-artifact UI upload.
+   The sequence cannot currently be completed end-to-end by this package. Root
+   must review a supported private ingestion path (including any host/key/mode/source
+   bindings) before code readiness; this fix does not invent a transport, public
+   export route, new workflow or secret architecture. No upload is executed here.
+5. Dispatch BUILD_APK, UPDATE or ROLLBACK at that same source with this proof_run_id.
+   Current prepare independently regenerates the exact action candidate and hashes
+   the entire proof, then the single protected deployment review acknowledges both
+   hashes. A changed candidate/source requires re-preparation/capture; no circular
+   proof hash is embedded in the capture record, and no extra human approval is
+   imposed by the preliminary automated preparation.
 
 ## Fixed SDK actions after every gate
 
@@ -90,7 +169,10 @@ The CLI is pinned to EAS27.2.0, Node22.20.0 and existing ExpoSDK58. Account usag
 is re-read: only the approved Free plan with remaining Android/total build quota
 and no overage is admitted. Update/updater and bandwidth headroom are also checked;
 no plan purchase/upgrade exists. Channel must be one unconditional qa→qa mapping;
-unknown, partial or active rollouts are refused. No force-end rollout flag exists.
+unknown, partial or active rollouts for the exact candidate/installed runtime are
+refused. A latest global group for another runtime does not block the first OTA
+on a newly installed native runtime; an independent runtime-filtered query is
+mandatory. No force-end rollout flag exists.
 
 For build/update, only EXPO_PUBLIC_QA_NATIVE_SHA, EXPO_PUBLIC_QA_JS_SHA and
 EXPO_PUBLIC_API_URL are synchronized to project-scoped preview variables. A
