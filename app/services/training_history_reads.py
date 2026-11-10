@@ -17,6 +17,8 @@ from app.config import get_settings
 from app.models.session import SessionExercise, SetLog, WorkoutSession
 
 VERSION = "training-history/1.0.0"
+SCAN_BATCH_SIZE = 200
+SCAN_MAX_BATCHES = 5
 
 
 class HistoryReadError(ValueError):
@@ -704,8 +706,10 @@ def _scan(db, owner, context, *, limit, cursor, exercise_ref=None, identity=None
     after, display = _scan_cursor(cursor, purpose, context, exercise_ref)
     found, seen, cache = [], set(), {}
     inspected, unresolved, exhausted = 0, 0, False
-    while inspected < 1000 and len(found) < limit:
-        count = min(200, 1000 - inspected)
+    # Database work is bounded by server constants, independent of HTTP input.
+    # The validated page size only permits an earlier return from these lots.
+    for _ in range(SCAN_MAX_BATCHES):
+        count = SCAN_BATCH_SIZE
         batch = _source_batch(db, context, after, count)
         for index, (session, row) in enumerate(batch):
             inspected += 1
@@ -735,7 +739,7 @@ def _scan(db, owner, context, *, limit, cursor, exercise_ref=None, identity=None
                 break
         else:
             exhausted = len(batch) < count
-        if exhausted:
+        if exhausted or len(found) >= limit:
             break
     next_cursor = (
         None

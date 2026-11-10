@@ -69,3 +69,27 @@ règles préservées, aucune séance issue de cette tentative.
 
 Physique, VoiceOver/TalkBack complets, geste, iOS320pt et APK pilote actualisé restent
 ouverts. DATA et déploiement/OVH/REL03 restent séparés. Aucune baseline modifiée.
+
+
+## Signal de sécurité CI et bornage explicite
+
+La première CI PR403/42903697834 sur5025c79 a réussi ses11jobs :8466backend/3ignorés,
+1117mobiles/87suites+TS et77visuels. Sonar ERROR :8smells et1signal de vulnérabilité
+CRITICAL S6680 sur la condition de scan,0nouveau bug/0hotspot, couverture93,622%
+nouvelle. Fusion suspendue pour examen de ce signal.
+
+Les bornes préexistantes sont confirmées : FastAPI et service limit1..100, scan
+1000lignes, lots SQL200. Onze tests adversariaux/budget passent avant et après
+raffinement ; aucune boucle illimitée reproduite. La structure est rendue
+explicitement indépendante de l'entrée HTTP : cinq lots maximum de200lignes,
+limite de page comme arrêt anticipé seulement. Réponses/cursors/partiel identiques.
+Aucun statut d'issue, seuil ou gate modifié. L'analyse du nouveau HEAD est requise
+avant fusion ; aucun effacement historique du signal initial.
+
+Les13autres sources du rendu et les15PNG acceptés sont intacts. Le reçu conserve
+l'empreinte serveur au moment du rendu et ajoute séparément son raffinement.
+Aucun changement visible, de règle SCI ou d'acceptation personnelle.
+
+Le broad après raffinement passe151tests backend. Ruff neuf/budget260≤548,
+Bandit, Gitleaks et protocole/OpenSpec strict passent. Les tests mobiles/UI sont
+inchangés ; la CI réelle du nouveau HEAD devra rejouer le tout avant merge.

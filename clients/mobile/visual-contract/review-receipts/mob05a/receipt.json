@@ -187,5 +187,15 @@
     "question_id": "call_65bac395821e4dfe89271c299817414f",
     "scope": "15 frames / 14 runtime sources; disclosed controlled/native/physical limits preserved",
     "received_before_ui_commit": true
-  }
+  },
+  "post_acceptance_server_refinements": [
+    {
+      "file": "app/services/training_history_reads.py",
+      "rendered_sha256": "5ce07cb3532b818ea53039b8740de645a032a9ef97bfb959bef87ba29d707ed3",
+      "refined_sha256": "b883c2b8ccb0cc54d797d79dbd612feed35c46ca376d4bdc36303b574a8912ee",
+      "scope": "Constant maximum of 5 SQL batches × 200 rows; response/UI semantics and existing 1000-row budget preserved",
+      "evidence": "11 adversarial/budget characterization tests pass before and after; actual new CI required",
+      "human_pixel_scope": "All rendered PNG and frontend source hashes unchanged"
+    }
+  ]
 }

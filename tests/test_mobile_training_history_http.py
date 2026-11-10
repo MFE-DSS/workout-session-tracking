@@ -7,6 +7,22 @@ import pytest
 ROOT = "/api/mobile/v1/me/training-history"
 
 
+@pytest.mark.parametrize("suffix", ["/exercises", "/exercises/opaque"])
+@pytest.mark.parametrize("limit", ["0", "101", str(2**100), "true", "NaN"])
+def test_scan_rejects_unbounded_or_non_integer_http_limits_before_reading(client, suffix, limit):
+    _, headers = mounted(client)
+    page = client.get(ROOT, params={"period": "4w", "time_zone": "UTC"}, headers=headers)
+    assert page.status_code == 200
+    response = client.get(
+        ROOT + suffix,
+        params={"read_context": page.json()["read_context"], "limit": limit},
+        headers=headers,
+    )
+    assert response.status_code == 422
+    assert response.json() == {"detail": {"error": "invalid_training_history_query"}}
+    assert response.headers["cache-control"] == "no-store"
+
+
 def mounted(client):
     from app.database import SessionLocal
     from app.models.user import User

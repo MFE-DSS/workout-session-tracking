@@ -456,12 +456,23 @@ def test_occurrences_follow_executed_identity_preserve_excluded_facts_and_bind_s
             )
 
 
-def test_zero_matches_after_1000_inspected_rows_is_partial_scan_not_empty_history(client):
+def test_zero_matches_after_1000_inspected_rows_is_partial_scan_not_empty_history(client, monkeypatch):
     from app.database import SessionLocal
     from app.models.session import SessionExercise
     from app.models.user import User
+    from app.services import training_history_reads as reads
     from app.services.exercise_identity import ensure_exercise
     from app.services.training_history_reads import read_exercises, read_sessions
+
+    batches = []
+    source_batch = reads._source_batch
+
+    def observed_batch(db, context, after, count):
+        rows = source_batch(db, context, after, count)
+        batches.append((count, len(rows)))
+        return rows
+
+    monkeypatch.setattr(reads, "_source_batch", observed_batch)
 
     with SessionLocal() as db:
         owner = db.query(User).one().id
@@ -490,6 +501,9 @@ def test_zero_matches_after_1000_inspected_rows_is_partial_scan_not_empty_histor
         assert partial["source_inspected"] == 1000
         assert partial["coverage_complete"] is False
         assert partial["next_cursor"]
+        assert len(batches) == 5
+        assert sum(returned for _, returned in batches) == 1000
+        assert all(requested <= 200 for requested, _ in batches)
         final = read_exercises(
             db, owner, read_context=page["read_context"], cursor=partial["next_cursor"]
         )
