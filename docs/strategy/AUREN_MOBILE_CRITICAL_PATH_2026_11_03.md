@@ -22,7 +22,7 @@ Il ne remplace aucun contrat visuel ou de domaine et ne crée aucune autorisatio
 | 4 | MOB-03 | Onboarding et compte ; dépendances STORE-00, notamment suppression de compte |
 | 5 | MOB-04 | MISSION |
 | 6 | MOB-05 | Progrès et journal |
-| 7 | MOB-06 | Bibliothèque de programmes |
+| 7 | MOB-06 | Bibliothèque de programmes — **RÉSERVÉE, gouvernée par Maltin** (10 novembre 2026) : ne pas démarrer, voir [§ Réservation Maltin](#réservation-maltin--mob-06-bibliothèque-de-séances) |
 | 8 | MOB-07 | Constructeur |
 | 9 | MOB-08 | Exercices |
 | 10 | MOB-09 | Contexte salle / équipement à réévaluer selon le recadrage : aucun inventaire manuel natif imposé |
@@ -37,6 +37,20 @@ Il ne remplace aucun contrat visuel ou de domaine et ne crée aucune autorisatio
 
 ALPHA est le jalon retenu ici par l'opérateur ; les dates de bêta citées dans l'ancienne passation ne constituent
 pas une échéance reconduite par ce document. Les tranches futures ne sont pas ouvertes par leur présence ici.
+
+## Réservation Maltin — MOB-06 bibliothèque de séances
+
+**Décision opérateur du 10 novembre 2026 (« vas-y »), sur la candidate « Bibliothèque de séances dans l'app » :**
+MOB-06 sert de test d'une gouvernance où les décisions sont prises et enregistrées dans Maltin **avant** le code.
+Pendant ce test, la tranche est **gouvernée par Maltin, pas par cette roadmap** :
+
+- branche réservée `feature/bibliotheque-seances`, créée vide sur `b9a334d` ; aucun commit n'y est poussé avant le travail transmis depuis Maltin ;
+- aucun change OpenSpec, proposition, brouillon de décision, fixture ou code MOB-06 n'est produit hors de Maltin ; le périmètre de la tranche 1 (catalogue, programmes personnels, plan de la semaine, lancement) est lui-même une décision Maltin ;
+- fichiers réservés, à ne pas modifier dans d'autres PR : `clients/mobile/src/routes/programmes.tsx`, `app/services/loadout.py`, la partie `/library` de `app/routers/pages.py`, toute route mobile de catalogue, tout module natif `library` ;
+- points partagés à séquencer et à signaler : `app/main.py` (montage de routers, aussi visé par MOB-05), `clients/mobile/ConnectedApp.tsx` (démarrage de séance, aussi visé par MOB-04 et REL-03).
+
+Le rang 7 n'est pas modifié par cette réservation ; un éventuel avancement est décidé dans Maltin.
+La réservation ne vaut ni GO BUILD, ni G1, ni autorisation de déploiement.
 
 ## STORE-00 — décisions et préparation en parallèle, dès maintenant
 
