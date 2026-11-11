@@ -1,0 +1,15 @@
+{
+  "key": "exp://127.0.0.1:8152/--/?case=progress-host",
+  "caseId": "progress-host",
+  "platform": "android",
+  "width": 360,
+  "height": 592,
+  "fontScale": 1.2999999523162842,
+  "source": "PRODUCTION_COMPONENTS_REAL_HTTP_SYNTHETIC_OWNERS",
+  "history_state": "confirmed",
+  "history_read_id": "6b85d6c77403427297495c9643ec8801",
+  "mission_state": "idle",
+  "weight_state": "confirmed",
+  "full_connected_app": false,
+  "programmatic_scroll_offset": 0
+}

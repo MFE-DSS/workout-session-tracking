@@ -1,0 +1,15 @@
+{
+  "key": "exp://127.0.0.1:8152/--/?case=progress-offline",
+  "caseId": "progress-offline",
+  "platform": "android",
+  "width": 360,
+  "height": 592,
+  "fontScale": 1,
+  "source": "PRODUCTION_COMPONENTS_REAL_HTTP_SYNTHETIC_OWNERS",
+  "history_state": "unknown",
+  "history_read_id": "4f5e4270bfca4ce992ff9f751b062f6d",
+  "mission_state": "idle",
+  "weight_state": "unknown",
+  "full_connected_app": false,
+  "programmatic_scroll_offset": 0
+}

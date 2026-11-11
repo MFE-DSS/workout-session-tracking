@@ -15,6 +15,8 @@ export type Shell = {
   siteUrl: string;
   /** Native MOB-03 account settings, independent from the future full training profile. */
   account?: React.ReactNode;
+  /** MOB-05A owned read-only history, mounted only by the focused Progress route. */
+  progress?: React.ReactNode;
 };
 
 const ShellContext = createContext<Shell | null>(null);

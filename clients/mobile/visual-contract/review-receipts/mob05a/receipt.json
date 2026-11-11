@@ -1,0 +1,400 @@
+{
+  "schema_version": "1.0.0",
+  "scope": "MOB-05A Progress Core",
+  "status": "FINAL_PIXELS_ACCEPTED_CONTROLLED",
+  "base_runtime": "205bf203596b0e6856335b7264624e3e27f74525",
+  "canonical_closeout_dependency": "4f793981a3ffa5e5c4508ae4a39abc78150b7593",
+  "sources": [
+    {
+      "file": "app/routers/mobile_api.py",
+      "sha256": "ddca2dc776362f5cc62c04d234618b05f68784909b1fb01fa436c1a1a255e008"
+    },
+    {
+      "file": "app/routers/mobile_training_history.py",
+      "sha256": "c28afca691e5252420b7e1384f1ed0bfa06088f547b630f93606a95adb0e6194"
+    },
+    {
+      "file": "app/services/training_history_reads.py",
+      "sha256": "5ce07cb3532b818ea53039b8740de645a032a9ef97bfb959bef87ba29d707ed3"
+    },
+    {
+      "file": "clients/mobile/ConnectedApp.tsx",
+      "sha256": "b41e43db4d0ff1877b06c81f68464604be361fc7a898ed95cada540d6d01d113"
+    },
+    {
+      "file": "clients/mobile/src/routes/progres.tsx",
+      "sha256": "b0b286da4698fa90d84471cb1d7e88f24ad1124ba749aaf5aed6b4c30a7a346b"
+    },
+    {
+      "file": "clients/mobile/src/shell/ShellContext.tsx",
+      "sha256": "1a922c7b504673183bf74045ff284fa476e2bdad305c58dfd977130416e49c38"
+    },
+    {
+      "file": "clients/mobile/src/api/trainingHistory.ts",
+      "sha256": "e0f5b7e657d11f55e9081a833220e61cbb8d063bb446810071ce2106dba57fc9"
+    },
+    {
+      "file": "clients/mobile/src/api/trainingHistoryResource.ts",
+      "sha256": "10806cdb2ce33ed66886ab1905098b9356f559c88ec4ed55398af3b99a6e7f6b"
+    },
+    {
+      "file": "clients/mobile/src/ui/history/ExerciseHistoryScreen.tsx",
+      "sha256": "ad5e30cc24d97d5501a643083198897d9cdaff8701628d29df44cff6e37d1dd3"
+    },
+    {
+      "file": "clients/mobile/src/ui/history/SessionFactsScreen.tsx",
+      "sha256": "1ab05120817be624ac60333da18e18ad9f9a02a5ef51849a50ae37f2b82b04c9"
+    },
+    {
+      "file": "clients/mobile/src/ui/history/TrainingHistoryHost.tsx",
+      "sha256": "94777d405c4315c08386e0bfdba6e88e3497d7092a8300423fc3124d8a835096"
+    },
+    {
+      "file": "clients/mobile/src/ui/history/TrainingHistoryScreen.tsx",
+      "sha256": "eeeee539cfc02e3647ed2939593d4cddf4769a88d9ceff325f5b4b3395dc7843"
+    },
+    {
+      "file": "clients/mobile/src/ui/history/WeightTrend.tsx",
+      "sha256": "e13092c7b2f94bcfc7fecc00625c689b362c4855891c8a8e56ae5dc18605d745"
+    },
+    {
+      "file": "clients/mobile/src/ui/history/historyView.ts",
+      "sha256": "0a00be99a295d1119b9c4ecabf4966c16cbf029a94cafcb7c8a9918308ddb856"
+    }
+  ],
+  "frames": [
+    {
+      "file": "reference-ux-cal-02.png",
+      "title": "Référence UX-CAL-02 acceptée",
+      "platform": "reference",
+      "source": "390 pt · référence conservée, aucun nouveau rendu",
+      "sha256": "d684cf13a9463dfe9ef21e317a730da0d68a6aa624778f2c927bde79e2b9f619"
+    },
+    {
+      "file": "reference-mob04.png",
+      "title": "Référence MOB-04 acceptée",
+      "platform": "reference",
+      "source": "390 pt · fichier accepté intact",
+      "sha256": "fd8041a8eeb1713e6ebfbcf3926d4490ac68ee2de4d260b98d58b284e3fe6d9e"
+    },
+    {
+      "file": "ios-connected-progress.png",
+      "title": "Progrès · vrai ConnectedApp",
+      "platform": "ios",
+      "source": "390 × 844 pt · AuthSession/SQLite et HTTP propriétaires réels ; route initialisée par adaptateur externe",
+      "sha256": "7878c4e0f07cd9a4c11d10a8bc96653131ae5324d4cc4b63709f188fa866698c"
+    },
+    {
+      "file": "ios-connected-session.png",
+      "title": "Séance · faits réellement journalisés",
+      "platform": "ios",
+      "source": "Action AX depuis Progrès ; kilogrammes legacy saisis, contexte inconnu",
+      "sha256": "934325069f724cfff2c3f4e85867ef56c50e89ad74887b39bad922aeab4497a0"
+    },
+    {
+      "file": "ios-connected-exercise.png",
+      "title": "Historique du mouvement exact",
+      "platform": "ios",
+      "source": "Action AX sur référence opaque serveur ; aucun rapprochement de charge",
+      "sha256": "75f30ca2b710f7c92db6e6e5d12a81a32006ceb424427cdd4358932ee64cfcb3"
+    },
+    {
+      "file": "ios-connected-occurrence.png",
+      "title": "Occurrence sélectionnée",
+      "platform": "ios",
+      "source": "Action AX ; exercice sélectionné explicite ; 15 kg saisis/10 répétitions synthétiques",
+      "sha256": "c5e64a5144ddf12a17b665bc768733e67155dc6ab68343a4ebcffbc2eb88aa71"
+    },
+    {
+      "file": "ios-connected-weight.png",
+      "title": "Chronologie BodyMeasurement",
+      "platform": "ios",
+      "source": "Même ConnectedApp ; vue basse positionnée par banc à 660 pt, pas une preuve de geste",
+      "sha256": "e67ea1d46e2326513d8a8fa3afa73ac132fc836e9c6a786bbd1630aff2ed25e3"
+    },
+    {
+      "file": "ios-connected-empty.png",
+      "title": "Compte sans historique / accord poids absent",
+      "platform": "ios",
+      "source": "Autre compte synthétique ; zéro séance enregistré, aucune permission fabriquée",
+      "sha256": "4e6d4a739fe1e83f75ad6991339082183d78db9fb8f0245d9e9fe6ff45f94a26"
+    },
+    {
+      "file": "android-host-normal.png",
+      "title": "Progrès · Host natif de production",
+      "platform": "android",
+      "source": "360 dp · police100 % ; route/coque, AuthSession/SQLite et HTTP réels dans banc externe",
+      "sha256": "7c293c81db7d5b68233f6dc29c8b5e1669ae4c97d720934ee82dd03330120124"
+    },
+    {
+      "file": "android-host-large.png",
+      "title": "Progrès · largeur480 dp",
+      "platform": "android",
+      "source": "480 dp · police100 % ; aucun changement de token ou de baseline",
+      "sha256": "a3264fb19e201465596d4beff17287170b49709afa5015ed5209f45d69aef001"
+    },
+    {
+      "file": "android-host-small-font.png",
+      "title": "Progrès · texte130 %",
+      "platform": "android",
+      "source": "360 dp · défilement nécessaire ; ancien label Programmes tronqué dans coque inchangée",
+      "sha256": "871ff72f4c8e660992e66203b910aab0b9d121c49703ecac2eac1051d606bd8c"
+    },
+    {
+      "file": "android-host-weight.png",
+      "title": "Mesures datées · échelle réelle",
+      "platform": "android",
+      "source": "360 dp · police100 % ; position640 dp ; points seuls, sans interpolation/prédiction",
+      "sha256": "8e3184ebf21776887f4d95d128bc6a3ba6bd5ad99d3dd5b86be1ebab6c8fa02d"
+    },
+    {
+      "file": "android-session.png",
+      "title": "Séance legacy · faits et contexte inconnu",
+      "platform": "android",
+      "source": "Présentateur de production + vrai client HTTP ; pas un journal d’exécution actif",
+      "sha256": "cde7c22fb1cdde577c91d9026f2d2fc45f4af5a38e4c96e736ba34cf3386d110"
+    },
+    {
+      "file": "android-offline.png",
+      "title": "Réponse non confirmée après lecture réelle",
+      "platform": "android",
+      "source": "Faute réseau du transport de banc après HTTP200 ; faits précédents conservés, actions fermées",
+      "sha256": "71a06bbaa49711c29bb4105beda64ef6886e2cbbafdec6ed6e534ce4b5f28d26"
+    },
+    {
+      "file": "android-exercise.png",
+      "title": "Historique d’exercice",
+      "platform": "android",
+      "source": "Index et occurrences réels du même propriétaire/période ; pas de comparaison inter-appareils",
+      "sha256": "5b15858dfe95077f965cf3fd675897efca1c2887c7c97e0e5531479cffdef3cc"
+    },
+    {
+      "file": "final-android-session-normal.png",
+      "title": "Détail final · Android 360 dp",
+      "platform": "android",
+      "source": "Présentateur de production, AuthSession/SQLite/HTTP réels ; fonte100 %. Unité kg saisis, contexte non capturé, aucune conversion.",
+      "sha256": "dd8465b973e29aecb9b91bf852dbaa3e1c7e5068b42b54849e0f8e37df5b4f64"
+    },
+    {
+      "file": "final-android-session-large.png",
+      "title": "Détail final · Android texte130 %",
+      "platform": "android",
+      "source": "Même consommateur et faits synthétiques, 360 dp. Le cadre grandit ; les cibles tactiles restent48 dp. Le label de tab Programmes tronqué appartient à la coque inchangée.",
+      "sha256": "7aab87f4bd2eab183f3d9e2091c3e18308414fc6093b38ddaa8b3ee025f7f691"
+    },
+    {
+      "file": "final-ios-connected-session.png",
+      "title": "Détail final · vrai ConnectedApp iOS",
+      "platform": "ios",
+      "source": "390×844 pt, fonte système Large ; action réelle depuis Progrès, mêmes faits propriétaires.",
+      "sha256": "cfbcf4b72053eb20d88e25b7f981acf8c9bf0551cc9eebe9148f025d6633eb7e"
+    },
+    {
+      "file": "final-ios-connected-provenance.png",
+      "title": "Sources et limites dépliées · iOS",
+      "platform": "ios",
+      "source": "Action AX réelle ; début/fin/complétion ISO exacts et limite masse totale consultables. Aucune information historique effacée.",
+      "sha256": "80b27dbc1bd9609be2003464b23051428f2cb3b62192077f2c4c126441decde3"
+    },
+    {
+      "file": "final-ios-connected-session-large.png",
+      "title": "Détail final · iOS grande fonte",
+      "platform": "ios",
+      "source": "390×844 pt, Dynamic Type XXXL ; même ConnectedApp et consommation HTTP. Ce rendu ne certifie pas VoiceOver ni toutes les tailles accessibles.",
+      "sha256": "c02c59121ae09156a6e877fe8f12617f50d70c4a4c6dc50c494c8c8401d7a9a2"
+    },
+    {
+      "file": "final-android-loading.png",
+      "title": "Chargement réel du Host · Android",
+      "platform": "android",
+      "source": "Vrai TrainingHistoryHost, réponse réseau maintenue en attente par le transport externe de test. Aucune donnée de succès injectée ; aucun vide supposé.",
+      "sha256": "dd7efaf728b0c0d49bc01ceff528463bb512d745476c0f632cc751ba6fee3361"
+    },
+    {
+      "file": "final-android-unknown.png",
+      "title": "Première lecture inconnue · Android",
+      "platform": "android",
+      "source": "Vrai TrainingHistoryHost, échec réseau avant première réponse ; aucun compte ou poids connu fabriqué. Actualiser reste accessible par défilement.",
+      "sha256": "d3d9ec4b6d32b32abdd9282a132ae1aeb934786deaefd1f77cc90be40278d0cb"
+    }
+  ],
+  "data": "EXPLICIT_SYNTHETIC_TESTIMONY_ONLY",
+  "physical_acceptance": "UNAVAILABLE",
+  "android_full_connected_app": "NOT_VERIFIED_EXPO_GO_NATIVE_MODULE_LIMIT",
+  "native_scientific_history": "NOT_CLAIMED; actual service/client contract tests cover typed SCI historical reads",
+  "uncertainty": "No load conversion, scientific score, new measurement model or workout command",
+  "limits": [
+    "CUA coordinate/scroll noWindowsAvailable; low views positioned outside product",
+    "iOS initial route set outside product, actual Host and session/exercise navigation used",
+    "Android case selection by deterministic external driver; no missing-native-module shim",
+    "Expo Go gear/Tools overlays are external; no new APK or tester-device acceptance",
+    "Full VoiceOver/TalkBack and 320pt iOS pending",
+    "Two disclosed minors: initial index-read failure is terse; upper time bound shown as date"
+  ],
+  "operator_acceptance": {
+    "quote": "Valider ces pixels MOB-05A contrôlés",
+    "question_id": "call_65bac395821e4dfe89271c299817414f",
+    "scope": "15 frames / 14 runtime sources; disclosed controlled/native/physical limits preserved",
+    "received_before_ui_commit": true
+  },
+  "post_acceptance_server_refinements": [
+    {
+      "file": "app/services/training_history_reads.py",
+      "rendered_sha256": "5ce07cb3532b818ea53039b8740de645a032a9ef97bfb959bef87ba29d707ed3",
+      "refined_sha256": "b883c2b8ccb0cc54d797d79dbd612feed35c46ca376d4bdc36303b574a8912ee",
+      "scope": "Constant maximum of 5 SQL batches × 200 rows; response/UI semantics and existing 1000-row budget preserved",
+      "evidence": "11 adversarial/budget characterization tests pass before and after; actual new CI required",
+      "human_pixel_scope": "All rendered PNG and frontend source hashes unchanged"
+    }
+  ],
+  "final_refinement": {
+    "date": "2026-11-11",
+    "base_sha": "6d6b1ba91198b1ac371574d12758f7907c7c4fca",
+    "sources": [
+      {
+        "file": "app/routers/mobile_api.py",
+        "sha256": "ddca2dc776362f5cc62c04d234618b05f68784909b1fb01fa436c1a1a255e008"
+      },
+      {
+        "file": "app/routers/mobile_training_history.py",
+        "sha256": "c28afca691e5252420b7e1384f1ed0bfa06088f547b630f93606a95adb0e6194"
+      },
+      {
+        "file": "app/services/training_history_reads.py",
+        "sha256": "b883c2b8ccb0cc54d797d79dbd612feed35c46ca376d4bdc36303b574a8912ee"
+      },
+      {
+        "file": "clients/mobile/ConnectedApp.tsx",
+        "sha256": "b41e43db4d0ff1877b06c81f68464604be361fc7a898ed95cada540d6d01d113"
+      },
+      {
+        "file": "clients/mobile/src/api/trainingHistory.ts",
+        "sha256": "e0f5b7e657d11f55e9081a833220e61cbb8d063bb446810071ce2106dba57fc9"
+      },
+      {
+        "file": "clients/mobile/src/api/trainingHistoryResource.ts",
+        "sha256": "10806cdb2ce33ed66886ab1905098b9356f559c88ec4ed55398af3b99a6e7f6b"
+      },
+      {
+        "file": "clients/mobile/src/routes/progres.tsx",
+        "sha256": "b0b286da4698fa90d84471cb1d7e88f24ad1124ba749aaf5aed6b4c30a7a346b"
+      },
+      {
+        "file": "clients/mobile/src/shell/ShellContext.tsx",
+        "sha256": "1a922c7b504673183bf74045ff284fa476e2bdad305c58dfd977130416e49c38"
+      },
+      {
+        "file": "clients/mobile/src/ui/history/ExerciseHistoryScreen.tsx",
+        "sha256": "ad5e30cc24d97d5501a643083198897d9cdaff8701628d29df44cff6e37d1dd3"
+      },
+      {
+        "file": "clients/mobile/src/ui/history/HistoricalFactsInstrument.tsx",
+        "sha256": "a280323a3f901df2d9878df8b5ebf69da53163fa4196ecf9618dc062944969b2"
+      },
+      {
+        "file": "clients/mobile/src/ui/history/SessionFactsScreen.tsx",
+        "sha256": "72f03608b03f0babe42f9a2720f07192ef6df958e1bf249aca6ed64d27a10c41"
+      },
+      {
+        "file": "clients/mobile/src/ui/history/TrainingHistoryHost.tsx",
+        "sha256": "94777d405c4315c08386e0bfdba6e88e3497d7092a8300423fc3124d8a835096"
+      },
+      {
+        "file": "clients/mobile/src/ui/history/TrainingHistoryScreen.tsx",
+        "sha256": "eeeee539cfc02e3647ed2939593d4cddf4769a88d9ceff325f5b4b3395dc7843"
+      },
+      {
+        "file": "clients/mobile/src/ui/history/WeightTrend.tsx",
+        "sha256": "e13092c7b2f94bcfc7fecc00625c689b362c4855891c8a8e56ae5dc18605d745"
+      },
+      {
+        "file": "clients/mobile/src/ui/history/historyView.ts",
+        "sha256": "0a00be99a295d1119b9c4ecabf4966c16cbf029a94cafcb7c8a9918308ddb856"
+      }
+    ],
+    "previous_receipt": "receipt-v1-accepted.json",
+    "previous_board": "index-v1-accepted.html",
+    "operator_acceptance": {
+      "quote": "Valider le delta final MOB-05A",
+      "question_id": "call_3bf814ef514c414996496828a7220ce8",
+      "date": "2026-11-11",
+      "received_before_ui_commit": true,
+      "scope": "22 frames including 15 preserved accepted frames and 7 final renders; controlled/native/physical limits preserved"
+    },
+    "scope": "Local historical detail hierarchy only; no API, SCI, global primitives, tokens, navigation or baseline modification",
+    "metrics": {
+      "session_title_sp": {
+        "before": 30,
+        "after": 17
+      },
+      "title_top_margin_dp": {
+        "before": 28,
+        "after": 0
+      },
+      "body_top_gap_dp": {
+        "before": 24,
+        "after": 12
+      },
+      "back_min_touch_dp": {
+        "before": 44,
+        "after": 48
+      },
+      "disclosure_min_touch_dp": 48
+    },
+    "independent_review": "0 Critical / 1 Important / 0 Minor; incomplete SCI observation preservation corrected with RED→GREEN, 88 suites / 1122 mobile tests and TypeScript PASS. No independent re-review of fix claimed.",
+    "scientific_native_limit": "NOT_CLAIMED; actual service/client contract tests cover typed SCI historical reads",
+    "new_frames": [
+      {
+        "file": "final-android-session-normal.png",
+        "title": "Détail final · Android 360 dp",
+        "platform": "android",
+        "source": "Présentateur de production, AuthSession/SQLite/HTTP réels ; fonte100 %. Unité kg saisis, contexte non capturé, aucune conversion.",
+        "sha256": "dd8465b973e29aecb9b91bf852dbaa3e1c7e5068b42b54849e0f8e37df5b4f64"
+      },
+      {
+        "file": "final-android-session-large.png",
+        "title": "Détail final · Android texte130 %",
+        "platform": "android",
+        "source": "Même consommateur et faits synthétiques, 360 dp. Le cadre grandit ; les cibles tactiles restent48 dp. Le label de tab Programmes tronqué appartient à la coque inchangée.",
+        "sha256": "7aab87f4bd2eab183f3d9e2091c3e18308414fc6093b38ddaa8b3ee025f7f691"
+      },
+      {
+        "file": "final-ios-connected-session.png",
+        "title": "Détail final · vrai ConnectedApp iOS",
+        "platform": "ios",
+        "source": "390×844 pt, fonte système Large ; action réelle depuis Progrès, mêmes faits propriétaires.",
+        "sha256": "cfbcf4b72053eb20d88e25b7f981acf8c9bf0551cc9eebe9148f025d6633eb7e"
+      },
+      {
+        "file": "final-ios-connected-provenance.png",
+        "title": "Sources et limites dépliées · iOS",
+        "platform": "ios",
+        "source": "Action AX réelle ; début/fin/complétion ISO exacts et limite masse totale consultables. Aucune information historique effacée.",
+        "sha256": "80b27dbc1bd9609be2003464b23051428f2cb3b62192077f2c4c126441decde3"
+      },
+      {
+        "file": "final-ios-connected-session-large.png",
+        "title": "Détail final · iOS grande fonte",
+        "platform": "ios",
+        "source": "390×844 pt, Dynamic Type XXXL ; même ConnectedApp et consommation HTTP. Ce rendu ne certifie pas VoiceOver ni toutes les tailles accessibles.",
+        "sha256": "c02c59121ae09156a6e877fe8f12617f50d70c4a4c6dc50c494c8c8401d7a9a2"
+      },
+      {
+        "file": "final-android-loading.png",
+        "title": "Chargement réel du Host · Android",
+        "platform": "android",
+        "source": "Vrai TrainingHistoryHost, réponse réseau maintenue en attente par le transport externe de test. Aucune donnée de succès injectée ; aucun vide supposé.",
+        "sha256": "dd7efaf728b0c0d49bc01ceff528463bb512d745476c0f632cc751ba6fee3361"
+      },
+      {
+        "file": "final-android-unknown.png",
+        "title": "Première lecture inconnue · Android",
+        "platform": "android",
+        "source": "Vrai TrainingHistoryHost, échec réseau avant première réponse ; aucun compte ou poids connu fabriqué. Actualiser reste accessible par défilement.",
+        "sha256": "d3d9ec4b6d32b32abdd9282a132ae1aeb934786deaefd1f77cc90be40278d0cb"
+      }
+    ],
+    "source_data": "EXPLICIT_SYNTHETIC_TESTIMONY_ONLY",
+    "acceptance_required_before_ui_commit": true
+  }
+}

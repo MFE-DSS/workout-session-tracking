@@ -1,0 +1,12 @@
+{
+  "source": "ACTUAL_CONNECTED_APP_HTTP_SYNTHETIC_OWNED_HISTORY",
+  "platform": "ios",
+  "device": "AUREN-RELEASE01-20261109",
+  "width_pt": 390,
+  "height_pt": 844,
+  "content_size": "extra-extra-extra-large",
+  "navigation": "Progress route initialized by external bench; detail opened through actual AX session action; disclosure action real",
+  "native_sha_at_render": "6d6b1ba91198b1ac371574d12758f7907c7c4fca",
+  "dirty_ui_delta": "SessionFactsScreen/HistoricalFactsInstrument final refinement",
+  "physical_acceptance": "UNAVAILABLE"
+}

@@ -257,7 +257,7 @@ features:
     api: "GET /api/mobile/v1/me/body/weight-history (poids seul, consentement/flag) ; écriture JSON non livrée"
     data: ["body_measurements (measured_at, weight_kg, tours)"]
     user_actions: [saisir son poids, saisir des mesures, corriger, supprimer, exporter]
-    native_destination: PROFIL (BODY_LEDGER)
+    native_destination: PROFIL (BODY_LEDGER) ; PROGRÈS (lecture du poids daté MOB-05A)
     status: REWRITE_NATIVE
     dependencies: [consentement aux mesures (body_consent), choix de la source unique du poids]
     visual_assets: [courbe de poids (code paramétrique)]
@@ -327,10 +327,13 @@ features:
   - id: history-journal
     feature: Historique des séances (journal)
     family: progres
-    routes: [GET /history]
+    routes:
+      - GET /history
+      - GET /api/mobile/v1/me/training-history
+      - GET /api/mobile/v1/me/training-history/sessions/{session_id}
     legacy_location: "pages.history → history.html"
-    domain_owner: [flight_recorder, session_state]
-    api: "à créer (read model historique)"
+    domain_owner: [flight_recorder, session_state, training_history_reads]
+    api: "training-history/1.0.0 : liste et faits propriétaires ; consommateur natif contrôlé MOB-05A, pixels en revue"
     data: [workout_sessions, set_logs]
     user_actions: [parcourir ses séances, ouvrir une séance passée]
     native_destination: PROGRÈS
@@ -342,16 +345,20 @@ features:
   - id: exercise-history
     feature: Historique d'un exercice
     family: progres
-    routes: ["GET /exercise-history/{template_slug}/{exercise_code}", "GET /exercise-history/{slug}"]
+    routes:
+      - "GET /exercise-history/{template_slug}/{exercise_code}"
+      - "GET /exercise-history/{slug}"
+      - GET /api/mobile/v1/me/training-history/exercises
+      - GET /api/mobile/v1/me/training-history/exercises/{exercise_ref}
     legacy_location: "sessions.exercise_history → exercise_history.html"
-    domain_owner: [exercise_history]
-    api: "à créer"
+    domain_owner: [exercise_history, training_history_reads]
+    api: "index/occurrences propriétaires, liens signés ; faits par contexte, aucune courbe de charge non comparable"
     data: [set_logs, exercises, exercise_aliases]
     user_actions: [voir la progression d'un exercice]
     native_destination: PROGRÈS (et depuis la séance)
     status: REWRITE_NATIVE
     dependencies: [MOB-05]
-    visual_assets: [courbe de charge (code paramétrique)]
+    visual_assets: [liste native de faits datés ; comparabilité non inférée]
     migration_risk: faible
 
   - id: progress

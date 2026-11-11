@@ -1,7 +1,7 @@
 # Inventaire des fonctions web → destination native (MOB-00)
 
 Généré depuis `inventory.yaml` (base `36b971a`) — ne pas éditer à la main.
-**39 fonctions**, **136 routes** rattachées, BLOCKED 10, DEPRECATE 1, KEEP_DOMAIN 4, REWRITE_NATIVE 19, WEB_ONLY 5.
+**39 fonctions**, **140 routes** rattachées, BLOCKED 10, DEPRECATE 1, KEEP_DOMAIN 4, REWRITE_NATIVE 19, WEB_ONLY 5.
 « (proposé) » = proposition de l'agent, à trancher par l'opérateur.
 
 ## Mission
@@ -40,7 +40,7 @@ Généré depuis `inventory.yaml` (base `36b971a`) — ne pas éditer à la main
 | Profil — page de synthèse du compte | REWRITE_NATIVE | PROFIL | 1 | profile_metrics · radar · session_state | UX-LAB PROFILE (axes de l'hexagone / octogone) · MOB-11 | élevé — surface centrale, modèle d'interaction hérité (TRANSITIONAL) |
 | Profil physique déclaré (taille, poids, FC de repos, tour de taille, tension) | REWRITE_NATIVE | PROFIL / onboarding | 1 | body_profile | MOB-03 onboarding · consentement explicite (spec vNext O6) | moyen — users.weight_kg écrasé en double de body_measurements.weight_kg : une seule source à choisir |
 | Préférences d'entraînement déclarées (objectif, fréquence, durée…) | REWRITE_NATIVE | PROFIL / onboarding | 3 | training_preferences | MOB-03 onboarding | moyen |
-| Mesures corporelles et poids, série temporelle datée | REWRITE_NATIVE | PROFIL (BODY_LEDGER) | 9 | measurements · body_ledger · body_profile | consentement aux mesures (body_consent) · choix de la source unique du poids | moyen — la série temporelle EXISTE déjà (body_measurements) ; ne pas en créer une seconde |
+| Mesures corporelles et poids, série temporelle datée | REWRITE_NATIVE | PROFIL (BODY_LEDGER) ; PROGRÈS (lecture du poids daté MOB-05A) | 9 | measurements · body_ledger · body_profile | consentement aux mesures (body_consent) · choix de la source unique du poids | moyen — la série temporelle EXISTE déjà (body_measurements) ; ne pas en créer une seconde |
 | Consentement à l'enregistrement des mesures corporelles | REWRITE_NATIVE | PROFIL / onboarding | 2 | body_profile | SPIGNOS_BODY_PRIVACY_AND_CONSENT_SPEC | moyen — RGPD, retrait effectif |
 | Lecture du corps (Body Intelligence) | BLOCKED | PROFIL | 1 | body_intelligence · body_intelligence_inputs · muscle_scoring · radar | UX-LAB PROFILE (axes de l'octogone) · revue des revendications (aucune mesure inventée) · body_assessment_enabled désactivé en production | élevé — frontière entre profil d'allocation mesurable et estimation physique |
 | Qualité de capture corporelle (coquille statique) | BLOCKED | PROFIL — photos de progression | 1 | — | photos de progression (conception · consentement · stockage privé) | faible |
@@ -51,8 +51,8 @@ Généré depuis `inventory.yaml` (base `36b971a`) — ne pas éditer à la main
 | Fonction | Statut | Destination native | Routes | Propriétaire du domaine | Dépendances | Risque |
 |---|---|---|---|---|---|---|
 | Rapport de coach (synthèse en 10 blocs) | BLOCKED | PROGRÈS | 1 | coach_report · coach_inference · body_intelligence · narrative | UX-LAB PROFILE / PROGRÈS · moteur scientifique V2 (couches E0–E8) | élevé — prose dense héritée, revendications à revoir |
-| Historique des séances (journal) | REWRITE_NATIVE | PROGRÈS | 1 | flight_recorder · session_state | MOB-05 | moyen |
-| Historique d'un exercice | REWRITE_NATIVE | PROGRÈS (et depuis la séance) | 2 | exercise_history | MOB-05 | faible |
+| Historique des séances (journal) | REWRITE_NATIVE | PROGRÈS | 3 | flight_recorder · session_state · training_history_reads | MOB-05 | moyen |
+| Historique d'un exercice | REWRITE_NATIVE | PROGRÈS (et depuis la séance) | 4 | exercise_history · training_history_reads | MOB-05 | faible |
 | Progrès (KPI, qualité, chronologie) | REWRITE_NATIVE | PROGRÈS | 1 | kpis · quality_score · timeline · progress_facts · progression_view | MOB-05 · UX-LAB PROGRÈS | moyen |
 | Anciennes adresses redirigées (/physique, /dashboard, /rules) | DEPRECATE | aucune | 3 | — | — | nul — déjà dépréciées dans le code |
 
