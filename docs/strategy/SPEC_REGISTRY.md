@@ -981,9 +981,9 @@ Les résultats finaux et limites seront consignés après gates, pas anticipés 
 
 ## MOB-05A — Progress Core propriétaire, build contrôlé du10novembre
 
-[Delta](../../openspec/changes/mob05-owned-training-history/proposal.md),
-[design](../../openspec/changes/mob05-owned-training-history/design.md),
-[GO/G1](../../openspec/changes/mob05-owned-training-history/BUILD_AUTHORIZATION.md).
+[Delta](../../openspec/changes/archive/2026-11-11-mob05-owned-training-history/proposal.md),
+[design](../../openspec/changes/archive/2026-11-11-mob05-owned-training-history/design.md),
+[GO/G1](../../openspec/changes/archive/2026-11-11-mob05-owned-training-history/BUILD_AUTHORIZATION.md).
 Base205bf203 puis intégration documentaire du closeout4f793981, après libération
 des leases MOB04 ; aucun chantier MOB06/Maltin touché. Quatre GET read-only
 possédés, route native Progrès, clients stricts et chronologie BodyMeasurement
@@ -992,3 +992,6 @@ mesure, cible ou score, pas de writer corporel/nutrition. Revue complète unique
 5Important corrigés,2mineurs conservés ; CI/merge/recette physique non anticipés.
 [État de réalisation](../pilot/mob05a-progress/DELIVERY.md),
 [parité contrôlée et APK du testeur](../pilot/mob05a-progress/PARITY.md).
+
+
+**Closeout MOB-05A —11novembre :** [PR403](https://github.com/MFE-DSS/workout-session-tracking/pull/403), HEAD0343ecf289d278ae60636978df3c8f21aad4fe5c, merge18e04bd25ae424e97ac9f810321972e1b101dcae. CI PR42983311724 et canonique42986290983 completed/success11jobs :8476backend/3ignorés,88suites/1122mobiles+TS,77visuels réellement rejoués. Pixels finaux acceptés « Valider le delta final MOB-05A » avant commitUI,22frames/15sources et anciennes références intactes. [Clôture contrôlée](../pilot/mob05a-progress/CLOSEOUT.md), [passation](../pilot/mob05a-progress/AGENT_HANDOFF.md), [spec canonique](../../openspec/specs/mobile/training-history/spec.md). Archive15/16tasks : seul suivi publication/CI/merge canonique final/nettoyage demeure ouvert à l'instant de publication et sera résolu par reçu vivant. Deux mineurs/physique/RELEASE/DATA restent explicites ; aucun APK/OTA/déploiement ou writer BODY/NUT implicite.

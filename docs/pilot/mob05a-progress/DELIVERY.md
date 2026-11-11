@@ -1,123 +1,29 @@
-# MOB-05A — Progress Core : réalisation contrôlée
+# MOB-05A — Progress Core livré dans le code contrôlé
 
-10 novembre2026 — BUILD / PIXELS_ACCEPTED_CONTROLLED, non fusionné. GO/G1 explicites reçus,
-aucune activation personnelle, publication APK/OTA ou modification QA02/OVH.
+11 novembre2026. **Code fusionné, CI canonique réussie ; publication du closeout en cours.** [PR403](https://github.com/MFE-DSS/workout-session-tracking/pull/403), HEAD `0343ecf289d278ae60636978df3c8f21aad4fe5c`, merge `18e04bd25ae424e97ac9f810321972e1b101dcae`. Aucun nouvel APK, activation DATA ou déploiement de ce slice.
 
-## Comportement réalisé
+## Fonction réellement raccordée
 
-Un seul onglet Progrès dans la coque quatre tabs : séances récentes et leurs faits,
-fréquence sur période civile explicite4/12semaines/Tout, index d'exercices exact
-et occurrences, poids daté depuis BodyMeasurement sous consentement applicable.
-Pas de second modèle, cache SQLite d'historique ou writer. Les comptes couvrent
-toute la période, pas seulement les cinq lignes visibles. Une clôture sans série
-de travail renseignée ne compte pas comme séance avec faits réalisés. Le planning
-daté absent est NOT_PERSISTED, jamais fabriqué depuis une cadence.
+L'onglet Progrès existant monte le vrai TrainingHistoryHost depuis ConnectedApp : séances récentes et faits par série, fréquence factuelle sur4/12semaines civiles ouTout, exercice exact et occurrences, chronologie BodyMeasurement datée sous accord applicable. Les lectures cessent au départ de l'onglet ; refresh et foreground revalident. Le journal, AuthSession, les producteursSCI, quatre tabs, MISSION et exécution restent les consommateurs canoniques existants.
 
-Les quatre routes `/api/mobile/v1/me/training-history` et ses sous-routes
-`sessions/{session_id}`, `exercises`, `exercises/{exercise_ref}` sont montées dans
-l'app réelle. Bearer propriétaire, no-store, foreign/unknown404 identiques,
-références signées à fenêtre/propriétaire/identité, changement→READ_CHANGED puis
-refresh. Lectures sans DML ; scan borné/pagination explicite et partiel≠vide.
+Quatre GET propriétaires sous `/api/mobile/v1/me/training-history`, Bearer, no-store, absence/étranger404 identiques et refs signées. Changement de référence demande refresh ; échec de pagination conserve les faits connus du même compte comme lecture précédente. Scan cinq lots de200 maximum, continuation partielle distincte de vide. Comptes sur toute la période, pas les seules lignes reçues.
 
-Legacy : noms et faits capturés, contexte/prescription inconnus ; valeurs invalides
-distinctes des absences. SCI : vrai client V3 existant puis projection historique
-stricte sans action/permission, faits typés conservés même sans guidage actuel.
-MACHINE_DISPLAY_KG/PER_IMPLEMENT ne deviennent jamais un total externe. Les
-regroupements d'identité ne sont pas une politique de comparaison de charges.
+Un statut terminé sans série de travail complétée et fait de reps/charge reste visible sans compter comme travail effectué. Planning daté absent : inconnu, pas objectif ou taux d'adhérence inventé. Legacy : faits capturés et `kg saisis`, matériel/prescription non capturés. SCI : vrai lecteurV3 et validation historique stricte, observation typée conservée après retrait de guidage ; aucune commande de travail issue de l'historique. MACHINE_DISPLAY_KG etPER_IMPLEMENT ne deviennent jamais une masse externe totale ou une équivalence entre appareils.
 
-ConnectedApp monte TrainingHistoryHost via ShellContext et vraie route Progrès,
-seulement focalisée. AuthSession/WeightHistory existants, mémoire liée au compte,
-réponses tardives/refresh/période/unmount gardés. Une erreur5xx garde les faits
-confirmés du même compte comme lecture précédente ; elle ne devient pas EMPTY.
-Le détail propose le lien serveur exact vers le mouvement et son occurrence
-sélectionnée ; back revient par niveaux. Foreground revalide les lectures.
+Poids : source unique BodyMeasurement, measured_at et qualité conservés ; pas de writer, fallback profil, seconde série, cache persistant, lissage ou prédiction. Les points inconnus/invalides ne deviennent pas0 ; pagination bornée explicite.
 
-## Tests et revue
+## Hiérarchie finale acceptée
 
-Revue unique de toute la branche :0Critical/5Important/2Minor ; une vague de
-correction, témoins RED→GREEN. Les cinq corrections :503/pagination, fin des scans
-poids au départ de Progrès, valeurs legacy invalides visibles, refus SCI sans
-observation typée, lien séance→exercice exact et repère d'occurrence. Aucun second
-avis indépendant du correctif final prétendu.
+Le détail historique utilise un en-tête local compact et FrameC/RecessedWindow/NumericReadout existants. Titre30→17sp, marge28→0dp, écart de corps24→12dp ; Retour44→48dp, liens/disclosures48dp. Valeurs/unités, date/statut et contexte court visibles ; dates exactes, provenance, limites et prescription capturée à la demande. Zéro, absent, invalide et observation SCI incomplète restent distincts.
 
-Broad final141tests backend PASS ;87suites/1117tests mobiles PASS. Après le broad,
-TSC a relevé un argument requis dans le seul témoin BackHandler : corrigé, puis
-TypeScript et4tests de callbacks PASS. Les140PASS/1FAIL antérieurs restent dans
-les logs, suivis du module corrigé25PASS puis du broad141PASS, sans résultat
-réécrit. Ruff neuf/budget260≤548, Bandit et protocole passent ; CI réelle à venir.
+L'opérateur a accepté le premier board puis le delta final : **« Valider le delta final MOB-05A »**, avant commit UI.22captures/15sources,15frames antérieures intactes. Aucune primitive globale, palette, logo ou baselineLOCKED modifiés. Rendus/limites et décisions dans [REVIEW_AND_VALIDATION](REVIEW_AND_VALIDATION.md) et le [reçu final](../../../clients/mobile/visual-contract/review-receipts/mob05a/receipt.json).
 
-Deux mineurs conservés : échec initial index trop peu explicite (Actualiser
-racine reste disponible) ; borne supérieure de période à la date sans heure.
-Le type/lien nouveau du contrat historique non publié n'altère aucun DTO SCI.
+## Preuves et gates restantes
 
-## Rendus et limites
+CI PR42983311724 et canonique42986290983 : completed/success,11jobs chacune ;8476backend/3ignorés,88suites/1122mobiles+TypeScript,77visuels réellement exécutés. Local151backend ciblés/broad et1122mobiles+TypeScript ; protocole/OpenSpec24/24, Ruffbudget260≤548, Bandit/Gitleaks passants. Revue initiale5Important corrigés, nouveau détail1Important corrigé, témoinsRED→GREEN ; pas de second avis indépendant des derniers correctifs revendiqué. Deux mineurs restent divulgués.
 
-Board contrôlé :15frames dont2références acceptées intactes et14sources runtime
-empreintées. iOS390×844pt : vrai ConnectedApp/AuthSession/SQLite/HTTP, route
-initialisée par adaptateur de banc ; actions AX séance→exercice→occurrence et
-retours observés. Android : Host/présentateurs de production dans banc HTTP natif,
-360/480dp, fonte100/130%. App Android complète Expo Go toujours limitée par module
-natif conservé ; aucune suppression/shim, aucun nouvelAPK.
+iOS : vrai ConnectedApp/HTTP ; Android : Host/présentateurs réels dans banc natif synthétique, app complète ExpoGo limitée par module natif conservé. Aucune recette physique ou cohorteSCI native complète nouvelle. TalkBack/VoiceOver/focus/gestes complets et nouveau build installé restent à vérifier. Les chiffres visibles ne sont pas des faits personnels du testeur.
 
-Vues basses positionnées par banc externe après noWindowsAvailable CUA ; pas de
-recette gestuelle. Gear/Tools sont overlays Expo Go. Corps/poids/répétitions sont
-témoignages synthétiques, pas des faits du testeur. Android vide non confirmé
-(délai de reçu), pas de PASS prétendu ; iOS vide/accord requis réellement lu.
-Historique SCI réel couvert par services/tests clients, pas un parcours natif
-complet revendiqué. Tentative locale avec ancien rawC3 refusée par inventaire2,
-règles préservées, aucune séance issue de cette tentative.
+Sonar PR final ERROR consultatif :8smells,0nouveau bug/vulnérabilité/hotspot, couverture app92,5%/nouvelle93,6548%. Canonique exact18e :ERROR,8bugs/565smells/8entrées externesBandit/0hotspot ; fichiers des huit entrées inchangés depuis la base, sans déclaration globale d'innocuité. [Closeout](CLOSEOUT.md) conserve les références exactes et l'historiqueS6680 corrigé, sans baisse de seuil ou disposition d'issue manuelle.
 
-Physique, VoiceOver/TalkBack complets, geste, iOS320pt et APK pilote actualisé restent
-ouverts. DATA et déploiement/OVH/REL03 restent séparés. Aucune baseline modifiée.
-
-
-## Signal de sécurité CI et bornage explicite
-
-La première CI PR403/42903697834 sur5025c79 a réussi ses11jobs :8466backend/3ignorés,
-1117mobiles/87suites+TS et77visuels. Sonar ERROR :8smells et1signal de vulnérabilité
-CRITICAL S6680 sur la condition de scan,0nouveau bug/0hotspot, couverture93,622%
-nouvelle. Fusion suspendue pour examen de ce signal.
-
-Les bornes préexistantes sont confirmées : FastAPI et service limit1..100, scan
-1000lignes, lots SQL200. Onze tests adversariaux/budget passent avant et après
-raffinement ; aucune boucle illimitée reproduite. La structure est rendue
-explicitement indépendante de l'entrée HTTP : cinq lots maximum de200lignes,
-limite de page comme arrêt anticipé seulement. Réponses/cursors/partiel identiques.
-Aucun statut d'issue, seuil ou gate modifié. L'analyse du nouveau HEAD est requise
-avant fusion ; aucun effacement historique du signal initial.
-
-Les13autres sources du rendu et les15PNG acceptés sont intacts. Le reçu conserve
-l'empreinte serveur au moment du rendu et ajoute séparément son raffinement.
-Aucun changement visible, de règle SCI ou d'acceptation personnelle.
-
-Le broad après raffinement passe151tests backend. Ruff neuf/budget260≤548,
-Bandit, Gitleaks et protocole/OpenSpec strict passent. Les tests mobiles/UI sont
-inchangés ; la CI réelle du nouveau HEAD devra rejouer le tout avant merge.
-
-## Raffinement final demandé le11novembre
-
-Le modèle fonctionnel accepté reste inchangé. Nouvelle demande opérateur limitée
-au détail historique : titre30→17sp, marge de titre28→0dp, écart de corps24→12dp,
-Retour44→48dp, Frame C/RecessedWindow/NumericReadout existants. Une mention courte
-de contexte non capturé reste visible ; dates ISO, source et limites se déplient.
-L'acceptation antérieure des15captures est conservée, pas réutilisée pour autoriser
-la nouvelle retouche. Board consolidé22captures, décision finale « Valider le delta final MOB-05A » reçue le11novembre avant commit UI.
-
-Revue indépendante de ce seul delta :0Critical/1Important/0Minor. Une observation
-SCI incomplète avec charge/répétitions inconnues était présentée à tort comme
-absence de fait. Témoin1RED puis présence d'observation conservée,1GREEN et suite
-88suites/1122mobiles+TypeScript PASS. Aucun second avis indépendant du correctif
-prétendu. Les deux mineurs initiaux et gates vocales/physiques restent ouverts.
-
-Nouveaux rendus réels : iOS ConnectedApp détail/sources/Dynamic Type XXXL ;
-Android360dp fonte100/130 et vrai Host loading/unknown via transport contrôlé.
-Aucune réponse de succès construite pour ces états ; aucune cohorte SCI native
-ou recette physique ajoutée par ces vues. Références et primitives LOCKED intactes.
-
-La CI42908162450 sur6d6b1ba a réellement réussi11jobs :8476backend/3ignorés,
-87suites/1117mobiles+TypeScript,77visuels. Sonar réel :0nouveau bug/vulnérabilité/
-hotspot,8smells, gate ERROR consultatif, couverture app92,5%/nouvelle93,6548%.
-Le signalS6680 n'est plus présent ; la future CI du HEAD incluant le détail final
-reste obligatoire après acceptation. Aucun résultat de cette future CI anticipé.
-
-Le reçu final consigne la décision call_3bf814ef514c414996496828a7220ce8 ; sources et22frames revérifiées avant commit. CI du nouveau HEAD et merge restent à observer.
+[Parité](PARITY.md) distingue preuve contrôlée et APK QA02, qui ne contient pas ce slice. [Passation QA](QA_RELEASE_HANDOFF.md) borne l'opération REL-03. BODY/NUT restent des préparations séparées avec décisions/GO propres ; MOB-06/Maltin, compte, journal et moteurs acquis ne sont pas rouverts.

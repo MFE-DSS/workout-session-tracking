@@ -67,8 +67,9 @@ contrôlées de transport, sans DTO de succès inventé.
 - [x] Composition locale history ; aucune modification de primitive globale, source SCI ou API.
 - [x] Tests consommateurs/unités et captures iOS/Android normal/grande fonte ; compléter le board existant.
 - [x] Une acceptation finale opérateur avant commit UI ; revue indépendante de ce delta et correction RED→GREEN.
-- [ ] CI du HEAD final, merge gardé et CI canonique.
-- [ ] Merge gardé, CI canonique et archive/closeout ; préparer BODY/NUT sans les appliquer.
+- [x] CI du HEAD final, merge gardé et CI canonique code.
+- [x] Merge code gardé et CI canonique ; BODY/NUT préparés sans apply.
+- [ ] Publication finale archive/closeout et nettoyage, à résoudre par reçu vivant.
 
 ## Revue et correction de ce delta
 
