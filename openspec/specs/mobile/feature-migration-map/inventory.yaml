@@ -333,7 +333,7 @@ features:
       - GET /api/mobile/v1/me/training-history/sessions/{session_id}
     legacy_location: "pages.history → history.html"
     domain_owner: [flight_recorder, session_state, training_history_reads]
-    api: "training-history/1.0.0 : liste et faits propriétaires ; consommateur natif contrôlé MOB-05A, pixels en revue"
+    api: "training-history/1.0.0 : liste et faits propriétaires ; consommateur natif contrôlé MOB-05A livré PR403, pixels finaux acceptés ; artefact pilote et recette physique séparés"
     data: [workout_sessions, set_logs]
     user_actions: [parcourir ses séances, ouvrir une séance passée]
     native_destination: PROGRÈS

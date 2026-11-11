@@ -10,3 +10,9 @@ Leases de composition exclusifs REL03→MOB04→MOB05A, relecture de canonique a
 Pixels : réponse de session « Valider ces pixels MOB-05A contrôlés »,
 question call_65bac395821e4dfe89271c299817414f. Quinze captures et quatorze sources
 runtime vérifiées octet pour octet avant commit UI ; limites du banc conservées.
+
+Addendum du11novembre : le raffinement limité du détail historique est accepté
+« Valider le delta final MOB-05A », question
+call_3bf814ef514c414996496828a7220ce8, avant son commit UI. Le reçu final conserve
+les22frames et15sources ; les15frames antérieures restent intactes. Aucun scope
+scientifique, DATA, APK/OTA, appareil physique ou déploiement élargi.

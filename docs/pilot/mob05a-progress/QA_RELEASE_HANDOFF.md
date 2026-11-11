@@ -1,10 +1,12 @@
 # MOB-05A → REL-03 : intégration au prochain candidat QA
 
-11 novembre 2026. **Code en cours de gate visuel final ; aucun artefact de
+11 novembre 2026. **Code fusionné PR403/18e04bd après acceptation finale ; aucun artefact de
 distribution MOB-05A construit ou publié.** Ce document est une entrée de
 coordination, pas un reçu `qa-release/1.0.0` exécutable ou une autorisation de
-déploiement. Le SHA final sera celui du HEAD accepté/testé et du merge vérifié,
-à reporter dans le reçu de livraison après intégration.
+déploiement. HEAD source accepté/testé : `0343ecf289d278ae60636978df3c8f21aad4fe5c` ; merge
+vérifié : `18e04bd25ae424e97ac9f810321972e1b101dcae`, même arbre. CI canonique
+42986290983 completed/success11jobs. Le futur artefact doit déclarer son propre
+SHA effectivement construit et son identité backend réelle.
 
 ## Couplage réel client / serveur
 

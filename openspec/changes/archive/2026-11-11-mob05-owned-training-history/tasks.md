@@ -13,6 +13,7 @@
 - [x] check_scope avant checks ; ciblés+broad/TS/Jest/protocole/OpenSpec/sécurité.
 - [x] Vrais rendus initiaux iOS/Android source-labellés, premiers pixels opérateur avant commit UI.
 - [x] Nouveau delta final du détail : acceptation du board consolidé avant son commit UI.
-- [ ] Revue indépendante, corrections scoped et quatre checks CI HEAD final, Sonar réel.
-- [ ] Commit/push/PR/merge gardé GOV-MERGE-01, CI canonique, archive/closeout/nettoyage propre.
-- [ ] Résultats HTTP/émulateur/physique et parité distingués ; aucune activation/DATA/OTA/déploiement implicite.
+- [x] Revue indépendante, corrections scoped et quatre checks CI HEAD final, Sonar réel.
+- [x] Commit/push/PR403/merge gardé GOV-MERGE-01 et CI canonique code vérifiés.
+- [ ] Suivi final : publication/CI/merge du closeout, canonique final et nettoyage possédé ; reçu vivant requis après preuve.
+- [x] Résultats HTTP/émulateur/physique et parité distingués ; aucune activation/DATA/OTA/déploiement implicite.
