@@ -42,3 +42,16 @@ geste, iOS320pt, clavier/retour sur appareil physique ou APK distribué.
 
 Aucune décision marquée violée dans le périmètre présenté ; les deux mineurs de
 clarté et limites de recette restent divulgués dans DELIVERY et le board.
+
+## Delta final du11novembre — pixels acceptés
+
+Même inventaire D1..D9/Q1..Q8 relu contre le raffinement. D1 : Retour et liens48dp ;
+D2/D7 : faits et fréquence, aucune inférence ; D3/Q6 : tokens existants, titre
+bodyStrong17/23 et NumericReadout canonique, agrandissement préservé ; D4/D5 :
+prose remplacée par instrument numérique et sources accessibles dans même delta ;
+D8/Q2/Q4 : tabs/MISSION/exécution intacts ; D6/D9/Q1/Q3 : non concernés. Q5 :
+composition historique locale HistoricalFactsFrame et Frame C, aucun changement de
+AccountFrame global ; Q7/Q8 : navigation seule et états de primitives conservés.
+Pas de décision violée identifiée ; aucune baseline éditée. L'acceptation de ce
+delta est distincte de l'ancien reçu : « Valider le delta final MOB-05A », reçue
+le11novembre avant commit UI. Les22frames et15sources finales sont revérifiées.

@@ -93,3 +93,31 @@ Aucun changement visible, de règle SCI ou d'acceptation personnelle.
 Le broad après raffinement passe151tests backend. Ruff neuf/budget260≤548,
 Bandit, Gitleaks et protocole/OpenSpec strict passent. Les tests mobiles/UI sont
 inchangés ; la CI réelle du nouveau HEAD devra rejouer le tout avant merge.
+
+## Raffinement final demandé le11novembre
+
+Le modèle fonctionnel accepté reste inchangé. Nouvelle demande opérateur limitée
+au détail historique : titre30→17sp, marge de titre28→0dp, écart de corps24→12dp,
+Retour44→48dp, Frame C/RecessedWindow/NumericReadout existants. Une mention courte
+de contexte non capturé reste visible ; dates ISO, source et limites se déplient.
+L'acceptation antérieure des15captures est conservée, pas réutilisée pour autoriser
+la nouvelle retouche. Board consolidé22captures, décision finale « Valider le delta final MOB-05A » reçue le11novembre avant commit UI.
+
+Revue indépendante de ce seul delta :0Critical/1Important/0Minor. Une observation
+SCI incomplète avec charge/répétitions inconnues était présentée à tort comme
+absence de fait. Témoin1RED puis présence d'observation conservée,1GREEN et suite
+88suites/1122mobiles+TypeScript PASS. Aucun second avis indépendant du correctif
+prétendu. Les deux mineurs initiaux et gates vocales/physiques restent ouverts.
+
+Nouveaux rendus réels : iOS ConnectedApp détail/sources/Dynamic Type XXXL ;
+Android360dp fonte100/130 et vrai Host loading/unknown via transport contrôlé.
+Aucune réponse de succès construite pour ces états ; aucune cohorte SCI native
+ou recette physique ajoutée par ces vues. Références et primitives LOCKED intactes.
+
+La CI42908162450 sur6d6b1ba a réellement réussi11jobs :8476backend/3ignorés,
+87suites/1117mobiles+TypeScript,77visuels. Sonar réel :0nouveau bug/vulnérabilité/
+hotspot,8smells, gate ERROR consultatif, couverture app92,5%/nouvelle93,6548%.
+Le signalS6680 n'est plus présent ; la future CI du HEAD incluant le détail final
+reste obligatoire après acceptation. Aucun résultat de cette future CI anticipé.
+
+Le reçu final consigne la décision call_3bf814ef514c414996496828a7220ce8 ; sources et22frames revérifiées avant commit. CI du nouveau HEAD et merge restent à observer.

@@ -20,7 +20,7 @@ test('previous/offline facts and zero partial scans cannot be presented as a con
 });
 test('read-only detail keeps unknown legacy context and separate real completion facts',async()=>{
  const p=props();p.state.detail={status:'confirmed',previous:false,value:{kind:'LEGACY',facts:legacyFacts()}};p.state.selectedEntry=11;await act(async()=>root.render(React.createElement(TrainingHistoryScreen,p)));
- expect(node('history-set-31')).toBeDefined();expect(node('history-context-21').children).toBe('Contexte matériel non capturé');expect(node('progress-period')).toBeUndefined();
+ expect(node('history-set-31')).toBeDefined();expect(node('history-context-21').children).toBe('Matériel non capturé');expect(node('progress-period')).toBeUndefined();
 });
 test('consent applies only to weight, never hides canonical session history or manufactures an agreement',async()=>{
  const p=props();p.weight={...p.weight,status:'consent_required',entries:[]};await act(async()=>root.render(React.createElement(TrainingHistoryScreen,p)));
@@ -31,7 +31,7 @@ test('SCI historical render keeps per-dumbbell observation and captured prescrip
  const {allowed_actions,applicability,observation_only,cursor,...execution}=sci.execution;
  p.state.detail={status:'confirmed',previous:false,value:{kind:'SCI',execution}};p.state.selectedEntry=11;
  await act(async()=>root.render(React.createElement(TrainingHistoryScreen,p)));
- const text=(x:any):string=>Array.isArray(x)?x.map(text).join(''):typeof x==='string'||typeof x==='number'?String(x):'';
+ const text=(x:any):string=>Array.isArray(x)?x.map(text).join(''):typeof x==='string'||typeof x==='number'?String(x):x?.props?text(x.props.children):'';
  const allText=root.container.queryAll(()=>true).map((n:any)=>text(n.props.children)).join('\n');
  expect(allText).toContain('20 kg par haltère');expect(allText).not.toContain('40 kg');expect(allText).not.toContain('Prescription capturée :');
 });

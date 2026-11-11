@@ -11,7 +11,8 @@
 - [x] Brancher vraie route Progrès, détails et graphiques accessibles sans changer les surfaces LOCKED.
 ## 3. Validation et livraison
 - [x] check_scope avant checks ; ciblés+broad/TS/Jest/protocole/OpenSpec/sécurité.
-- [x] Vrais rendus iOS/Android source-labellés, pixels opérateur avant commit UI.
+- [x] Vrais rendus initiaux iOS/Android source-labellés, premiers pixels opérateur avant commit UI.
+- [x] Nouveau delta final du détail : acceptation du board consolidé avant son commit UI.
 - [ ] Revue indépendante, corrections scoped et quatre checks CI HEAD final, Sonar réel.
 - [ ] Commit/push/PR/merge gardé GOV-MERGE-01, CI canonique, archive/closeout/nettoyage propre.
 - [ ] Résultats HTTP/émulateur/physique et parité distingués ; aucune activation/DATA/OTA/déploiement implicite.
