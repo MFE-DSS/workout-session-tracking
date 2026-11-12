@@ -22,7 +22,7 @@ Il ne remplace aucun contrat visuel ou de domaine et ne crée aucune autorisatio
 | 4 | MOB-03 | Onboarding et compte ; dépendances STORE-00, notamment suppression de compte |
 | 5 | MOB-04 | MISSION |
 | 6 | MOB-05 | Progrès et journal |
-| 7 | MOB-06 | Bibliothèque de programmes — **RÉSERVÉE, gouvernée par Maltin** (10 novembre 2026) : ne pas démarrer, voir [§ Réservation Maltin](#réservation-maltin--mob-06-bibliothèque-de-séances) |
+| 7 | MOB-06 | Bibliothèque de programmes — **REPRISE AUTORISÉE sous OpenSpec/AUREN** (12 novembre 2026) sur `feature/bibliotheque-seances` ; [décision de reprise](../pilot/mob06-library/GOVERNANCE_RESUMPTION.md). La réservation Maltin est levée. |
 | 8 | MOB-07 | Constructeur |
 | 9 | MOB-08 | Exercices |
 | 10 | MOB-09 | Contexte salle / équipement à réévaluer selon le recadrage : aucun inventaire manuel natif imposé |
@@ -38,19 +38,28 @@ Il ne remplace aucun contrat visuel ou de domaine et ne crée aucune autorisatio
 ALPHA est le jalon retenu ici par l'opérateur ; les dates de bêta citées dans l'ancienne passation ne constituent
 pas une échéance reconduite par ce document. Les tranches futures ne sont pas ouvertes par leur présence ici.
 
-## Réservation Maltin — MOB-06 bibliothèque de séances
+<a id="réservation-maltin--mob-06-bibliothèque-de-séances"></a>
 
-**Décision opérateur du 10 novembre 2026 (« vas-y »), sur la candidate « Bibliothèque de séances dans l'app » :**
-MOB-06 sert de test d'une gouvernance où les décisions sont prises et enregistrées dans Maltin **avant** le code.
-Pendant ce test, la tranche est **gouvernée par Maltin, pas par cette roadmap** :
+## MOB-06 — reprise de la bibliothèque sous OpenSpec
 
-- branche réservée `feature/bibliotheque-seances`, créée vide sur `b9a334d` ; aucun commit n'y est poussé avant le travail transmis depuis Maltin ;
-- aucun change OpenSpec, proposition, brouillon de décision, fixture ou code MOB-06 n'est produit hors de Maltin ; le périmètre de la tranche 1 (catalogue, programmes personnels, plan de la semaine, lancement) est lui-même une décision Maltin ;
-- fichiers réservés, à ne pas modifier dans d'autres PR : `clients/mobile/src/routes/programmes.tsx`, `app/services/loadout.py`, la partie `/library` de `app/routers/pages.py`, toute route mobile de catalogue, tout module natif `library` ;
-- points partagés à séquencer et à signaler : `app/main.py` (montage de routers, aussi visé par MOB-05), `clients/mobile/ConnectedApp.tsx` (démarrage de séance, aussi visé par MOB-04 et REL-03).
+**Décision opérateur du 12 novembre 2026 : abandon de l'essai Maltin et reprise de
+`feature/bibliotheque-seances`.** La réservation du 10 novembre est levée : aucun
+passage de relais, scope, registre ou avis Maltin n'est désormais un prérequis.
+Le [reçu de reprise](../pilot/mob06-library/GOVERNANCE_RESUMPTION.md) conserve la
+formulation exacte et la référence historique sans réécrire les preuves du test.
 
-Le rang 7 n'est pas modifié par cette réservation ; un éventuel avancement est décidé dans Maltin.
-La réservation ne vaut ni GO BUILD, ni G1, ni autorisation de déploiement.
+La bibliothèque revient au cycle OpenSpec et aux contrats AUREN ordinaires :
+reprise du domaine existant, périmètre documenté et accepté avant build, croquis et
+pixels avant livraison UI, CI/revue puis GOV-MERGE-01. L'ancienne interdiction de
+produire une proposition, un change ou du code hors Maltin n'est plus applicable.
+L'abandon de Maltin ne vaut pas validation d'une composition visuelle ou déploiement.
+
+La branche est conservée. Les leases de sources partagées avec BODY/NUT restent
+séquencés, notamment `clients/mobile/ConnectedApp.tsx`, `app/routers/mobile_api.py`
+et le journal possédé ; aucune PR de code concurrente sur ces fichiers.
+Les contrats scientifiques, identités canoniques, autorisations BODY/NUT déjà
+reçues et gates de distribution restent inchangés. Le rang de roadmap n'est pas
+réécrit ; le mandat MVP courant demeure la référence de séquencement.
 
 ## STORE-00 — décisions et préparation en parallèle, dès maintenant
 
