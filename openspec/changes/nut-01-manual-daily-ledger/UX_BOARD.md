@@ -2,7 +2,37 @@
 
 # UX_BOARD — NUT-01 manuel / G1 proposé
 
-**G1_PENDING / NO_GO_BUILD / PIXELS_NOT_PRODUCED.** Famille dans Progrès, pas tab supplémentaire. Références MOB05A et UX-CAL-02 ; tokens/Frame C/RecessedWindow/NumericReadout LOCKED.
+**G1_FUNCTIONAL_ACCEPTED / TECHNICAL_BUILD_AUTHORIZED / UI_COMPOSITION_PENDING / PIXELS_NOT_PRODUCED.** Famille dans Progrès, pas tab supplémentaire. Références MOB05A et UX-CAL-02 ; tokens/Frame C/RecessedWindow/NumericReadout LOCKED.
+
+## Décision G1 fonctionnelle reçue
+
+« Valider le G1 fonctionnel uniquement », question
+call_4cb89afa5a174deeb907e6a2f4864053. Reçu exact dans
+G1_FUNCTIONAL_AUTHORIZATION.json. La décision ne vaut ni master artistique ni
+acceptation des pixels natifs.
+
+Le GO technique du12novembre reste acquis. Le croquis ci-dessous borne les
+parcours et le contenu ; il ne constitue pas un master artistique accepté et
+n'autorise pas une nouvelle géométrie autonome. Une composition NUT et ses
+pixels natifs devront encore être exposés puis acceptés avant commit UI.
+
+- Une journée explicite et sa zone, apports manuels kcal/protéines/glucides/lipides
+  optionnels ; une absence reste inconnue, zéro reste une valeur déclarée.
+- Saisie/correction puis reçu serveur exact ; les nombres inchangés restent
+  hérités. Effacer un champ est explicite. La complétude est une déclaration
+  humaine distincte ; aucune présence de quatre nombres ne la présume.
+- Cibles personnelles séparées : STANDARD/TRAINING/REST et date d'effet
+  choisies par l'utilisateur ; aucune cible par défaut ou classification de jour
+  déduite de ses séances. Association au jour par référence serveur exacte.
+- Historique/versions et période7/30jours ; synthèse certifiée seulement après
+  lecture complète de la fenêtre. Lecture précédente, partielle, hors ligne et
+  résultat d'écriture inconnu demeurent distincts du vide confirmé.
+- Accord nutrition distinct, reprise explicite de la commande durable après
+  réponse perdue, isolation compte/backend. Aucun nouvel envoi automatique.
+
+Ces parcours sont servis par le protocole existant WIRE_AND_READ_PROTOCOL.md.
+Photo, OCR, barcode et candidats texte restent des ports futurs non servis ;
+ils ne deviennent pas des actions disponibles dans ce G1 manuel.
 
 ```text
 PROGRÈS > Nutrition                   Aide

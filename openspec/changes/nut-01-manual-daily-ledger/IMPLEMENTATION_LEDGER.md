@@ -27,3 +27,14 @@ Ruling : migrationcanonique NUT attendparentBODYnonfusionné. Préparer une migr
 - Le reçu natif/backend a été comparé depuis les deux fichiersSQLite ; copie cohérente locale sauvegardée. Il s’agit du port possédé et des modules de production, pas du montage ConnectedApp/journal final ni d’une recette physique/Android. Aucune UI nouvelle composée.
 - Premier démarrage du banc bloqué par Metro IPv6-only localhost ; réglage limité à la commande Node --dns-result-order=ipv4first, puis vrai parcours réussi. Pas de patch de dépendance/module/SDK/lock. Metro borné à un worker pour la seconde phase ; backend/Metro arrêtés après preuve PID/cwd, données conservées. Aucun appareil personnel ou autre service arrêté.
 - Le master BODY externe reste NOT_ACCEPTED. NUT UI/G1/pixels et parent canonique restent des gates. Aucun commit/push/PR/CI/Sonar, merge/closeout/activation, nouvelAPK/OTA ou déploiement par ce checkpoint.
+
+
+## 13 novembre — décision fonctionnelle opérateur
+Décision call_4cb89afa5a174deeb907e6a2f4864053 : « Valider le G1 fonctionnel
+uniquement ». Reçu G1_FUNCTIONAL_AUTHORIZATION.json et en-tête UX_BOARD alignés.
+Le GO technique existant reste acquis ; la composition et les pixels NUT ne
+sont pas approuvés. Aucun nouvel écran/code métier, partage BODY, migration
+active ou appel externe par cet enregistrement. Les paragraphes antérieurs
+« G1 non accepté » décrivent leur instant ; ils ne rouvrent pas ce G1.
+Draft406 reste le même change. Domaine serveur et migration draft préservés,
+intégration du graphe et CI globale finale attendent le vrai parent BODY.
