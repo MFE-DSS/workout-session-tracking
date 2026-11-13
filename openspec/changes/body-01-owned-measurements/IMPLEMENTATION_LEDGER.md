@@ -117,7 +117,17 @@ que historyView/UI du worktree n'était pas publié. Pas panne infra. Ruling :
 conserver WeightEntry comme défaut de WeightWindowState, spécialiser seulement
 le port BODY. Aucun décodeur historique ou UI à publier. Export du client du
 HEAD committé reproduit le rouge, puis même export+3fichiers de correctif donne
-TS exit0 et Jest1160PASS. Nouveau témoin compile-only de compatibilité legacy
+TS exit0. Le premier export ne contenait pas les fixtures docs : Jest y donne
+15suitesFAIL/77PASS (24FAIL/929PASS, ENOENT), pas1160PASS. Le reçu précédent
+avait anticipé son résultat à tort ; cette mention est corrigée explicitement.
+Export complété depuis les mêmes sources versionnées, campagne distincte.
+Nouveau témoin compile-only de compatibilité legacy
 RED TS2322→GREEN. Worktreecomplet TS exit0. Addendum de revue indépendant sans
 Critical/Important ; aucun reset/stash/cascade de modifications. Nouvelle CI
 exacte requise après ce patch minimal, sans transformer le premier rouge enPASS.
+
+Après ajout des fixtures docs du même HEAD26770b5 (tous les fichiers mobiles
+versionnés comparés octet par octet), campagne locale distincte :92suites /
+1160tests PASS, TS exit0. Ce contrôle d'export vérifie le découpage publié,
+pas un nouvel assemblage BODY/NUT/MOB06. Aucun écran/consommateur noncommitté
+n'y a été ajouté ; deps réutilisées sous lock inchangé. La CI reste souveraine.
