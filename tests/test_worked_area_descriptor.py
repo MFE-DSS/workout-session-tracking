@@ -193,8 +193,19 @@ def test_muscle_mapping_untouched():
     assert "app/services/muscle_mapping.py" not in _changed()
 
 
-def test_no_model_migration_schema_touched():
+def test_no_unadmitted_model_migration_schema_touched():
+    # Historical worked-area scope remains read-only. BODY-01 subsequently
+    # admitted this exact additive lineage metadata delta; canonical numeric
+    # models and worked-area services must still remain untouched.
+    admitted_body = {
+        "app/models/__init__.py",
+        "app/models/body_measurement_operation.py",
+        "migrations/versions/body_measurement_operations_01.py",
+        "data/schema_snapshot.sql",
+    }
     for p in _changed():
+        if p in admitted_body:
+            continue
         assert not p.startswith("app/models/"), p
         assert not p.startswith("migrations/"), p
         assert p != "data/schema_snapshot.sql", p

@@ -1,0 +1,12 @@
+{
+  "scope": "BODY-01 revised design B01-B08 / normative amendment / G1",
+  "decision": "Autoriser BODY-01, son amendement et G1",
+  "date": "2026-11-11",
+  "question_id": "call_106057b169a74bc9887b1fea9f527f5d",
+  "base": "3cf77e17f37448980b115d8e0e0adad783c1d0b2",
+  "limits": [
+    "synthetic isolated app/DB",
+    "pixels acceptance before UI commit",
+    "no personal activation/deployment/APK/OTA"
+  ]
+}
