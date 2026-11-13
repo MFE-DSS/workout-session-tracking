@@ -51,14 +51,15 @@ export class BodyErasureResource{
   return this.state;
  }
 }
+export type BodyWeightWindowState=WeightWindowState<WeightPoint>;
 export class BodyWeightWindowResource{
- private value:WeightWindowState={status:'idle',previous:false,coverage:'PARTIAL',canContinue:false,entries:[]};private revision:number;private sequence=0;
+ private value:BodyWeightWindowState={status:'idle',previous:false,coverage:'PARTIAL',canContinue:false,entries:[]};private revision:number;private sequence=0;
  constructor(private auth:AuthSession,private source:BodyMeasurementsResource){this.revision=auth.revision;}
  invalidate(){this.sequence++;this.value={status:'idle',previous:false,coverage:'PARTIAL',canContinue:false,entries:[]};this.source.invalidate();}
  get state(){if(this.revision!==this.auth.revision){this.revision=this.auth.revision;this.invalidate();}return JSON.parse(JSON.stringify(this.value));}
  refresh(window:HistoryWindow){const old=this.state;return this.read(window,false,JSON.stringify(window)===JSON.stringify(old.window)?old:undefined);}
  continue(){const s=this.state;return s.canContinue&&s.window?this.read(s.window,true,s):Promise.resolve(s);}
- private async read(window:HistoryWindow,more:boolean,old?:WeightWindowState){
+ private async read(window:HistoryWindow,more:boolean,old?:BodyWeightWindowState){
   const revision=this.auth.revision,sequence=++this.sequence,current=()=>revision===this.auth.revision&&sequence===this.sequence;
   this.value={status:'pending',previous:Boolean(old?.entries.length),coverage:'PARTIAL',canContinue:false,entries:old?.entries??[],window};
   let result=await(more?this.source.loadNext():this.source.refresh({mode:'weight',limit:100}));let pages=0;

@@ -109,3 +109,15 @@ resources, pending/recovery et tests unitaires, delta type-only du graphe poids 
 aucun mount/APIpublic/SSR/UI/journal attach/ConnectedApp. Le reliquat corrigé
 reste sauvegardé, le master BODY toujours NOT_ACCEPTED. Pas de nouveau GO ni
 merge de scope incomplet. Les vérifications/CI exactes suivent leur reçu réel.
+
+
+CI43522207147 du checkpoint2b328bf : mobile1159PASS, puis typecheck échoue
+WeightTrend.tsx12 TS2345. Cause exacte : type partagé élargi à WeightPoint tandis
+que historyView/UI du worktree n'était pas publié. Pas panne infra. Ruling :
+conserver WeightEntry comme défaut de WeightWindowState, spécialiser seulement
+le port BODY. Aucun décodeur historique ou UI à publier. Export du client du
+HEAD committé reproduit le rouge, puis même export+3fichiers de correctif donne
+TS exit0 et Jest1160PASS. Nouveau témoin compile-only de compatibilité legacy
+RED TS2322→GREEN. Worktreecomplet TS exit0. Addendum de revue indépendant sans
+Critical/Important ; aucun reset/stash/cascade de modifications. Nouvelle CI
+exacte requise après ce patch minimal, sans transformer le premier rouge enPASS.

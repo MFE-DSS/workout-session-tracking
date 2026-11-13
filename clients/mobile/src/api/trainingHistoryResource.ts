@@ -62,7 +62,7 @@ export class TrainingHistoryResource{
  back(){void this.state;this.seq.detail++;if(this.value.selectedEntry!==null){this.value.selectedEntry=null;this.value.detail=idle();}else{this.seq.occurrences++;this.value.selectedExercise=null;this.value.occurrences=idle();}return this.state;}
 }
 export type WeightPoint=Omit<WeightEntry,'provenance'>&{provenance:WeightEntry['provenance']|import('./bodyMeasurements').BodyValue['provenance'];bodySource?:import('./bodyMeasurementsResource').BodyWeightSource};
-export type WeightWindowState={status:'idle'|'pending'|'confirmed'|'unknown'|'consent_required'|'unavailable'|'rejected';previous:boolean;coverage:'COMPLETE'|'PARTIAL';canContinue:boolean;entries:WeightPoint[];window?:HistoryWindow};
+export type WeightWindowState<Entry=WeightEntry>={status:'idle'|'pending'|'confirmed'|'unknown'|'consent_required'|'unavailable'|'rejected';previous:boolean;coverage:'COMPLETE'|'PARTIAL';canContinue:boolean;entries:Entry[];window?:HistoryWindow};
 const emptyWeight=():WeightWindowState=>({status:'idle',previous:false,coverage:'PARTIAL',canContinue:false,entries:[]});
 export class WeightWindowResource{
  private value=emptyWeight();private revision:number;private sequence=0;private consumed=0;
