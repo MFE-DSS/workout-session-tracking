@@ -260,6 +260,44 @@ def owned_document(db: Session, owner_id: int, root_ref: int) -> dict:
     return document(db, owner_id, context[0], context=context)
 
 
+def _erasure_entries(db: Session, owner_id: int, rows: list[BodyMeasurement]) -> list[dict]:
+    """Owned erasure metadata only; no numerical observations leave this projection."""
+    if not rows:
+        return []
+    contexts = head_contexts(db, owner_id, rows)
+    roots = {context["root_ref"] for context in contexts.values()}
+    precisions = {}
+    for root, provenance in db.execute(
+        select(Operation.root_ref, Operation.date_provenance)
+        .where(Operation.owner_id == owner_id, Operation.root_ref.in_(roots))
+        .order_by(Operation.applied_revision.desc())
+    ):
+        if provenance and root not in precisions:
+            precisions[root] = provenance["precision"]
+    result = []
+    for row in rows:
+        context = contexts[row.id]
+        result.append({
+            "root_ref": context["root_ref"],
+            "measurement_id": row.id,
+            "revision": context["revision"],
+            "head_token": context["token"],
+            "measured_at": instant(row.measured_at),
+            "date_precision": precisions.get(context["root_ref"], "UNKNOWN"),
+            "version_count": context["version_count"],
+        })
+    return result
+
+
+def owned_erasure_document(db: Session, owner_id: int, root_ref: int) -> dict:
+    revision = body_revision(db, owner_id)
+    row, _, _ = owned_head(db, owner_id, root_ref)
+    result = _erasure_entries(db, owner_id, [row])[0]
+    if body_revision(db, owner_id) != revision:
+        raise BodyCommandError("body_cursor_conflict")
+    return result
+
+
 def _encode_cursor(payload: dict) -> str:
     from app.config import get_settings
 
@@ -343,7 +381,7 @@ def page(
     previous = _cursor(cursor, identity)
     query = select(BodyMeasurement).where(BodyMeasurement.user_id == owner_id)
     context = None
-    if kind in {"CURRENT", "WEIGHT"}:
+    if kind in {"CURRENT", "WEIGHT", "ERASURE"}:
         query = query.where(current_measurement_predicate())
     if kind == "WEIGHT":
         query = query.where(BodyMeasurement.weight_kg.is_not(None))
@@ -365,7 +403,7 @@ def page(
             BodyMeasurement.measured_at
             < datetime.combine(through_day + timedelta(days=1), datetime.min.time(), tzinfo=UTC)
         )
-    chronological = kind in {"CURRENT", "WEIGHT"}
+    chronological = kind in {"CURRENT", "WEIGHT", "ERASURE"}
     if previous:
         if chronological:
             try:
@@ -384,7 +422,11 @@ def page(
         else query.order_by(BodyMeasurement.id.desc())
     )
     rows = list(db.scalars(query.limit(limit + 1)))
-    entries = [document(db, owner_id, row, context=context) for row in rows[:limit]]
+    entries = (
+        _erasure_entries(db, owner_id, rows[:limit])
+        if kind == "ERASURE"
+        else [document(db, owner_id, row, context=context) for row in rows[:limit]]
+    )
     if body_revision(db, owner_id) != revision:
         raise BodyCommandError("body_cursor_conflict")
     next_cursor = None
@@ -393,7 +435,7 @@ def page(
         next_cursor = _encode_cursor(
             {"identity": identity, "last_id": last.id, "last_at": instant(last.measured_at)}
         )
-    return {
+    result = {
         "contract_version": CONTRACT,
         "owner_id": owner_id,
         "body_revision": revision,
@@ -401,6 +443,11 @@ def page(
         "entries": entries,
         "next_cursor": next_cursor,
         "window": window,
+    }
+    if kind == "ERASURE":
+        return {**result, "projection": "ERASURE_ONLY"}
+    return {
+        **result,
         "field_specs": [
             {
                 "key": spec.key,

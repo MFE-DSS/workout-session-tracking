@@ -75,3 +75,37 @@ pas les writers/readers publics encore couplés au SSR. Une nouvelle revue a
 reproduit le consentement ORM périmé (RED) ; le kernel relit désormais la ligne
 sous le verrou d’écriture avec populate_existing. GREEN30 puis48 témoins, dont
 startup réel sans sidecar. Aucun changement du comportement des replays exacts.
+
+## 13 novembre — orchestration des trois PRs, correctifs du reliquat
+
+PR407 reste au checkpoint technique1fd97eba ; UI/master et reliquat public non
+livrés. Revue fraîche du reliquat : R01 saisie native d'un pair/date bloquée par
+un nombre historique inchangé hors bornes ; R02 effacement nouveau inaccessible
+après retrait/reprise faute de sélection/token. Aucun Critical identifié ; ni
+la revue ni les CI du checkpoint ne certifient les composants non committés.
+
+Ruling R01 : reconnaître l'égalité numérique finie d'un champ historique avant
+les bornes d'acquisition, l'omettre de la commande, puis conserver le parser et
+les bornes stricts pour tout nombre nouveau/changé. Cela préserve aussi le
+préremplissage historique négatif/exponentiel sans autoriser de nouvelle saisie
+de ce type. Coût si erreur : un champ changé pourrait être omis ; témoins de
+pair/date réels et rejets de nouvelles valeurs sont exigés. RED4FAIL/8PASS
+reproduit la barrière native ; aucune géométrie ni politique SCI à changer.
+
+
+Ruling R02 avant apply : protocole ERASURE_ACCESS_PROTOCOL.md, projection
+minimale explicite des GET existants, aucun chiffre corporel/grant/table/route
+nouvelle. Curseurs liés au purpose/owner/plage/révision, tête CAS fraîche avant
+effacement explicite de toutes versions. Chemins natif/SSR de gestion gardés
+hors commit UI ; retrait ne force pas de nouvel accord pour supprimer.
+RED HTTP2, client9, resource3, ConnectedApp1 et SSR1 reproduisent les barrières.
+GREEN HTTP2, client/resource puis mobile complet1178, lecture/SSR42 ; ces campagnes
+sont distinctes. TS final exit0. Relecture corrective R01/R02 sans nouveau
+Critical/Important ; une limitation mineure du formulaire SSR clear-only
+partiel reste visible, sans bloquer l'effacement.
+
+Checkpoint ports prévu dans Draft407 : helpers read minimaux + témoins, client,
+resources, pending/recovery et tests unitaires, delta type-only du graphe poids ;
+aucun mount/APIpublic/SSR/UI/journal attach/ConnectedApp. Le reliquat corrigé
+reste sauvegardé, le master BODY toujours NOT_ACCEPTED. Pas de nouveau GO ni
+merge de scope incomplet. Les vérifications/CI exactes suivent leur reçu réel.

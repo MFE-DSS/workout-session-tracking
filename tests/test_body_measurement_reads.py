@@ -206,3 +206,47 @@ def test_ssr_context_counts_real_versions_without_per_row_queries(body_db):
     assert len(queries) <= 2
     assert len(contexts) == 8
     assert sorted(item["version_count"] for item in contexts.values()) == [1] * 7 + [2]
+
+
+def test_erasure_projection_lists_current_owned_roots_without_observation_fields(body_db):
+    from app.models.measurement import BodyMeasurement
+    from app.services.body_measurement_reads import owned_erasure_document, owned_head, page
+
+    original = create(body_db)
+    correction(body_db, original["root_ref"], {"waist_cm": 85})
+    legacy = BodyMeasurement(user_id=1, measured_at=datetime(2000, 1, 1), weight_kg=800)
+    body_db.add(legacy)
+    body_db.commit()
+    result = page(body_db, 1, kind="ERASURE")
+    assert result["projection"] == "ERASURE_ONLY"
+    assert "field_specs" not in result
+    assert result["window"] == {"from": None, "through": None}
+    assert len(result["entries"]) == 2
+    projected = {row["root_ref"]: row for row in result["entries"]}
+    assert projected[original["root_ref"]]["version_count"] == 2
+    assert projected[legacy.id]["version_count"] == 1
+    assert projected[legacy.id]["date_precision"] == "UNKNOWN"
+    assert set(projected[legacy.id]) == {
+        "root_ref", "measurement_id", "revision", "head_token", "measured_at",
+        "date_precision", "version_count",
+    }
+    head = owned_erasure_document(body_db, 1, original["root_ref"])
+    assert head == projected[original["root_ref"]]
+    assert head["head_token"] == owned_head(body_db, 1, original["root_ref"])[1]
+    assert page(body_db, 2, kind="ERASURE")["entries"] == []
+
+
+def test_erasure_cursor_does_not_become_a_fact_cursor_or_survive_an_owner_mutation(body_db):
+    from app.services.body_measurement_reads import BodyCommandError, page
+
+    capture(body_db, "erasure-cursor-1", "2025-01-01")
+    capture(body_db, "erasure-cursor-2", "2025-01-01")
+    first = page(body_db, 1, kind="ERASURE", limit=1)
+    second = page(body_db, 1, kind="ERASURE", limit=1, cursor=first["next_cursor"])
+    assert first["entries"][0]["root_ref"] != second["entries"][0]["root_ref"]
+    assert second["next_cursor"] is None
+    with pytest.raises(BodyCommandError, match="body_cursor_conflict"):
+        page(body_db, 1, kind="CURRENT", limit=1, cursor=first["next_cursor"])
+    capture(body_db, "erasure-cursor-3", "2025-01-02")
+    with pytest.raises(BodyCommandError, match="body_cursor_conflict"):
+        page(body_db, 1, kind="ERASURE", limit=1, cursor=first["next_cursor"])
