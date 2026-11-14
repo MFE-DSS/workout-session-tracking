@@ -79,3 +79,15 @@ test('lookup or replay refusal cannot certify that a previous unknown command ne
   expect(await store.pending()).toEqual([]);
  }finally{d.close();}
 });
+test.each(['DAY','TARGET'] as const)('two %s recovery instances share one atomic initial-POST claim',async namespace=>{
+ const d=fixture();try{
+  const store=await attachNutritionPending(d.port(),createSerialQueue(),7,scope,hash),c=client(jest.fn(async()=>({state:'unknown'})));
+  const request=namespace==='DAY'?input():nutritionCommand('TARGET','/me/nutrition/targets/revisions',{
+   contract_version:'nutrition-command/1.0.0',request_id:'target-one',expected_head_token:'0'.repeat(64),operation:'SET_FIELDS',values:{kcal_milli:2200000},variant:'STANDARD',effective_from:'2026-11-12',
+  });
+  const results=await Promise.allSettled([new NutritionRecovery(c,store,()=>true).send(request),new NutritionRecovery(c,store,()=>true).send(request)]);
+  expect(c.submit).toHaveBeenCalledTimes(1);expect(results.filter(r=>r.status==='rejected')).toHaveLength(1);
+  d.reopen();const restored=await attachNutritionPending(d.port(),createSerialQueue(),7,scope,hash);
+  expect((await restored.pending())[0]).toMatchObject({namespace,state:'SENT_UNKNOWN',payload_json:request.payload_json});
+ }finally{d.close();}
+});

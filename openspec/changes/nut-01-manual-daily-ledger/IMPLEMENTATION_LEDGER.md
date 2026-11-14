@@ -38,3 +38,23 @@ active ou appel externe par cet enregistrement. Les paragraphes antérieurs
 « G1 non accepté » décrivent leur instant ; ils ne rouvrent pas ce G1.
 Draft406 reste le même change. Domaine serveur et migration draft préservés,
 intégration du graphe et CI globale finale attendent le vrai parent BODY.
+
+
+## 14 novembre — réserve atomique de première émission
+Continuation technique sans nouvelle UI, GO/G1 acquis. Ruling : deux instances
+partageant le journal peuvent lire PREPARED avant leur markUnknown ; un test
+DAY/TARGET doit démontrer un seul POST initial. Retenu : vérifier PREPARED dans
+la transaction SQLite de marquage initial. Le rejeu explicite garde sa voie
+SENT_UNKNOWN existante et ses mêmes bytes ; ni nouvelle table, ni migration,
+ni grant automatique. Pas de mutex uniquement React ou second stockage.
+
+
+### Checkpoint technique du 14 novembre — vérification et limites
+2 FAIL/5 PASS puis 44 ciblés PASS ; copie de travail 1166 mobiles et TS exit0.
+Revue indépendante des seuls deltas de reprise : aucun Critical/Important introduit.
+Réserve atomique PREPARED pour première émission ; ce n’est pas une
+sérialisation globale de tous les rejeux explicitement demandés. Aucun nouveau
+schéma, composition, baseline ou autorisation de release. Les suites ci-dessus
+sont celles du worktree, avec ses consommateurs non publiés ; la CI du HEAD
+publié sera observée séparément. Draft conservée, scope produit incomplet,
+parents canoniques et validations artistiques pendants.

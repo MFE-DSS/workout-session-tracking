@@ -27,7 +27,7 @@ export class NutritionRecovery{
   if(command.state==='CONFLICT')return{state:'rejected',code:command.rejection,status:409};
   if(command.state==='SENT_UNKNOWN')throw Error('nutrition_verification_required');
   const fresh=await this.consent();if(fresh)return fresh;
-  await this.store.markUnknown(command.namespace,command.request_id,this.current);
+  await this.store.markUnknown(command.namespace,command.request_id,this.current,true);
   const durable=await this.store.read(command.namespace,command.request_id);if(!durable)throw Error('nutrition_prepare_not_durable');
   if(!this.owned(durable))return{state:'cancelled'};
   return this.apply(durable,await this.client.submit(durable),true);

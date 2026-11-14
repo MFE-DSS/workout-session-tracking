@@ -8,7 +8,7 @@ export interface NutritionPendingCommands{
  prepare(input:NutritionInput,current:()=>boolean):Promise<PendingNutritionCommand>;
  read(namespace:NutritionNamespace,key:string):Promise<PendingNutritionCommand|null>;
  pending():Promise<PendingNutritionCommand[]>;
- markUnknown(namespace:NutritionNamespace,key:string,current:()=>boolean):Promise<void>;
+ markUnknown(namespace:NutritionNamespace,key:string,current:()=>boolean,initialOnly?:boolean):Promise<void>;
  ack(namespace:NutritionNamespace,key:string,receipt:NutritionReceipt,current:()=>boolean):Promise<void>;
  conflict(namespace:NutritionNamespace,key:string,code:string,current:()=>boolean):Promise<void>;
 }
@@ -47,7 +47,7 @@ export async function attachNutritionPending(db:PlanSQL,serial:Serial,owner:numb
    guard(current);const saved=await read(input.namespace,input.request_id);guard(current);if(!saved)throw Error('nutrition_prepare_not_durable');return saved;
   },
   async pending(){const rows=await db.getAllAsync<any>("SELECT * FROM nutrition_pending_commands_v1 WHERE owner_id=? AND backend_scope=? AND state IN ('PREPARED','SENT_UNKNOWN') ORDER BY created_at_ms,namespace,request_id",owner,scope);return Promise.all(rows.map(async row=>(await decode(row))!));},
-  async markUnknown(namespace,key,current){await transaction(current,async tx=>{const row=await decode(await raw(tx,namespace,key));if(!row||!['PREPARED','SENT_UNKNOWN'].includes(row.state))throw Error('nutrition_command_terminal');await tx.runAsync("UPDATE nutrition_pending_commands_v1 SET state='SENT_UNKNOWN' WHERE owner_id=? AND backend_scope=? AND namespace=? AND request_id=?",owner,scope,namespace,key);});},
+  async markUnknown(namespace,key,current,initialOnly=false){await transaction(current,async tx=>{const row=await decode(await raw(tx,namespace,key));if(!row||!['PREPARED','SENT_UNKNOWN'].includes(row.state))throw Error('nutrition_command_terminal');if(initialOnly&&row.state!=='PREPARED')throw Error('nutrition_verification_required');await tx.runAsync("UPDATE nutrition_pending_commands_v1 SET state='SENT_UNKNOWN' WHERE owner_id=? AND backend_scope=? AND namespace=? AND request_id=?",owner,scope,namespace,key);});},
   async ack(namespace,key,receipt,current){await transaction(current,async tx=>{const row=await decode(await raw(tx,namespace,key));if(!row||row.state==='CONFLICT'||!decodeNutritionReceipt(receipt,owner,row)||row.state==='ACKED'&&JSON.stringify(row.receipt)!==JSON.stringify(receipt))throw Error('nutrition_receipt_mismatch');await tx.runAsync("UPDATE nutrition_pending_commands_v1 SET state='ACKED',receipt_json=? WHERE owner_id=? AND backend_scope=? AND namespace=? AND request_id=?",JSON.stringify(receipt),owner,scope,namespace,key);});},
   async conflict(namespace,key,code,current){await transaction(current,async tx=>{const row=await decode(await raw(tx,namespace,key));if(!row||row.state==='ACKED'||!code)throw Error('nutrition_command_terminal');await tx.runAsync("UPDATE nutrition_pending_commands_v1 SET state='CONFLICT',rejection=? WHERE owner_id=? AND backend_scope=? AND namespace=? AND request_id=?",code.slice(0,128),owner,scope,namespace,key);});},
  };
