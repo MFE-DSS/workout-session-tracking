@@ -1,0 +1,60 @@
+# NUT-01 implementation ledger
+
+12novembre2026. Technical GO received call_c1496d1a84e04b1a8dd61ad04f063aa6; preserved documents pinned in BUILD_AUTHORIZATION.json. UI/G1/pixels not accepted. Existing recovered worktree reused, no product code yet.
+Brainstorming/options/risks retained in design; implementation inline using existing stack. Task1 starts with strict command/model tests; BODY full verification continues on its separate source. Parent migration/shared integration unresolved until BODY merge, not an excuse to stall independent domain work or fabricate a canonical parent.
+
+Task1 boundary :24RED(missing feature)→24GREEN strict command/wire/milli/canonical/duplicate handling. Models : existenceRED +10setupmissingmodule, then10PASS/1FAIL found actual SQLiteCHECK NULL truth issue for revision2withoutparent. Explicit parentISNOTNULL added, full command+models35tests running. Models intentionally not registered in product startup; real fileSQLite/foreignkeys/cascade proven in tests, not a migration applied to a served backend. Tier nowMIGRATION, no concurrent secondfullsweep; final NUTglobal/migration checks await completion of technical scope/dependency integration.
+
+Task1/2 : noyauSQLite/receipt/CAS, ciblesréférencées, retrait/réouverture, identitéauth et accorddistinct implémentés.53tests domaine+lecturesPASS, puis3vraisHTTP et inventaireroutes inclus dans broad70PASS. Flux inconnus/0, completenesstests incluent noop inchangé(RED→GREEN ne remet pas partiel sansmutation) et tokenUnicode(REDTypeError→rejettypé sans effet). GardeSQLiteconsentmonotonicmicrosecond empêcheABA soushorlogefigée. Importsfixtures initialement déclenchaientF811 ; helpers explicites déplacés en tests/nutrition_helpers.py, sansfixtureglobale/autogrant. Complexité_target séparée, Ruffneufcorrigé, budget/sécuritéfinauxàrejouer.
+Task3 APIréelle montée sous /me/nutrition,13routes inventoriéesnouvelledomaineREWRITE_NATIVE (pas VERIFIED_NATIVE). Modèlesenregistrés et nutrition_manual exclu duDDLstartup avant montage ; testprouve l'absence destables etcapabilitiesSCHEMA_UNAVAILABLE. Vraiefixturemigration explicite pourHTTPsynthétique ; aucunDDLproduit. Versions406sansdowngrade/no-store/Bearer, reçuaprèsretrait sansvaleurs, cibleétrangère404identiqueinconnue.
+Ruling : migrationcanonique NUT attendparentBODYnonfusionné. Préparer une migrationfigée horsversionsactives et qualifier un graphecomposé temporaire avecsourceparentempreintée ; ne pas créer un parentfactice ni prétendrealembicheadcanoniqueNUTactuel. Les testsnouveauxn'ont pas encorevalidé toutescourses/APIcursors/DB/schéma/hardeningni clientnatif ; travailtechniqueencours, pascompleted.
+
+## Vérifications techniques et revue — 12novembre2026
+- Migration draft réellement exécutée dans graphe composé BODY+NUT synthétique : écart now() SQLite reproduit, test DDL indépendant RED puis CURRENT_TIMESTAMP GREEN ; deux modèles acceptent maintenant le temps serveur. Legacy BodyMeasurement800 et DDL inchangés ; drift0, roundtrip vide, downgrade peuplé refusé. Aucun fichier actif de versions migratoires NUT ajouté avant son parent.
+- Revue backend indépendante : P2 identité serveur/schéma/signature propre et P2 détection des contraintes réparés avec témoins RED→GREEN et réexamen indépendant. Backend/clé vides refusent503 ; config par banc obligatoire. Codes d’erreurs externes fermés, no_change interne projeté422invalid_command.
+- Campagne ciblée/broad80PASS (avant2témoins supplémentaires de concurrence). Deux connexions réelles : un seul absent-head gagne ; cache d’accord et preuve auth relus après modification sur autre connexion ; module transactions8PASS.
+- Client : milli-entiers et4vecteurs de bytes/hash pinés, refus JSON non canonique ; aucun4/4/9. NamespaceDAY/TARGET+owner+backend partitionnent les copies de commandes sur la connexion possédée ; aucune seconde chronologie canonique.
+- Revue native : refus de lookup/replay ne termine plus une commande SENT_UNKNOWN ; erreur externe inconnue reste UNKNOWN ; collection COMPLETE réconcilie faits/couverture/totaux ; champs connus exigent provenance ; transports identité/domaine explicitement de même scope.41tests ciblés +TypeScript, addendum indépendant sans constat nommé encore ouvert.
+- Suite mobile complète92suites/1163tests PASS, TypeScript PASS. Ceci éprouve les modules/consommateurs de test ; aucun écran Nutrition/ConnectedApp monté ni appareil physique déclaré vérifié.
+- Ruff neuf, budget260≤548, Bandit7modules applicatifs, protocole, OpenSpec25/25 et Gitleaks snapshot49fichiers passent aux instants consignés. Snapshot final et tests additionnels restent à relire en fin de campagne.
+- Sweep global local mémoire1800Mo, lots2 via runner canonique : en cours. Son échec test_alembic_head_matches_base_metadata est attendu et conservé parce que les modèles NUT existent mais leur migration reste draft hors graphe actif. Ce n’est pas un sweep vert, ni un motif pour affaiblir le drift.
+- Aucun commit/push/PR/CI/Sonar NUT, archive, activation, APK/OTA ou déploiement. Les gates de parent BODY et de composition native restent ouvertes.
+
+## Dernier checkpoint technique — 12novembre2026
+- Le sweep NUT isolé a été arrêté normalement après232/440fichiers, sous1800Mo, avec un échec conservé test_alembic_head_matches_base_metadata. Vérification PID/commande/cwd et arrêt des seuls processus possédés. Ce lancement était prématuré avant son parent : le contrôle global final devra utiliser le vrai graphe intégrable, et reste non satisfait. Les résultats du sweep BODY complet antérieur ne deviennent pas ceux de NUT.
+- API client de tête naturelle corrigée pour lire ABSENT sans construire de fausse valeur ni commande. Témoin1RED→GREEN ;42tests ciblés etTypeScript PASS. Suite mobile finale92suites/1164tests PASS.
+- Preuve native iOS26.3, ExpoGo58.0.7, sur simulateur dédié : vraies API, accord NUT explicite synthétique, commande0kcal/1.25gprotéine et champs inconnus non remplis, perte de réponse après vrai HTTP200, SENT_UNKNOWN durable expo-sqlite. Terminaison app puis relance, tokenSecureStore restauré, reçu exact récupéré parGET et ACK durable ; un seul POST de nutrition et une seule révision serveur, A/B/A gardé. Ces nombres sont exclusivement des données de test, jamais une cible ou un journal humain.
+- Le reçu natif/backend a été comparé depuis les deux fichiersSQLite ; copie cohérente locale sauvegardée. Il s’agit du port possédé et des modules de production, pas du montage ConnectedApp/journal final ni d’une recette physique/Android. Aucune UI nouvelle composée.
+- Premier démarrage du banc bloqué par Metro IPv6-only localhost ; réglage limité à la commande Node --dns-result-order=ipv4first, puis vrai parcours réussi. Pas de patch de dépendance/module/SDK/lock. Metro borné à un worker pour la seconde phase ; backend/Metro arrêtés après preuve PID/cwd, données conservées. Aucun appareil personnel ou autre service arrêté.
+- Le master BODY externe reste NOT_ACCEPTED. NUT UI/G1/pixels et parent canonique restent des gates. Aucun commit/push/PR/CI/Sonar, merge/closeout/activation, nouvelAPK/OTA ou déploiement par ce checkpoint.
+
+
+## 13 novembre — décision fonctionnelle opérateur
+Décision call_4cb89afa5a174deeb907e6a2f4864053 : « Valider le G1 fonctionnel
+uniquement ». Reçu G1_FUNCTIONAL_AUTHORIZATION.json et en-tête UX_BOARD alignés.
+Le GO technique existant reste acquis ; la composition et les pixels NUT ne
+sont pas approuvés. Aucun nouvel écran/code métier, partage BODY, migration
+active ou appel externe par cet enregistrement. Les paragraphes antérieurs
+« G1 non accepté » décrivent leur instant ; ils ne rouvrent pas ce G1.
+Draft406 reste le même change. Domaine serveur et migration draft préservés,
+intégration du graphe et CI globale finale attendent le vrai parent BODY.
+
+
+## 14 novembre — réserve atomique de première émission
+Continuation technique sans nouvelle UI, GO/G1 acquis. Ruling : deux instances
+partageant le journal peuvent lire PREPARED avant leur markUnknown ; un test
+DAY/TARGET doit démontrer un seul POST initial. Retenu : vérifier PREPARED dans
+la transaction SQLite de marquage initial. Le rejeu explicite garde sa voie
+SENT_UNKNOWN existante et ses mêmes bytes ; ni nouvelle table, ni migration,
+ni grant automatique. Pas de mutex uniquement React ou second stockage.
+
+
+### Checkpoint technique du 14 novembre — vérification et limites
+2 FAIL/5 PASS puis 44 ciblés PASS ; copie de travail 1166 mobiles et TS exit0.
+Revue indépendante des seuls deltas de reprise : aucun Critical/Important introduit.
+Réserve atomique PREPARED pour première émission ; ce n’est pas une
+sérialisation globale de tous les rejeux explicitement demandés. Aucun nouveau
+schéma, composition, baseline ou autorisation de release. Les suites ci-dessus
+sont celles du worktree, avec ses consommateurs non publiés ; la CI du HEAD
+publié sera observée séparément. Draft conservée, scope produit incomplet,
+parents canoniques et validations artistiques pendants.

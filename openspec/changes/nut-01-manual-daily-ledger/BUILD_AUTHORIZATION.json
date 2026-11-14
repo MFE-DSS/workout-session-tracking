@@ -1,0 +1,17 @@
+{
+  "received_at": "2026-11-12T12:35:58.535123+00:00",
+  "question_id": "call_c1496d1a84e04b1a8dd61ad04f063aa6",
+  "operator_answer": "Autoriser le build technique NUT-01",
+  "scope": "manual domain/declared targets, two versioned tables, distinct consent, owned API, clients/exact local recovery; synthetic only",
+  "excluded": [
+    "new UI composition/G1/pixel approval",
+    "personal-data activation",
+    "APK/OTA or deployment"
+  ],
+  "base": "3cf77e17f37448980b115d8e0e0adad783c1d0b2",
+  "reviewed_documents": {
+    "EXECUTION_SCOPE_20261112.md": "2de80d5b8315eb3b8492fbdf3b20e256243eef65aa242ee019c80d65efbde2b9",
+    "WIRE_AND_READ_PROTOCOL.md": "a237529bd1cc66eb5ea7c383953f799306edc6a6745228bc37198d7abe4827c5",
+    "PERSISTENCE_AND_COMMANDS.md": "6f2aedeee457fbe259e34dd6bdb37ebbf4bd8e28be33275b0b64a54b1191b241"
+  }
+}
