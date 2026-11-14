@@ -649,6 +649,8 @@ Préparation après socle : [MOB04 MISSION, proposition sans GO BUILD](../propos
 |---|---|---|
 | MOB-06 bibliothèque de séances | OpenSpec + contrats AUREN ; [reprise opérateur](../pilot/mob06-library/GOVERNANCE_RESUMPTION.md) | REPRISE AUTORISÉE ; essai/réservation Maltin abandonnés. Branche `feature/bibliotheque-seances` conservée et réconciliée au canonique. Cadrage du build et validations UI selon les gates ordinaires ; aucune fonctionnalité native livrée par ce delta documentaire. |
 
+Change [mob06-owned-program-library](../../openspec/changes/mob06-owned-program-library/proposal.md) : GO BUILD/G1 reçu (call_4321044cec284c79898cb7d2dd483990). Checkpoint de services, API isolément montable et ports natifs ; montage produit/ConnectedApp et pixels Programmes restent ouverts, sans programme actif ou agenda inventé. Le départ perdu reste UNKNOWN, sans reçu idempotent serveur supposé ni nouvel envoi automatique.
+
 L'entrée historique du 10 novembre reste consultable au commit `1000d2e56b273a31400b8458a4e96c30bfc3810c`.
 Elle ne bloque plus MOB-06 et n'exige aucun registre ou passage de relais Maltin.
 
