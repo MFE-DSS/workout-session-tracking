@@ -126,3 +126,14 @@ Les patches serveur/schéma et journal NUT partagé sont préservés hors branch
 aucun fichier partagé live ni pixel n’est appliqué ici. Master BODY et Programmes
 restent non acceptés ; aucune nouvelle PR, CI, release ou clôture de produit.
 CR durable : `/Users/martinfeldmann/auren-review/AUREN_CR_ASSEMBLAGE_BODY_NUT_MOB06_2026_11_13.md`.
+
+
+### Checkpoint technique du 14 novembre — vérification et limites
+Nouveau témoin de deux contrôleurs/SQLite : premier POST unique, UNKNOWN et reprise propriétaire conservés. Implémentation inchangée ; aucun RED prétendu. Copie de travail1195mobiles et TS exit0.
+Revue indépendante des seuls deltas de reprise : aucun Critical/Important introduit.
+Réserve atomique PREPARED pour première émission ; ce n’est pas une
+sérialisation globale de tous les rejeux explicitement demandés. Aucun nouveau
+schéma, composition, baseline ou autorisation de release. Les suites ci-dessus
+sont celles du worktree, avec ses consommateurs non publiés ; la CI du HEAD
+publié sera observée séparément. Draft conservée, scope produit incomplet,
+parents canoniques et validations artistiques pendants.

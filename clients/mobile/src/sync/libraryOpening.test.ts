@@ -34,6 +34,13 @@ test('lost response survives new controller and verify/resume never replays crea
  await restored.resume();expect(s.resumed).toBe(1);expect(s.sends).toBe(1);
  expect((await s.pending.get(localId,()=>true))?.creation_outcome).toBe('UNKNOWN');
 });
+test('two library controllers sharing durable intent issue only one initial creation POST',async()=>{
+ const s=await setup();s.unknown();const other=s.make();
+ await Promise.all([s.controller.submit(choice,()=>true),other.submit(choice,()=>true)]);
+ expect(s.sends).toBe(1);expect((await s.pending.unresolved(()=>true))?.state).toBe('SENT_UNKNOWN');
+ const restored=s.make();await restored.hydrate();await restored.verify();await restored.resume();
+ expect(s.sends).toBe(1);expect(s.resumed).toBe(1);expect((await s.pending.get(localId,()=>true))?.creation_outcome).toBe('UNKNOWN');
+});
 test('201 followed by failed local execution save stays unresolved',async()=>{
  const s=await setup();s.failSave();await s.controller.submit(choice,()=>true);
  expect(s.sends).toBe(1);expect(s.controller.state.phase).toBe('unknown');
