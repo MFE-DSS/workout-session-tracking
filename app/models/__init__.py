@@ -5,6 +5,7 @@ package is imported (used by `init_db` and Alembic autogenerate later).
 """
 from app.models import (  # noqa: F401
     body_consent,
+    body_measurement_operation,
     body_zone,
     catalog,
     challenge,

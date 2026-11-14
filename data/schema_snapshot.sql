@@ -7,6 +7,9 @@
 -- index: ix_body_measurements_user_date
 CREATE INDEX ix_body_measurements_user_date ON body_measurements (user_id, measured_at);
 
+-- index: ix_body_operation_root
+CREATE INDEX ix_body_operation_root ON body_measurement_operations_v1 (owner_id, root_ref);
+
 -- index: ix_decision_traces_fingerprint
 CREATE INDEX ix_decision_traces_fingerprint ON decision_traces (decision_fingerprint);
 
@@ -82,6 +85,9 @@ CREATE INDEX ix_workout_sessions_user_id ON workout_sessions (user_id);
 -- index: ix_ws_user_status_excl_started
 CREATE INDEX ix_ws_user_status_excl_started ON workout_sessions (user_id, status, excluded_from_stats, started_at);
 
+-- index: uq_body_correction_parent
+CREATE UNIQUE INDEX uq_body_correction_parent ON body_measurement_operations_v1 (owner_id, parent_ref) WHERE operation = 'CORRECT';
+
 -- index: uq_first_created_handoff_owner
 CREATE UNIQUE INDEX uq_first_created_handoff_owner ON first_session_requests (owner_id) WHERE state = 'CREATED';
 
@@ -99,6 +105,9 @@ CREATE TABLE blueprint_source_events ( id VARCHAR(36) NOT NULL, owner_id INTEGER
 
 -- table: body_consents
 CREATE TABLE body_consents ( id INTEGER NOT NULL, user_id INTEGER NOT NULL, consent_type VARCHAR(64) NOT NULL, granted BOOLEAN NOT NULL, consent_version INTEGER NOT NULL, granted_at DATETIME, withdrawn_at DATETIME, created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, PRIMARY KEY (id), CONSTRAINT uq_body_consent_user_type UNIQUE (user_id, consent_type), FOREIGN KEY(user_id) REFERENCES users (id) ON DELETE CASCADE );
+
+-- table: body_measurement_operations_v1
+CREATE TABLE body_measurement_operations_v1 ( id INTEGER NOT NULL, owner_id INTEGER NOT NULL, request_id VARCHAR(64) NOT NULL, command_digest VARCHAR(64) NOT NULL, operation VARCHAR(8) NOT NULL, root_ref INTEGER NOT NULL, parent_ref INTEGER, measurement_ref INTEGER NOT NULL, applied_revision INTEGER NOT NULL, changed_fields JSON NOT NULL, provenance_by_changed_field JSON NOT NULL, date_provenance JSON, before_fingerprint VARCHAR(64), after_fingerprint VARCHAR(64), receipt JSON NOT NULL, recorded_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, PRIMARY KEY (id), FOREIGN KEY(owner_id) REFERENCES users (id) ON DELETE CASCADE, CONSTRAINT uq_body_operation_request UNIQUE (owner_id, request_id), CONSTRAINT uq_body_operation_revision UNIQUE (owner_id, root_ref, applied_revision), CONSTRAINT ck_body_operation_kind CHECK (operation IN ('CREATE','CORRECT','ERASE')), CONSTRAINT ck_body_operation_positive CHECK (applied_revision > 0 AND root_ref > 0 AND measurement_ref > 0), CONSTRAINT ck_body_operation_parent CHECK ((operation = 'CORRECT' AND parent_ref IS NOT NULL) OR (operation != 'CORRECT' AND parent_ref IS NULL)) );
 
 -- table: body_measurements
 CREATE TABLE "body_measurements" ( id INTEGER NOT NULL, user_id INTEGER NOT NULL, measured_at DATETIME NOT NULL, weight_kg FLOAT, chest_cm FLOAT, waist_cm FLOAT, calf_cm FLOAT, created_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, arm_cm_left FLOAT, arm_cm_right FLOAT, thigh_cm_left FLOAT, thigh_cm_right FLOAT, hip_cm FLOAT, neck_cm FLOAT, shoulder_width_cm FLOAT, calf_cm_left FLOAT, calf_cm_right FLOAT, wingspan_cm FLOAT, PRIMARY KEY (id), FOREIGN KEY(user_id) REFERENCES users (id) ON DELETE CASCADE );
