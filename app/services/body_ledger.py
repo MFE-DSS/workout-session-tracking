@@ -40,6 +40,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.models.measurement import BodyMeasurement
+from app.services.body_measurement_reads import current_measurement_predicate
 from app.services.time_format import relative_hours_ago
 
 #: Unités sémantiques du corps (`arbitrage §6`). Elles NE SONT PAS rendues
@@ -181,7 +182,7 @@ def _mesures(db: Session, user_id: int) -> list[BodyMeasurement]:
     return list(
         db.execute(
             select(BodyMeasurement)
-            .where(BodyMeasurement.user_id == user_id)
+            .where(BodyMeasurement.user_id == user_id, current_measurement_predicate())
             .order_by(
                 BodyMeasurement.measured_at.desc(), BodyMeasurement.id.desc()
             )

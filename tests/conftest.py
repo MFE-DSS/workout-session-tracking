@@ -54,6 +54,9 @@ def client(monkeypatch: pytest.MonkeyPatch) -> TestClient:
 
     try:
         with TestClient(main_mod.app) as c:
+            from helpers import install_body_schema
+
+            install_body_schema()
             # Auto-create a test user and log in so every subsequent
             # request carries the session cookie. This makes all V1
             # tests pass unchanged under the V2 auth layer.

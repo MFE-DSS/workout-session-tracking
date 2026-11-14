@@ -1,0 +1,12 @@
+{
+  "received_date": "2026-11-14",
+  "source": "Direct operator message following the BODY DA08 native review; no new question identifier",
+  "decision": "Accepted with non-blocking polish reservations",
+  "operator_words": "Alors oui, globalement, j'accepte les pixels […] Mais sinon c'est OK.",
+  "board": "http://127.0.0.1:8260/",
+  "artifact": "AUREN_BODY_DA08_NATIVE_REVIEW.zip",
+  "artifact_sha256": "fb8bdae85ff957b41087e6198bfb2d9c78a02862d17ea3408863e0904f7a299e",
+  "scope": "Presented BODY ConnectedApp iOS pixels and explicitly labelled supplementary evidence, including withdrawn-consent erasure management",
+  "reservations": "See POLISH_BACKLOG.md. Freeze presented geometry for delivery; no new palette, scientific interpretation or unreviewed redesign.",
+  "not_granted": ["Physical-device acceptance", "New Android ConnectedApp proof", "NUT or Programmes native pixel acceptance", "APK or OTA publication", "Deployment or real-data activation"]
+}

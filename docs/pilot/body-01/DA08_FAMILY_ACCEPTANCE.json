@@ -1,0 +1,9 @@
+{
+  "decision": "Accepter la famille DA‑08",
+  "question_id": "call_cbab5c2ca76c4afd8bb803eb3115f699",
+  "proof_sha256": "76961f867de8192722e473cfa156bcf11afed011866a46d840a4a4f623e3719b",
+  "scope": "Accepted component family for BODY, NUT and Programmes; final ConnectedApp pixels, device acceptance and release remain separate gates.",
+  "received_date": "2026-11-14",
+  "canonical_parent": "1462482a4e2bcd1fcde121d6f207a2131616e849",
+  "body_checkpoint": "f899b735486e1e258982462ae8f7b96ad15f6984"
+}

@@ -154,3 +154,58 @@ schéma, composition, baseline ou autorisation de release. Les suites ci-dessus
 sont celles du worktree, avec ses consommateurs non publiés ; la CI du HEAD
 publié sera observée séparément. Draft conservée, scope produit incomplet,
 parents canoniques et validations artistiques pendants.
+
+
+## 14 novembre — masters acceptés et reconstruction BODY native
+
+Les trois décisions de call_e22888c3c8c64715bb1544af27dc95fb remplacent le
+statut artistique NOT_ACCEPTED, sans accepter les pixels ConnectedApp. Reçu
+dans docs/pilot/body-01/DA07_MASTER_ACCEPTANCE.json ; plan préalable et gate
+détaillé DA07_NATIVE_GATE.md. Diff préexistant sauvegardé avant édition.
+
+Le vrai ConnectedApp iOS porte maintenant le cockpit, la saisie située et la
+gestion minimale d’effacement. Revue entière : quatre Important reproduits
+puis corrigés ; mineur legacy conservé. 233 backend ciblés/broad, 1204 mobiles
+et TS passent. Relance SQLite/effacement après retrait : un POST puis un GET
+du reçu exact, ACKED, aucun grant neuf pendant reprise. Host Android avec
+HTTP/SQLite réel, pas ConnectedApp Android complet ni recette physique.
+
+Board http://127.0.0.1:8252/ : décision native BODY requise avant commit UI.
+Docker visuel local indisponible, CI nouvelle du diff non committé absente ;
+aucun PASS réutilisé du checkpoint, aucun APK/OTA/merge. Parents NUT/MOB06
+et leases partagés restent séquencés après livraison BODY.
+
+## 14 novembre — famille DA‑08 acceptée et reconstruction BODY
+
+Décision call_cbab5c2ca76c4afd8bb803eb3115f699 conservée. Plan body-da08-integration, reçu et DA08_NATIVE_GATE.md décrivent le résultat courant : 1215 mobiles/TS,179 backend ciblés et244 broad/SSR ; revue entière et addendum correction sans Important, mineurs corrigés. Board8260, ConnectedApp iOS réel, reprise SQLite d’effacement après retrait. Android indisponible dans cette passe. Pixels finaux pendants, aucun commit UI ni CI/merge nouveau. Les mentions historiques de master non accepté restent datées ; la famille DA‑08 est maintenant acceptée.
+
+## 14 novembre — acceptation des pixels et finition différée
+
+Message opérateur direct : « Alors oui, globalement, j’accepte les pixels […]
+Mais sinon c’est OK. » Acceptation du board8260 et de son ZIP immuable, distincte
+de l’acceptation de famille. Reçu DA08_NATIVE_ACCEPTANCE.json ; six réserves
+concrètes dans POLISH_BACKLOG.md. Aucune nouvelle géométrie, palette, formule ou
+interprétation de graphique appliquée après cette décision. Les gates Android
+complet/physique, NUT/Programmes, DATA et release restent séparés.
+
+check_scope sur l’ensemble du diff canonique + travail courant : MIGRATION,
+sweep final borné en cours. Relecture §5.2 dans DESIGN_DECISION_REVIEW.md.
+DELIVERY.md réconcilié à cet état ; les résultats historiques restent datés.
+
+## 15 novembre — campagne locale finale avant publication
+
+Diff entier MIGRATION ;438fichiers /8597PASS /1ignoré sur runtime et sources de
+tests empreintés inchangés. Premier runner canonique arrêté au budget mémoire
+(1613>1600Mo),258fichiers complets. Reprise avec même garde/plafond :74nodes
+recovery-home,97nodes training-preferences (fichier déjà connu lourd),178fichiers
+restants ; tous passants. Manifeste disjoint exhaustif, aucune désélection
+supplémentaire. Les scripts de reprise sont des harnais de preuve hors dépôt,
+avec seulement cwd/listes adaptés, pas une modification du pipeline canonique.
+Ce n’est ni une exécution ininterrompue verte, ni la CI du produit fusionné.
+
+Mobile1215/100suites etTS exit0, quatre contrôles migration exit0, Ruff neuf et
+budget260≤548, Bandit-ll0Medium/High, protocole/OpenSpec25/25. Échec initial du
+wrapper budget lié au PATHruff réparé par invocation venv correcte, pas un
+défaut lint masqué. Références distantes inchangées1462482a/f899b735.
+Reçus persistants body-da08-integration-20261114/FINAL_LOCAL_RECEIPT.json et
+RESOURCE_CONTINUATION_PLAN.json ; CI HEAD final puis merge restent à effectuer.

@@ -8,13 +8,15 @@ import {TrainingHistoryClient,type HistoryPeriod} from '../../api/trainingHistor
 import {TrainingHistoryResource,WeightWindowResource,type WeightWindowState} from '../../api/trainingHistoryResource';
 import {WeightHistoryClient} from '../../api/weightHistory';
 import {WeightHistoryResource} from '../../api/weightHistoryResource';
+import {BodyMeasurementsResource,BodyWeightWindowResource} from '../../api/bodyMeasurementsResource';
+import type {BodyMeasurementsClient} from '../../api/bodyMeasurements';
 import {TrainingHistoryScreen} from './TrainingHistoryScreen';
 
-type Props={auth:AuthSession;call:Transport;typed?:Pick<FirstSessionV3Client,'execution'>;timeZone?:string};
-export function TrainingHistoryHost({auth,call,typed,timeZone}:Props){
+type Props={auth:AuthSession;call:Transport;typed?:Pick<FirstSessionV3Client,'execution'>;timeZone?:string;bodyClient?:BodyMeasurementsClient;onBody?:()=>void};
+export function TrainingHistoryHost({auth,call,typed,timeZone,bodyClient,onBody}:Props){
  const zone=timeZone??Intl.DateTimeFormat().resolvedOptions().timeZone??'UTC';
  const sources=useMemo(()=>({history:new TrainingHistoryResource(auth,new TrainingHistoryClient(auth,call,typed)),
-  weight:new WeightWindowResource(auth,new WeightHistoryResource(auth,new WeightHistoryClient(auth,call)))}),[auth,call,typed]);
+  weight:bodyClient?new BodyWeightWindowResource(auth,new BodyMeasurementsResource(auth,bodyClient)):new WeightWindowResource(auth,new WeightHistoryResource(auth,new WeightHistoryClient(auth,call)))}),[auth,call,typed,bodyClient]);
  const alive=useRef(false),sequence=useRef(0),periodRef=useRef<HistoryPeriod>('4w');
  const [period,setPeriod]=useState<HistoryPeriod>('4w'),[,paint]=useState(0),[weightVisible,setWeightVisible]=useState(false),[weightFailed,setWeightFailed]=useState(false);
  const run=useCallback(async(send:()=>Promise<unknown>)=>{
@@ -48,5 +50,5 @@ export function TrainingHistoryHost({auth,call,typed,timeZone}:Props){
   onExercise={ref=>{void run(()=>sources.history.selectExercise(ref));}} onMoreExercises={()=>{void run(()=>sources.history.nextExercises());}}
   onOccurrence={entry=>{void run(()=>sources.history.selectOccurrence(entry));}} onMoreOccurrences={()=>{void run(()=>sources.history.nextOccurrences());}}
   onDetailExercise={(seId,ref)=>{void run(()=>sources.history.openExerciseFromDetail(seId,ref));}}
-  onEntry={entry=>{void run(()=>sources.history.selectEntry(entry));}} onMoreWeight={()=>{void run(()=>sources.weight.continue());}}/>;
+  onEntry={entry=>{void run(()=>sources.history.selectEntry(entry));}} onMoreWeight={()=>{void run(()=>sources.weight.continue());}} onBody={onBody}/>;
 }

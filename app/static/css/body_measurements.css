@@ -1,0 +1,5 @@
+/* BODY-01 local command targets. Existing disclosure/colors/typography remain authoritative. */
+.body-lineage-action > summary,
+.body-command {
+  min-height: 48px;
+}

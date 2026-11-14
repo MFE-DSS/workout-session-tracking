@@ -76,6 +76,7 @@ def test_owner_is_from_bearer_and_history_is_not_copied_or_backfilled(client):
         other = User(username="other-weight-owner", password_hash=user.password_hash)
         db.add(other)
         db.flush()
+        bp.set_consent(db, other.id, True)
         bp.create_measurement(db, owner, {"weight_kg": 72}, measured_at=datetime(2025, 1, 2))
         bp.create_measurement(db, other.id, {"weight_kg": 91}, measured_at=datetime(2025, 1, 3))
         other_id = other.id

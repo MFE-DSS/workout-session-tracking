@@ -14,6 +14,18 @@ TESTPASS_BCRYPT_HASH = "$2b$12$6EEqZ/sTvQI70mZ5iIihGu7IYM4QH/CNFuEFh5dRuhPmQV0Tr
 TESTPASS_PLAIN = "testpass"
 
 
+def install_body_schema() -> None:
+    """Explicit test-fixture provisioning, never application-startup DDL.
+
+    Full Alembic upgrade/drift/roundtrip is covered independently. Existing
+    route fixtures otherwise model an unmigrated server after init_db().
+    """
+    from app.database import engine
+    from app.models.body_measurement_operation import BodyMeasurementOperation
+
+    BodyMeasurementOperation.__table__.create(engine, checkfirst=True)
+
+
 def get_test_user_id() -> int:
     """Return the id of the 'testuser' user that conftest creates.
 

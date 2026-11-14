@@ -66,6 +66,9 @@ def _make_client(
     from app import main as main_mod  # noqa: E402
 
     with TestClient(main_mod.app) as c:
+        from tests.helpers import install_body_schema
+
+        install_body_schema()
         if login:
             from app.database import SessionLocal
             from app.models.user import User

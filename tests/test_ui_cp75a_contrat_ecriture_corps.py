@@ -39,6 +39,8 @@ def _utilisateur() -> int:
         u = User(username=f"corps-{next(_RANG)}", password_hash="-")
         db.add(u)
         db.commit()
+        from app.services.body_profile import set_consent
+        set_consent(db, u.id, True)
         return u.id
 
 
@@ -72,7 +74,8 @@ def _relire(uid: int, mid: int) -> dict:
     from app.services import body_profile as bp
 
     with SessionLocal() as db:
-        m = bp.get_owned_measurement(db, uid, mid)
+        from app.services.body_measurement_reads import owned_head
+        m, _, _ = owned_head(db, uid, mid)
         return {s.key: getattr(m, s.key) for s in bp.BODY_MEASUREMENT_FIELDS}
 
 
@@ -83,11 +86,15 @@ def _ecrire(uid: int, mid: int, soumis: dict[str, float | None]) -> None:
 
     with SessionLocal() as db:
         m = bp.get_owned_measurement(db, uid, mid)
-        bp.update_measurement(
+        original = {s.key: getattr(m, s.key) for s in bp.BODY_MEASUREMENT_FIELDS}
+        updated = bp.update_measurement(
             db, m,
             {k: v for k, v in soumis.items() if v is not None},
             champs_soumis=set(soumis),
         )
+        assert updated.id != mid
+        db.refresh(m)
+        assert {s.key: getattr(m, s.key) for s in bp.BODY_MEASUREMENT_FIELDS} == original
 
 
 # ═══════════ LES QUATRE PREUVES DU `§7` ═══════════
@@ -169,7 +176,8 @@ def test_la_date_de_mesure_reste_veridique(client):
     _ecrire(uid, mid, {"waist_cm": 83.0})
 
     with SessionLocal() as db:
-        apres = bp.get_owned_measurement(db, uid, mid).measured_at
+        from app.services.body_measurement_reads import owned_head
+        apres = owned_head(db, uid, mid)[0].measured_at
     assert apres == avant, (
         f"`measured_at` a bougé lors d'une correction partielle : "
         f"{avant} → {apres}"
@@ -194,7 +202,10 @@ def test_sans_champs_soumis_le_remplacement_integral_survit(client):
 
     with SessionLocal() as db:
         m = bp.get_owned_measurement(db, uid, mid)
-        bp.update_measurement(db, m, {"waist_cm": 80.0})
+        updated = bp.update_measurement(db, m, {"waist_cm": 80.0})
+        assert updated.id != mid
+        db.refresh(m)
+        assert m.weight_kg == 78.5 and m.waist_cm == 84.0
 
     apres = _relire(uid, mid)
     assert apres["waist_cm"] == 80.0
@@ -232,6 +243,9 @@ def test_la_route_d_edition_ne_perd_plus_les_champs_non_soumis(
     from app.models.user import User
     from app.services import body_profile as bp
 
+    assert body_client.post(
+        "/body/consent", data={"action": "grant"}, follow_redirects=False
+    ).status_code == 303
     with SessionLocal() as db:
         uid = db.execute(select(User)).scalars().first().id
     with SessionLocal() as db:
@@ -239,8 +253,11 @@ def test_la_route_d_edition_ne_perd_plus_les_champs_non_soumis(
             db, uid, {"weight_kg": 80.0, "waist_cm": 85.0, "chest_cm": 100.0})
         mid = m.id
 
+    from tests.test_body_measurement_web_versions import hidden
+    form = body_client.get(f"/body/measurements/{mid}/edit").text
     r = body_client.post(f"/body/measurements/{mid}/edit",
-                         data={"waist_cm": "83"}, follow_redirects=False)
+                         data={"waist_cm": "83", "request_id": hidden(form, "request_id"),
+                               "expected_head_token": hidden(form, "expected_head_token")}, follow_redirects=False)
     assert r.status_code in {303, 302}, f"{r.status_code}: {r.text[:200]}"
 
     apres = _relire(uid, mid)

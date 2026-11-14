@@ -26,6 +26,7 @@ from app.models.measurement import BodyMeasurement
 from app.models.session import WorkoutSession
 from app.models.user import User
 from app.services.body_intelligence import BodyIntelligenceInput
+from app.services.body_measurement_reads import current_measurement_predicate
 from app.services.coach_report import _weight_trend_90d, _work_sets_per_week
 from app.services.confidence import compute_confidence_score
 from app.services.muscle_mapping import RADAR_AXIS_ORDER
@@ -164,6 +165,7 @@ def _latest_weight_measurement(
         select(BodyMeasurement.weight_kg, BodyMeasurement.measured_at)
         .where(
             BodyMeasurement.user_id == user_id,
+            current_measurement_predicate(),
             BodyMeasurement.weight_kg.is_not(None),
         )
         .order_by(BodyMeasurement.measured_at.desc())
@@ -183,6 +185,7 @@ def _latest_waist_measurement(db: Session, user_id: int) -> float | None:
         select(BodyMeasurement.waist_cm)
         .where(
             BodyMeasurement.user_id == user_id,
+            current_measurement_predicate(),
             BodyMeasurement.waist_cm.is_not(None),
         )
         .order_by(BodyMeasurement.measured_at.desc())

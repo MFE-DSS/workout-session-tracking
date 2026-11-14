@@ -1,3 +1,9 @@
+> Statut courant — 14 novembre 2026 : famille DA08 et pixels BODY présentés
+> acceptés, avec réserves non bloquantes dans `docs/pilot/body-01/POLISH_BACKLOG.md`.
+> Reçu : `docs/pilot/body-01/DA08_NATIVE_ACCEPTANCE.json`. La livraison/CI finale
+> reste en cours, sans activation ni release. Les mentions ci-dessous datées du
+> 11 novembre sont conservées comme préparation historique.
+
 > GO BODY-01/amendement/G1 reçu le 11 novembre 2026 : « Autoriser BODY-01, son amendement et G1 » (call_106057b169a74bc9887b1fea9f527f5d). Apply contrôlé en cours ; pixels non acceptés, aucune activation/release. Les statuts pré-GO ci-dessous gardent leur instant de préparation.
 
 # UX_BOARD — BODY-01 / G1 familial proposé
