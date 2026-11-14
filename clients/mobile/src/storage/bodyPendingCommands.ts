@@ -8,7 +8,7 @@ export interface BodyPendingCommands{
  prepare(input:BodyCommandInput,current:()=>boolean):Promise<PendingBodyCommand>;
  pending():Promise<PendingBodyCommand[]>;
  read(key:string):Promise<PendingBodyCommand|null>;
- markUnknown(key:string,current:()=>boolean):Promise<void>;
+ markUnknown(key:string,current:()=>boolean,initialOnly?:boolean):Promise<void>;
  ack(key:string,receipt:BodyReceipt,current:()=>boolean):Promise<void>;
  reject(key:string,code:string,current:()=>boolean):Promise<void>;
 }
@@ -49,7 +49,7 @@ export async function attachBodyPending(db:PlanSQL,serial:Serial,owner:number,sc
    guard(current);const saved=await read(input.request_id);guard(current);if(!saved)throw Error('body_prepare_not_durable');return saved;
   },
   async pending(){const rows=await db.getAllAsync<any>("SELECT * FROM body_pending_commands_v1 WHERE owner_id=? AND backend_scope=? AND state IN ('PREPARED','SENT_UNKNOWN') ORDER BY created_at_ms,request_id",owner,scope);return Promise.all(rows.map(async row=>(await decode(row))!));},
-  async markUnknown(key,current){await transaction(current,async tx=>{const row=await decode(await raw(tx,key));if(!row)throw Error('body_command_missing');await tx.runAsync("UPDATE body_pending_commands_v1 SET state='SENT_UNKNOWN' WHERE owner_id=? AND backend_scope=? AND request_id=? AND state='PREPARED'",owner,scope,key);});},
+  async markUnknown(key,current,initialOnly=false){await transaction(current,async tx=>{const row=await decode(await raw(tx,key));if(!row)throw Error('body_command_missing');if(initialOnly&&row.state!=='PREPARED')throw Error('body_verification_required');if(['ACKED','REJECTED'].includes(row.state))throw Error('body_command_terminal');await tx.runAsync("UPDATE body_pending_commands_v1 SET state='SENT_UNKNOWN' WHERE owner_id=? AND backend_scope=? AND request_id=? AND state='PREPARED'",owner,scope,key);});},
   async ack(key,value,current){await transaction(current,async tx=>{const row=await decode(await raw(tx,key));if(!row||!decodeBodyReceipt(value,owner,row)||row.state==='REJECTED')throw Error('body_receipt_mismatch');await tx.runAsync("UPDATE body_pending_commands_v1 SET state='ACKED',receipt_json=? WHERE owner_id=? AND backend_scope=? AND request_id=?",JSON.stringify(value),owner,scope,key);});},
   async reject(key,code,current){await transaction(current,async tx=>{const row=await decode(await raw(tx,key));if(!row||row.state==='ACKED')throw Error('body_command_terminal');await tx.runAsync("UPDATE body_pending_commands_v1 SET state='REJECTED',rejection=? WHERE owner_id=? AND backend_scope=? AND request_id=?",code.slice(0,128),owner,scope,key);});},
  };

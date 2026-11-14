@@ -131,3 +131,26 @@ versionnés comparés octet par octet), campagne locale distincte :92suites /
 1160tests PASS, TS exit0. Ce contrôle d'export vérifie le découpage publié,
 pas un nouvel assemblage BODY/NUT/MOB06. Aucun écran/consommateur noncommitté
 n'y a été ajouté ; deps réutilisées sous lock inchangé. La CI reste souveraine.
+
+
+## 14 novembre — continuation, frontière de reprise BODY
+Ruling B25/B26 : même portée autorisée. Un résultat de lookup/rejeu refusé ne
+prouve pas que l'ancienne mutation inconnue a échoué ; conserver SENT_UNKNOWN
+jusqu'au reçu exact. Send ne doit pas relancer une commande SENT_UNKNOWN ni
+renvoyer une commande ACKED/REJECTED. Retenu : transitions terminales seulement
+sur résultat direct de la première tentative, garde owner/backend sur toutes
+les entrées, états terminaux relus localement. Pas de nouveau ledger, API,
+politique de consentement ou géométrie. Coût si erreur : masquer un refus frais
+ou rouvrir une commande ancienne ; témoins disque/reprise/ACK/refus sont requis.
+Alternative auto-retry et copie de la clé : exclues par le contrat existant.
+
+
+### Checkpoint technique du 14 novembre — vérification et limites
+6 FAIL/5 PASS puis 48 ciblés PASS ; copie de travail 1186 mobiles et TS exit0.
+Revue indépendante des seuls deltas de reprise : aucun Critical/Important introduit.
+Réserve atomique PREPARED pour première émission ; ce n’est pas une
+sérialisation globale de tous les rejeux explicitement demandés. Aucun nouveau
+schéma, composition, baseline ou autorisation de release. Les suites ci-dessus
+sont celles du worktree, avec ses consommateurs non publiés ; la CI du HEAD
+publié sera observée séparément. Draft conservée, scope produit incomplet,
+parents canoniques et validations artistiques pendants.
