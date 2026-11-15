@@ -69,3 +69,10 @@ test('reading an absent head needs only a natural key, with no invented intake o
  const [url,init]=fetchImpl.mock.calls[0] as any;
  expect(url).toBe(scope+'/api/mobile/v1/me/nutrition/days/2026-11-12');expect(init.method).toBe('GET');expect(init.body).toBeUndefined();
 });
+test('capabilities consume exact owned negotiation and reject a foreign or contradictory write permission',async()=>{
+ const caps={contract_version:'nutrition-manual/1.0.0',owner_id:7,mode:'MANUAL_DAILY',state:'AVAILABLE',can_read:true,can_write:true,assisted_modes:[]};
+ const fetchImpl=jest.fn(async()=>response(caps)),f=await fixture(fetchImpl);
+ expect(await (f.client as any).capabilities()).toEqual({state:'confirmed',value:caps});
+ fetchImpl.mockImplementation(async()=>response({...caps,owner_id:8}));expect((await (f.client as any).capabilities()).state).toBe('unknown');
+ fetchImpl.mockImplementation(async()=>response({...caps,can_read:false}));expect((await (f.client as any).capabilities()).state).toBe('unknown');
+});

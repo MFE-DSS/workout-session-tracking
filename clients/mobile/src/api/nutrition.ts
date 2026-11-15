@@ -2,7 +2,7 @@
 import {AuthSession} from '../auth/authSession';
 import {ApiFailure,type Transport} from './http';
 import {nutritionCanonical,nutritionSorted,nutExact,nutHash,nutId,nutRequestId,nutDay,nutVariant,type PreparedNutritionRequest,type NutritionVariant,type NutritionNamespace} from '../domain/nutritionCommand';
-import {decodeNutritionConsent,decodeNutritionHead,decodeNutritionPage,nutritionReadQuery,type NutritionRead,type NutritionConsent,type NutritionHead,type NutritionPage} from './nutritionDTO';
+import {decodeNutritionCapabilities,decodeNutritionConsent,decodeNutritionHead,decodeNutritionPage,nutritionReadQuery,type NutritionRead,type NutritionConsent,type NutritionHead,type NutritionPage} from './nutritionDTO';
 
 export const NUT_CONTRACT='nutrition-manual/1.0.0' as const;
 export type NutritionOutcome<T>={state:'confirmed';value:T}|{state:'unknown'|'cancelled'|'changed'|'unavailable'|'consent_required'}|{state:'rejected';code:string|null;status:number};
@@ -77,6 +77,7 @@ export class NutritionClient{
   try{nutritionCanonical(command);if(!nutHash(command.body_digest))throw Error();}catch{return Promise.resolve({state:'rejected',status:422,code:'invalid_nutrition_command'});}
   return this.request(`/me/nutrition/operations/${command.namespace}/${command.request_id}`,raw=>decodeNutritionReceipt(raw,this.ownerId,command));
  }
+ capabilities(){return this.request('/me/nutrition/capabilities',raw=>decodeNutritionCapabilities(raw,this.ownerId));}
  consent(){return this.request('/me/nutrition/consent',raw=>decodeNutritionConsent(raw,this.ownerId));}
  setConsent(granted:boolean,expected:NutritionConsent){
   if(typeof granted!=='boolean'||!decodeNutritionConsent(expected,this.ownerId))return Promise.resolve<NutritionOutcome<NutritionConsent>>({state:'rejected',status:422,code:'invalid_nutrition_consent'});

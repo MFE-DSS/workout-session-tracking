@@ -397,6 +397,10 @@ def test_alembic_head_unchanged():
     # compte ne peut pas porter).
     # puis PLAN V3 (`plan_v3_20261107_01` : sept tables additives de
     # workflow et indexes propriétaires, sans backfill ni seed ACTIVE).
+    # puis BODY-01 (`body_measurement_operations_01` : metadata de lignée
+    # additive, nombres dans BodyMeasurement, aucun backfill ni mutation EKB).
+    # puis NUT-01 (`nutrition_manual_01` : deux tables additives de révisions
+    # quotidiennes/cibles déclarées, sans seed ni mutation de données EKB).
     # Cette sentinelle suit le head courant.
     #
     # ⚠ ELLE NE SE VÉRIFIE PAS EN ISOLATION DEPUIS UN AUTRE RÉPERTOIRE.
@@ -405,4 +409,6 @@ def test_alembic_head_unchanged():
     # ce test depuis un autre arbre lit les migrations de CET arbre et rend un
     # vert qui ne dit rien. Le sweep, lui, fait `cd` dans son propre arbre —
     # c'est pourquoi lui seul a vu ce head changer.
-    assert script.get_current_head() == "plan_v3_20261107_01"
+    assert script.get_current_head() == "nutrition_manual_01"
+    assert script.get_revision("nutrition_manual_01").down_revision == "body_measurement_operations_01"
+    assert script.get_revision("body_measurement_operations_01").down_revision == "plan_v3_20261107_01"

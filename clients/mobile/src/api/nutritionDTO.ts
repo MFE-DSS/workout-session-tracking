@@ -3,6 +3,11 @@ import {NUT_FIELDS,nutDay,nutExact,nutHash,nutId,nutMilli,nutRecord,nutVariant,t
 const CONTRACT='nutrition-manual/1.0.0';
 const instant=(x:unknown):x is string=>typeof x==='string'&&x.length<=64&&/(?:Z|[+-][0-9]{2}:[0-9]{2})$/.test(x)&&Number.isFinite(Date.parse(x));
 const nat=(x:unknown):x is number=>Number.isSafeInteger(x)&&(x as number)>=0;
+export type NutritionCapabilities={contract_version:typeof CONTRACT;owner_id:number;mode:'MANUAL_DAILY';state:'AVAILABLE'|'SCHEMA_UNAVAILABLE';can_read:boolean;can_write:boolean;assisted_modes:[]};
+export function decodeNutritionCapabilities(raw:unknown,owner:number):NutritionCapabilities|null{
+ if(!nutExact(raw,['contract_version','owner_id','mode','state','can_read','can_write','assisted_modes'])||raw.contract_version!==CONTRACT||raw.owner_id!==owner||raw.mode!=='MANUAL_DAILY'||!['AVAILABLE','SCHEMA_UNAVAILABLE'].includes(raw.state as string)||typeof raw.can_read!=='boolean'||typeof raw.can_write!=='boolean'||!Array.isArray(raw.assisted_modes)||raw.assisted_modes.length||raw.can_write&&!raw.can_read||raw.state==='SCHEMA_UNAVAILABLE'&&(raw.can_read||raw.can_write))return null;
+ return raw as NutritionCapabilities;
+}
 export type NutritionConsent={contract_version:typeof CONTRACT;owner_id:number;purpose:'nutrition_manual';state:'ABSENT'|'PRESENT';granted:boolean;wording_version:number;current_wording_version:1;granted_at:string|null;withdrawn_at:string|null;consent_token:string};
 export type NutritionEntry={id:number;revision:number;values:NutritionValues;units:Record<string,{unit:'kcal'|'g';scale:1000}>;provenance:Record<string,unknown>;recorded_at:string;head_token:string|null;local_day?:string;timezone?:string;state?:'ACTIVE'|'WITHDRAWN';declared_complete?:boolean;target_ref?:number|null;variant?:'STANDARD'|'TRAINING'|'REST';effective_from?:string;enabled?:boolean};
 export type NutritionHead={contract_version:typeof CONTRACT;owner_id:number;key:Record<string,string>;state:'ABSENT'|'PRESENT';head_token:string;entry:NutritionEntry|null};

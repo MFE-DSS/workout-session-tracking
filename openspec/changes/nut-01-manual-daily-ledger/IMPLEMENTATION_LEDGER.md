@@ -58,3 +58,57 @@ schéma, composition, baseline ou autorisation de release. Les suites ci-dessus
 sont celles du worktree, avec ses consommateurs non publiés ; la CI du HEAD
 publié sera observée séparément. Draft conservée, scope produit incomplet,
 parents canoniques et validations artistiques pendants.
+
+## 15 novembre — reprise sur parent BODY livré
+Ruling: integrate exact BODY 045a3dbc sources into the existing dirty NUT worktree using preserved 53-file snapshot and three-way resolutions; record normal parent merge before publishing final NUT HEAD. No stale patch application or unique source removal. Cost if wrong: duplicate or omitted parent changes; exact tree/ancestry and mandatory CI remain required.
+Pre-flight Task4→Task5: BODY lineage and NUT tables share init_db exclusion, Base.metadata, migration order and owner journal. Preserve all three migration-only exclusions and attach NUT to the existing account/backend journal, not another connection or chronology.
+Task4 in progress: source snapshot at nut-canonical-integration-20261115; no active migration or shared source resolution applied yet.
+
+Task4 startup conflict: new behavioral witness fails with actual body_measurement_operations_v1 wrongly created by init_db. Minimal union keeps plan_v3/body_01/nutrition_manual migration-only; no runtime DDL introduced. STARTUP_RED.log preserves the observed failure.
+
+## 15 novembre — intégration native NUT en cours
+Parent BODY code045a3dbc et closeout5b19dc7 livrés, quatreCI réelles vertes. Source BODY et archive reprises dans ce même arbre NUT avec résolutions préservées ; HEAD Git NUT reste ddcdd4b jusqu'aux gates de commit, parent normal à intégrer avant publication. Pas d'autre worktree d'assemblage ni patch ancien appliqué en aveugle.
+- Migration réelle NUT après BODY : témoin révision absente RED→6GREEN avec héritage/lignée peuplée inchangés, rollback NUT vide permis mais historique peuplé refusé ; quatrechecks migration/snapshot/drift passent. Snapshot généré par outil canonique, aucun DDLstartup.
+- Journal réel partagé : NUT non attaché RED→25GREEN ciblés BODY/NUT/V3 ; redémarrage fichierSQLite, unknown et partition A/B/backend préservés ; reset du journal ne détruit pas les commandes NUT.
+- Reprise fonctionnelle : client de tête et CAS figé, optional/missing/0, complétude distincte, cibles datées sans fallback après désactivation. Deux défauts auteur vus en tests RED : lookup refusé ouvrait indûment replay, identité changée conservait les faits ; corrigés,7GREEN. Capabilities serveur existantes maintenant consommées strictement, aucun writer sur simple accord avec can_writefalse ; test RED→GREEN.
+- Recomposition NUT selon masterB DA07 et familleDA08 déjà acceptés, sans changement de primitives/tokens : registre de jour, quatre faits typés, éditeur situé, versions/cibles/accord et reprise. Nouveaux pixels non committés. Rerender parent et Retour contextuel RED→4GREEN.
+- Entrée Progrès RED→GREEN ; vrai ConnectedApp, clients réels, fichierSQLite et frontière RPC synthétique : zéro typé et trois macros inconnues, perte de réponse/kill/reçu exact sans secondPOST ;13GREEN avec consommateurs BODY/Progrès. Pas encore preuve native physique/serveur HTTP pour cette composition.
+- TypeScript et suite mobile complète en cours ; sweep backend canonique mémoire1600Mo/lot1 en cours sur sources empreintées, pas encore PASS final. Aucune CI NUT finale/merge/APK/OTA/déploiement.
+Ruling: use accepted DA08 composite implementations as-is with DA07 B information structure, not a new art variant. Native NUT evidence and explicit pixel decision still precede UI commit. Cost if wrong: visual mismatch; master/native comparison and operator gate remain required.
+
+## Revue complète NUT —15novembre
+Rapport indépendant WHOLE_INTEGRATION_REVIEW.md (70sources empreintées, lecture sans mutation) : aucun Critical,5Important,2Minor. Important acceptés comme défauts utilisateur, une passe de correction : frontières de lectures secondaires/invalidation, clé naturelle du repli journalier, brouillon refusé avec relecture humaine, cible0/différence arithmétique, mémoire factuelle/couverture. Témoins RED conservés ; premiers25 ciblés GREEN après corrections, suite finale/native encore à terminer. Pas de second avis prétendu sur les fixes.
+Final: minor (deferred): audit de journée encore désactivé en lecture seule et accès direct à ancienne cible liée non exposé si absente des candidats courants.
+Final: minor (deferred): états ACTIVE/WITHDRAWN et enabled/completeness non résumés explicitement dans chaque ligne de version ; valeurs/source/date restent lisibles.
+Final: Ruling: jugement artistique réservé à l'opérateur ; aucune acceptation native NUT transférée depuis BODY. Coût si faux : mauvais rendu livré ; gate de pixels conservé avant commit.
+Final: Ruling: recette physique/Android non fournie, pas déclarée passée ; prochaine preuve iOS ConnectedApp/HTTP distincte des tests renderer. Coût si faux : défauts appareil inconnus ; gates physiques et candidat restent ouverts.
+Final: Ruling: médias/prescription/fournisseur/EAS/OTA/déploiement/effacement DATA global hors mandat manuel synthétique. Coût si faux : scope incomplet seulement si une nouvelle autorisation le requiert ; aucun produit futur affiché comme disponible.
+
+
+### 15 novembre — revue entière, correctifs et vrai consommateur
+
+Revue indépendante fraîche du manifeste réel NUT contre BODY canonique `5b19dc7` : zéro Critical, cinq Important. Une seule passe de corrections : résultats d’autorité de toutes les lectures secondaires ferment la frontière et invalident les lectures tardives ; fallback limité au même jour ; refus définitif conserve le brouillon et exige relecture explicite avant nouvelle commande ; cible zéro et écart arithmétique rendus sans division par zéro ; mémoire factuelle et couverture 7/30 jours avec alternative textuelle. RED→GREEN : REVIEW_CONTROLLER_RED, REVIEW_MEMORY_RED et REVIEW_HISTORY_BOUNDARY_RED ; 29 tests de correctifs/consommateurs verts, puis suite complète 108 suites/1291 tests + TypeScript. Une extension 30 jours du témoin de mémoire passe séparément (6 tests) après cette suite, pas réétiquetée 1292 sans nouveau run.
+
+Deux mineurs de revue restent différés : accès aux versions en mode lecture seule et accès direct à une cible historique retirée des candidats ; états explicites des lignes d’audit (ACTIVE/WITHDRAWN/complétude/enabled). Aucun second avis indépendant des correctifs prétendu.
+
+ConnectedApp intégral iOS 390×844 réel : accord Nutrition séparé, zéro kcal confirmé avec trois macros inconnues, correction 1750 suivie d’une réponse 503 remplacée après le vrai commit serveur ; fermeture forcée/relance d’Expo Go puis reçu exact GET retrouvé sans nouveau POST. Virgule 1,25 g acquise au vrai clavier logiciel et confirmée. Cible synthétique Entraînement 2100 créée dans l’interface ; les contextes historiques mixtes ont été acquis par les vraies routes HTTP et restent explicitement synthétiques. Les valeurs ne sont jamais des recommandations.
+
+Limites d’outillage : transfert clavier matériel macOS FR a produit un caractère incorrect, puis la séquence sélection/paste a quitté l’app sans exception JS observée ; aucune mutation soumise lors de cet essai. Le clavier logiciel a ensuite fourni le témoin décimal concluant. Ciblage Simulator vérifié par le nom du seul appareil dédié.
+
+Sweep migration : 267/447 fichiers passants avant arrêt automatique de mémoire à 1906 Mo pour un budget 1600 sur recovery_home_consumer. Les 171 nœuds des deux fichiers lourds passent en processus bornés (pic 305 Mo), puis queue disjointe de 178 fichiers en cours. Aucun budget levé ni PASS global revendiqué avant sa fin ; backend/tests/migrations empreintés inchangés.
+
+État de livraison : vrai parent présent dans les sources, ascendance Git encore à intégrer normalement avant push. Aucun commit UI NUT, CI finale NUT, merge ou recette physique prétendu. Gate pixels Nutrition propre encore attendu.
+
+
+### Finalisation des contrôles indépendants —15novembre
+Sweep composé clos :447fichiers =267initiaux +2fichiers lourds/171nœuds +178queue ;8668PASS/1ignoré. Arrêt initial1906Mo conservé ; même garde1600Mo, pics305/1166Mo sur continuations. Sources app/migrations inchangées ; seul tri d’imports de `test_nutrition_migration.py` après son premier passage, même contenu de lignes et relecture3PASS. Pas de seconde campagne globale inutile.
+
+Ruff nouveaux fichiers NUT PASS après2tri d’imports ; budget260≤548 ; protocole, Bandit -ll, Gitleaks72fichiers de delta effectif et OpenSpec26/26PASS. Un faux changeBODY ne contenait plus que des répertoires vides après archive : seuls ces répertoires vides ont été retirés, aucun fichier. L’ancien échec OpenSpec est conservé.
+
+Ruling: le gate de contrôles locaux n’est pas une CI du HEAD final — aucun push/checkpoint technique renommé livraison. Le vrai parent Git sera fusionné normalement avant push, après la décision pixelsNUT. Coût si mauvaise résolution : gates de parent et CI finale à reprendre.
+
+Paquet pixels unique17captures et preuves servi uniquement sur127.0.0.1:8264, opérateur sollicité. Les gestes CUA de défilement restent une limite de recette ; les vues mémoire sont explicitement celles du Host de présentateurs réels avec HTTP/SQLite. L’acceptation de la composition native ne sera pas assimilée à une certification gestuelle/physique.
+
+
+### Décision native finale reçue —15novembre
+**« Accepter les pixels NUT pour le pilote, avec réserves artistiques »**, questioncall_ac972e9af5dd4c2698c6f2c131cce4eb. Le refus précédent est levé pour ce périmètre contrôlé. Reçu exactNATIVE_PIXEL_ACCEPTANCE.json ; aucun nouveau GO technique/G1/famille demandé. Les réserves artistiques, limites Android/physique et gates de CI/merge/release restent conservées.

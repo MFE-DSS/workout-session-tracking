@@ -10,9 +10,9 @@
 - [x] Recevoir le GO technique NUT/domaines/API/clients/recovery exact ; parent BODY avant intégration applicable. G1/composition/pixels restent des gates distinctes, non acceptées ; aucune permission fournisseur nécessaire au journal manuel.
 
 ## Après GO propre seulement
-- [ ] Contrats/leases/migration fixés, plan borné, tests RED puis domaine/readmodel/API/SQLite et local owner-bound.
-- [ ] Vrai consommateur natif jour/cibles/historique/trend sans provider ; tests A/B/offline/reprise/complétude/concurrence.
-- [ ] Board natif réel familial comparé références ; accord pixels avant commit UI.
+- [x] Contrats/leases/migration fixés, plan borné, tests RED puis domaine/readmodel/API/SQLite et local owner-bound.
+- [x] Vrai consommateur natif jour/cibles/historique factuel sans provider ; tests A/B/offline/reprise/complétude/concurrence. ConnectedApp iOS et présentateurs Host Android distingués dans le reçu du15novembre.
+- [x] Board natif réel familial comparé références ; accord pixels avant commit UI, avec réserves artistiques non bloquantes pour le pilote.
 - [ ] check_scope/checks exigés/sécurité/revue indépendante/CI HEAD exact ; corrections autonomes dans scope.
 - [ ] Commit/push/PR/guarded merge GOV-MERGE-01, canonique CI/Sonar réel, manifeste intégration/smoke, archive/closeout/cleanup possédés.
 - [ ] DATA/physique/RC/release séparés ; aucun EAS Build/OTA routinier. Futur provider ne bloque pas COMPLETE manuel.
@@ -24,6 +24,18 @@
 - [x] Draft migratoire gelé hors versions actives ; graphe BODY+NUT synthétique composé qualifié, données antérieures et refus downgrade peuplé préservés.
 - [x] Client typé, stockage exact/reprise explicite et lecteur multi-pages implémentés sans composition UI.
 - [x] Revue native/corrections et suite mobile ; preuve iOS technique de reprise réelle sans nouvelle UI.
-- [ ] Campagne globale finale à effectuer sur le vrai graphe BODY+NUT intégrable ; première tentative partielle arrêtée232/440fichiers avec drift conservé.
+- [x] Campagne globale locale du15novembre sur sources BODY5b19+NUT :447fichiers,8668PASS/1ignoré, composée après arrêt mémoire ; ancien échec232/440 conservé. Aucune CI finale déduite.
 - [ ] Intégrer la migration dans le vrai graphe après parent BODY et obtenir drift/snapshot/CI verts à cette révision. L'échec de drift de la branche NUT isolée est conservé, pas contourné.
 - [ ] Montage journal/ConnectedApp et vrai consommateur visuel : non réalisés sous ce GO technique ; gates artistiques applicables à conserver.
+
+
+### État courant vérifié —15 novembre
+G1 fonctionnel déjà reçu et masters/famille DA07/DA08 acquis ; ne pas redemander. Migration active `nutrition_manual_01` après BODY canonique `body_measurement_operations_01`, quatre checks de migration PASS. La parenté Git normale reste à établir avant push.
+
+Revue indépendante entière faite :5Important corrigés RED→GREEN en une passe,2mineurs différés consignés.108suites/1291mobiles + TypeScript PASS ; témoin mémoire7/30jours6PASS après le run complet. Ruff neuf/budget260≤548/protocole/Bandit/Gitleaks/OpenSpec26/26PASS.
+
+Board natif unique http://127.0.0.1:8264/ :17captures, ConnectedApp iOS et Host de présentateurs Android360/480dp/130% clairement séparés ; opérateur sollicité sur les seuls pixels NUT. Pas encore d’acceptation reçue, de commit UI, de nouvelle CI406 ou de merge NUT. Les éléments ci-dessus du12novembre gardent leur statut historique.
+
+
+### Décision native finale reçue —15novembre
+**« Accepter les pixels NUT pour le pilote, avec réserves artistiques »**, questioncall_ac972e9af5dd4c2698c6f2c131cce4eb. Le refus précédent est levé pour ce périmètre contrôlé. Reçu exactNATIVE_PIXEL_ACCEPTANCE.json ; aucun nouveau GO technique/G1/famille demandé. Les réserves artistiques, limites Android/physique et gates de CI/merge/release restent conservées.

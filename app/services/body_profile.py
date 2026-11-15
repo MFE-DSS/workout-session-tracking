@@ -30,6 +30,7 @@ from app.models.body_consent import (
     BodyConsent,
 )
 from app.models.measurement import BodyMeasurement
+from app.services.body_measurement_reads import current_measurement_predicate
 
 # ---------------------------------------------------------------------------
 # Measurement field specs (manual MVP). Keys are the real ORM column names
@@ -117,12 +118,12 @@ def assert_no_forbidden_wording(text: str) -> None:
 # ---------------------------------------------------------------------------
 
 
-def parse_and_validate(raw: dict[str, str]) -> dict[str, float]:
+def parse_and_validate(raw: dict[str, str], *, check_bounds: bool = True) -> dict[str, float]:
     """Parse a form mapping {field_key: raw_string} into validated floats.
 
     - Empty / whitespace values are skipped (partial entries allowed).
     - Non-numeric values raise ValueError.
-    - Out-of-plausibility-bounds values raise ValueError.
+    - Bounds are strict by default; transactional adapters defer them to the kernel.
     - At least one field must be provided, else ValueError.
 
     Returns only the provided, valid fields.
@@ -136,7 +137,9 @@ def parse_and_validate(raw: dict[str, str]) -> dict[str, float]:
             value = float(raw_val)
         except (ValueError, TypeError):
             raise ValueError(f"{spec.label} : valeur non numérique") from None
-        if value < spec.min or value > spec.max:
+        if not math.isfinite(value):
+            raise ValueError(f"{spec.label} : valeur non numérique")
+        if check_bounds and (value < spec.min or value > spec.max):
             raise ValueError(
                 f"{spec.label} : valeur hors plage plausible "
                 f"({spec.min:g}–{spec.max:g})"
@@ -347,30 +350,28 @@ def create_measurement(
     cleaned: dict[str, float],
     *,
     measured_at: datetime | None = None,
+    request_id: str | None = None,
+    date_precision: str | None = None,
 ) -> BodyMeasurement:
-    """Persist a validated measurement row. ``cleaned`` must already be
-    validated by ``parse_and_validate``.
+    """Canonical INSERT, now atomic with its lineage/provenance receipt.
 
-    Sb_MORPHO_PROFILE_RUNTIME_01 — this is the **canonical writer**
-    (`Sx_MORPHO_CAPTURE_01_SPEC` §2.1). It always **inserts**: a measurement is
-    a dated fact, and correcting an entry means adding a later one, not
-    rewriting history.
-
-    ``measured_at`` exists because the `/profile` form lets the user date their
-    own entry, a capability that predates this unification. Folding that route
-    into this writer without the parameter would have silently discarded the
-    submitted date and stamped everything ``now()`` — a data-quality regression
-    disguised as a refactor. Callers that do not date their entries keep the
-    ``now()`` default. The caller is responsible for rejecting future dates.
+    No date or number is copied from the undated user profile. Historical
+    callers retain their supplied timestamp, whose precision is unknown
+    unless the acquiring route explicitly attests it.
     """
-    m = BodyMeasurement(user_id=user_id, measured_at=measured_at or datetime.now(UTC))
-    for key, value in cleaned.items():
-        if key in _FIELD_BY_KEY:
-            setattr(m, key, value)
-    db.add(m)
-    db.commit()
-    db.refresh(m)
-    return m
+    from uuid import uuid4
+
+    from app.services.body_measurement_commands import apply_command
+
+    precision = date_precision or ("UNKNOWN" if measured_at else "SERVER_CAPTURE_TIME")
+    command = {
+        "operation": "CREATE", "request_id": request_id or str(uuid4()),
+        "values": cleaned, "_date_precision": precision,
+    }
+    if measured_at is not None and precision != "SERVER_CAPTURE_TIME":
+        command["_measured_at"] = measured_at.isoformat()
+    receipt = apply_command(db, user_id, command, source="MANUAL_ENTRY")
+    return db.get(BodyMeasurement, receipt["measurement_id"])
 
 
 def get_owned_measurement(
@@ -391,7 +392,7 @@ def list_measurements(
     return list(
         db.execute(
             select(BodyMeasurement)
-            .where(BodyMeasurement.user_id == user_id)
+            .where(BodyMeasurement.user_id == user_id, current_measurement_predicate())
             .order_by(BodyMeasurement.measured_at.desc())
             .limit(limit)
         ).scalars().all()
@@ -417,6 +418,7 @@ def list_weight_measurements(
         raise ValueError("invalid owner")
     query = select(BodyMeasurement).where(
         BodyMeasurement.user_id == user_id,
+            current_measurement_predicate(),
         BodyMeasurement.weight_kg.is_not(None),
     )
     if before is not None:
@@ -495,53 +497,68 @@ def weight_history_page(
         result["next_cursor"] = [_weight_history_instant(last.measured_at), last.id]
     return result
 
+def _owned_root(db: Session, m: BodyMeasurement) -> int:
+    from app.models.body_measurement_operation import BodyMeasurementOperation
+
+    operation = db.scalar(select(BodyMeasurementOperation).where(
+        BodyMeasurementOperation.owner_id == m.user_id,
+        BodyMeasurementOperation.measurement_ref == m.id,
+    ).order_by(BodyMeasurementOperation.applied_revision.desc()).limit(1))
+    return operation.root_ref if operation else m.id
+
+
+def measurement_head_token(db: Session, m: BodyMeasurement) -> str:
+    from app.services.body_measurement_reads import BodyCommandError, owned_head
+
+    current, token, _ = owned_head(db, m.user_id, _owned_root(db, m))
+    if current.id != m.id:
+        raise BodyCommandError("head_conflict")
+    return token
+
+
 def update_measurement(
     db: Session,
     m: BodyMeasurement,
     cleaned: dict[str, float],
     *,
     champs_soumis: set[str] | None = None,
+    expected_head_token: str | None = None,
+    request_id: str | None = None,
 ) -> BodyMeasurement:
-    """Met à jour une mesure possédée. **Absent ≠ effacé.**
+    """Append correction; absent versus explicit clear remains preserved.
 
-    ⚠ `UI-CP7.5A` — LE CONTRAT D'ÉCRITURE CHANGE, ET C'EST LE PRÉALABLE À
-    TOUTE SAISIE GUIDÉE.
-
-    Jusqu'ici, tout champ absent de ``cleaned`` était remis à `NULL` : le
-    formulaire soumettait les treize champs à chaque fois, donc « absent »
-    voulait dire « vidé ». Cette sémantique de REMPLACEMENT rend la saisie
-    partielle **impossible sans perte** — corriger son tour de taille
-    effacerait son poids, ses bras et ses cuisses.
-
-    C'est pourquoi l'écran ne pouvait qu'afficher la matrice entière : ce
-    n'était pas un choix de mise en page, c'était la seule forme que le
-    contrat d'écriture autorisait.
-
-    Désormais :
-
-    * ``champs_soumis`` **fourni** → seuls ces champs sont écrits, les autres
-      restent **inchangés**. Un champ soumis vide est un **effacement
-      explicite**, ce qui reste un geste possible et voulu.
-    * ``champs_soumis`` **absent** (`None`) → ancien comportement de
-      remplacement intégral, conservé pour les appelants qui soumettent
-      réellement l'ensemble.
-
-    ⚠ Le défaut reste le comportement historique : changer la sémantique par
-    DÉFAUT ferait muter en silence des appelants qu'on n'a pas relus.
+    BODY-01 explicitly supersedes the old in-place editing contract. With
+    no champs_soumis, the legacy full-replacement intent is still honored,
+    but on a new version, never by modifying the original observation.
     """
-    for spec in BODY_MEASUREMENT_FIELDS:
-        if champs_soumis is not None and spec.key not in champs_soumis:
-            continue
-        setattr(m, spec.key, cleaned.get(spec.key))
-    db.commit()
-    db.refresh(m)
-    return m
+    from uuid import uuid4
+
+    from app.services.body_measurement_commands import apply_command
+
+    submitted = set(_FIELD_BY_KEY) if champs_soumis is None else champs_soumis
+    values = {key: cleaned.get(key) for key in submitted}
+    token = expected_head_token or measurement_head_token(db, m)
+    receipt = apply_command(db, m.user_id, {
+        "operation": "CORRECT", "request_id": request_id or str(uuid4()),
+        "root_ref": _owned_root(db, m), "expected_head_token": token, "values": values,
+    }, source="MANUAL_CORRECTION")
+    return db.get(BodyMeasurement, receipt["measurement_id"])
 
 
-def delete_measurement(db: Session, m: BodyMeasurement) -> None:
-    """Hard-delete (no soft-delete masking)."""
-    db.delete(m)
-    db.commit()
+def delete_measurement(db: Session, m: BodyMeasurement, *,
+                       expected_head_token: str | None = None,
+                       request_id: str | None = None) -> None:
+    """Explicit per-record erasure includes every version, not just its head."""
+    from uuid import uuid4
+
+    from app.services.body_measurement_commands import apply_command
+
+    token = expected_head_token or measurement_head_token(db, m)
+    apply_command(db, m.user_id, {
+        "operation": "ERASE", "request_id": request_id or str(uuid4()),
+        "root_ref": _owned_root(db, m), "expected_head_token": token,
+        "confirm_all_versions": True,
+    }, source="MANUAL_ENTRY")
 
 
 # ---------------------------------------------------------------------------

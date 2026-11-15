@@ -21,6 +21,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.models.measurement import BodyMeasurement
+from app.services.body_measurement_reads import current_measurement_predicate
 from app.models.session import WorkoutSession
 from app.models.user import User
 from app.services.muscle_mapping import RADAR_AXES
@@ -72,6 +73,7 @@ def _weight_trend_90d(db: Session, user_id: int) -> float | None:
         select(BodyMeasurement.measured_at, BodyMeasurement.weight_kg)
         .where(
             BodyMeasurement.user_id == user_id,
+            current_measurement_predicate(),
             BodyMeasurement.measured_at >= window,
             BodyMeasurement.weight_kg.is_not(None),
         )

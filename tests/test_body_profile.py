@@ -7,6 +7,7 @@ non-regression smoke for the session mode.
 from __future__ import annotations
 
 import os
+import re
 import tempfile
 from datetime import UTC
 from pathlib import Path
@@ -37,6 +38,9 @@ def body_client(monkeypatch: pytest.MonkeyPatch) -> TestClient:
     from app import main as main_mod  # noqa: E402
 
     with TestClient(main_mod.app) as c:
+        from helpers import install_body_schema
+
+        install_body_schema()
         from app.database import SessionLocal
         from app.models.user import User
         from app.services.auth import hash_password
@@ -296,7 +300,11 @@ def test_hard_delete_removes_row(body_client: TestClient) -> None:
             select(BodyMeasurement.id).where(BodyMeasurement.user_id == uid)
         ).scalar_one()
 
-    r = body_client.post(f"/body/measurements/{mid}/delete", follow_redirects=False)
+    html = body_client.get("/body").text
+    data = {name: re.search(rf'name="{name}" value="([^"]+)"', html).group(1)
+            for name in ("request_id", "expected_head_token")}
+    data["confirm_all_versions"] = "yes"
+    r = body_client.post(f"/body/measurements/{mid}/delete", data=data, follow_redirects=False)
     assert r.status_code == 303
     assert _count_measurements(uid) == 0
 

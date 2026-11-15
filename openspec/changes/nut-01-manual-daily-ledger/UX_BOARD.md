@@ -67,3 +67,7 @@ Résultat à vérifier → Vérifier
 Valeurs synthétiques futures, pas screenshot ni journal réel. Chaque chiffre a un seul porteur, unité adjacente. Valeurs0 distinctes de —. Source USER_DECLARED dans détail ; complétude humaine distincte de présence des chiffres. Cible propre distincte des apports, aucune recommandation. Mode caméra/étiquette/barcode/texte futur non affiché comme action disponible.
 
 Cibles >=48dp, fonte extensible, clavier décimal/virgule/Done, safe areas, retour/brouillon, VoiceOver/TalkBack champ/unité/source/état, ordre focus/réduction motion. Board après GO : iOS/Android normal/grand texte, jour vide/partiel/terminé/corrigé, cible absente/entraînement/repos, sources, offline/pending/inconnu/A-B/reprise, comparaisons aux références. Aucune baseline automatique. Accord pixels avant commit UI, physique distinct.
+
+
+### Décision native finale reçue —15novembre
+**« Accepter les pixels NUT pour le pilote, avec réserves artistiques »**, questioncall_ac972e9af5dd4c2698c6f2c131cce4eb. Le refus précédent est levé pour ce périmètre contrôlé. Reçu exactNATIVE_PIXEL_ACCEPTANCE.json ; aucun nouveau GO technique/G1/famille demandé. Les réserves artistiques, limites Android/physique et gates de CI/merge/release restent conservées.

@@ -46,3 +46,8 @@ test('native back consumes detail only, and foreground refresh rechecks current 
  const count=s.calls.filter(c=>c.path.startsWith('/me/training-history?')).length;
  await act(async()=>{foreground('active');await flush();});expect(s.calls.filter(c=>c.path.startsWith('/me/training-history?'))).toHaveLength(count+1);
 });
+test('Progress opens the owned nutrition consumer through its supplied callback, without a new tab or mutation',async()=>{
+ const s=await setup(),open=jest.fn();await act(async()=>{root.render(React.createElement(TrainingHistoryHost,{auth:s.auth,call:s.call,timeZone:'UTC',onNutrition:open} as any));await flush();});
+ const entry=node('progress-nutrition');expect(entry).toBeDefined();await act(async()=>{entry.onClick({nativeEvent:{},stopPropagation:()=>{},currentTarget:1,target:1});await flush();});
+ expect(open).toHaveBeenCalledTimes(1);expect(s.calls.filter(c=>!c.path.startsWith('/auth/')).every(c=>c.body===null)).toBe(true);
+});

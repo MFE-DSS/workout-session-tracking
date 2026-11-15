@@ -1,0 +1,12 @@
+{
+  "decision": "Accepter les pixels NUT pour le pilote, avec réserves artistiques",
+  "question_id": "call_ac972e9af5dd4c2698c6f2c131cce4eb",
+  "received_date": "2026-11-15",
+  "scope": "Pixels NUT contrôlés du board 127.0.0.1:8264. Lève le refus précédent pour le pilote, sans prétendre à la DA finale ni à la recette physique, au déploiement ou à un nouvel APK.",
+  "prior_refusal_question": "call_60adc1fe84e8410c859d57940a71d932",
+  "package_sha256": "34754c0bb82e27640bb8f014037e015a9ba38b9e539e43aad7c4e487570b9cf9",
+  "captures_manifest_sha256": "6882ac2f012dc29774d5aedd1510062a5b8732bb7ebe4c99e3eb1e8d81d98903",
+  "capture_count": 17,
+  "artistic_reservations": "Non bloquantes pour cette tranche pilote, à traiter dans un scope ultérieur ; aucune nouvelle variante autonome autorisée.",
+  "native_limits": "ConnectedApp iOS réel ; Android présentateurs Host avec HTTP/SQLite ; clavier/grandes fontes observés, gestes/focus exhaustifs et appareils physiques ouverts."
+}
