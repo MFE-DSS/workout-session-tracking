@@ -111,7 +111,10 @@ whole-DB manifests still independently prove point-in-time copying.
 
 No legacy JSON export/restore: every table, ID, refresh hash and PLAN fact is
 preserved by SQLite online backup. Exact admitted head is
-`plan_v3_20261107_01`, plus exact canonical schema snapshot, integrity and FKs.
+`nutrition_manual_01` (including the additive PLAN and BODY lineage), plus exact
+canonical schema snapshot, integrity and FKs. Older schemas, even with a forged
+current revision label, are refused. This does not run migrations at startup or
+authorize a live schema change; qualify migration/backup on synthetic copies first.
 Unknown schemas require a separately authorized compatibility change.
 
 ```sh

@@ -10,25 +10,31 @@ from contextlib import closing
 from pathlib import Path
 
 import pytest
+from alembic import command
+from alembic.config import Config
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def migrate_database(path, revision="head"):
+    config = Config()
+    config.set_main_option("script_location", str(ROOT / "migrations"))
+    config.set_main_option("sqlalchemy.url", f"sqlite:///{path}")
+    command.upgrade(config, revision)
+
+
+@pytest.fixture(scope="session")
+def migrated_canonical_schema(tmp_path_factory):
+    path = tmp_path_factory.mktemp("qa-canonical-migration") / "schema.db"
+    migrate_database(path)
+    return path
+
+
 @pytest.fixture
-def qa_database(tmp_path):
+def qa_database(tmp_path, migrated_canonical_schema):
     path = tmp_path / "synthetic.db"
+    path.write_bytes(migrated_canonical_schema.read_bytes())
     with closing(sqlite3.connect(path)) as db, db:
-        statements = (ROOT / "data/schema_snapshot.sql").read_text().splitlines()
-        db.executescript(
-            "\n".join(
-                sorted(
-                    (s for s in statements if s.startswith("CREATE ")),
-                    key=lambda s: not s.startswith("CREATE TABLE"),
-                )
-            )
-        )
-        db.execute("CREATE TABLE alembic_version (version_num VARCHAR(32) PRIMARY KEY)")
-        db.execute("INSERT INTO alembic_version VALUES ('plan_v3_20261107_01')")
         db.execute(
             "INSERT INTO users (id,username,password_hash,is_active) VALUES (42,'qa02-assigned','private-hash',1)"
         )
@@ -74,6 +80,21 @@ def qa_database(tmp_path):
         db.execute(
             "INSERT INTO first_plan_runtime_authorities (profile_key,generation,state) VALUES ('first-session-runtime/3.0.0',3,'WITHDRAWN')"
         )
+        db.execute(
+            "INSERT INTO body_measurements (id,user_id,measured_at,weight_kg) VALUES (1,42,'2026-11-15',800)"
+        )
+        db.execute(
+            "INSERT INTO body_measurement_operations_v1 (owner_id,request_id,command_digest,operation,root_ref,measurement_ref,applied_revision,changed_fields,provenance_by_changed_field,receipt) VALUES (42,'body-preserved',?,'CREATE',1,1,1,?,'{}','{}')",
+            ("c" * 64, json.dumps(["weight_kg"])),
+        )
+        db.execute(
+            "INSERT INTO nutrition_target_revisions_v1 (id,user_id,variant,effective_from,enabled,revision,kcal_milli,provenance,request_id,command_digest,receipt) VALUES (1,42,'STANDARD','2026-11-15',1,1,2000000,'{}','target-preserved',?,'{}')",
+            ("d" * 64,),
+        )
+        db.execute(
+            "INSERT INTO nutrition_day_revisions_v1 (user_id,local_day,timezone,state,declared_complete,target_ref,revision,kcal_milli,provenance,request_id,command_digest,receipt) VALUES (42,'2026-11-15','Europe/Paris','ACTIVE',1,1,1,1900000,'{}','day-preserved',?,'{}')",
+            ("e" * 64,),
+        )
     return path
 
 
@@ -86,18 +107,36 @@ def rows(path):
         }
 
 
+def test_real_canonical_migration_is_verified_without_revision_stamping(qa_database):
+    from tools.qa_delivery.database import verify_database
+
+    assert rows(qa_database)["alembic_version"] == [("nutrition_manual_01",)]
+    assert verify_database(qa_database)["server_schema"] == "nutrition_manual_01"
+
+
 def test_backup_restore_copies_all_tables_ids_and_refresh_without_source_mutation(
     qa_database, tmp_path
 ):
     from tools.qa_delivery.database import backup_database, verify_database
 
     original = qa_database.read_bytes()
-    snapshot, restored = tmp_path / "backup.db", tmp_path / "restored.db"
+    snapshot, exported, restored = (
+        tmp_path / "backup.db", tmp_path / "export.db", tmp_path / "restored.db"
+    )
     receipt = backup_database(qa_database, snapshot)
-    backup_database(snapshot, restored)
-    assert rows(qa_database) == rows(snapshot) == rows(restored)
+    exported.write_bytes(snapshot.read_bytes())
+    exported.with_suffix(".db.manifest.json").write_bytes(
+        snapshot.with_suffix(".db.manifest.json").read_bytes()
+    )
+    exported.chmod(0o600)
+    exported.with_suffix(".db.manifest.json").chmod(0o600)
+    from tools.qa_delivery.database import _verify_backup
+
+    backup_database(exported, restored, expected_backup=_verify_backup(exported))
+    assert rows(qa_database) == rows(snapshot) == rows(exported) == rows(restored)
     assert qa_database.read_bytes() == original
-    assert receipt["server_schema"] == "plan_v3_20261107_01"
+    assert rows(qa_database)["alembic_version"] == [("nutrition_manual_01",)]
+    assert receipt["server_schema"] == "nutrition_manual_01"
     assert receipt["tables"]["users"]["rows"] == 1
     assert receipt["tables"]["device_sessions"]["rows"] == 1
     assert receipt["tables"]["blueprint_source_events"]["rows"] == 1
@@ -107,6 +146,10 @@ def test_backup_restore_copies_all_tables_ids_and_refresh_without_source_mutatio
         "first_session_requests",
         "first_plan_execution_bindings",
         "first_plan_set_observations",
+        "body_measurements",
+        "body_measurement_operations_v1",
+        "nutrition_target_revisions_v1",
+        "nutrition_day_revisions_v1",
     ):
         assert receipt["tables"][table]["rows"] == 1
     assert receipt["continuity_digest"] == verify_database(restored)["continuity_digest"]
@@ -114,7 +157,7 @@ def test_backup_restore_copies_all_tables_ids_and_refresh_without_source_mutatio
     assert snapshot.stat().st_mode & 0o777 == 0o600
 
 
-@pytest.mark.parametrize("damage", ["unknown_head", "fk", "corrupt", "missing", "schema"])
+@pytest.mark.parametrize("damage", ["unknown_head", "old_head", "fk", "corrupt", "missing", "schema"])
 def test_invalid_database_refused_before_copy(qa_database, tmp_path, damage):
     from tools.qa_delivery.database import backup_database
 
@@ -127,6 +170,7 @@ def test_invalid_database_refused_before_copy(qa_database, tmp_path, damage):
             db.execute(
                 {
                     "unknown_head": "UPDATE alembic_version SET version_num='future'",
+                    "old_head": "UPDATE alembic_version SET version_num='plan_v3_20261107_01'",
                     "fk": "UPDATE device_sessions SET user_id=999",
                     "schema": "DROP TABLE first_plan_set_observations",
                 }[damage]
@@ -135,6 +179,24 @@ def test_invalid_database_refused_before_copy(qa_database, tmp_path, damage):
     with pytest.raises(ValueError, match="qa_database_invalid"):
         backup_database(qa_database, target)
     assert not target.exists()
+    assert not target.with_suffix(".db.manifest.json").exists()
+
+
+@pytest.mark.parametrize("forged_head", [False, True])
+def test_genuine_older_schema_is_refused_even_with_forged_current_head(tmp_path, forged_head):
+    from tools.qa_delivery.database import backup_database
+
+    source, target = tmp_path / "older.db", tmp_path / "must-not-publish.db"
+    migrate_database(source, "plan_v3_20261107_01")
+    if forged_head:
+        with sqlite3.connect(source) as db:
+            db.execute("UPDATE alembic_version SET version_num='nutrition_manual_01'")
+    original = source.read_bytes()
+    with pytest.raises(ValueError, match="qa_database_invalid"):
+        backup_database(source, target)
+    assert source.read_bytes() == original
+    assert not target.exists()
+    assert not target.with_suffix(".db.manifest.json").exists()
 
 
 def test_existing_destination_and_interrupted_backup_never_overwrite_or_leave_partial(
@@ -182,7 +244,7 @@ def test_database_cli_restore_new_copy_has_redacted_manifest(qa_database, tmp_pa
     assert result.returncode == 0, result.stderr
     assert rows(target) == rows(qa_database)
     assert "private-" not in result.stdout and str(tmp_path) not in result.stdout
-    assert json.loads(result.stdout)["server_schema"] == "plan_v3_20261107_01"
+    assert json.loads(result.stdout)["server_schema"] == "nutrition_manual_01"
 
 
 def test_source_refresh_rotation_during_capture_refuses_publication(
