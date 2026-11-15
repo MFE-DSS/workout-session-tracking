@@ -1027,3 +1027,15 @@ Archive CLI `openspec/changes/archive/2026-11-15-body-01-owned-measurements/`,
 reste ouvert à l'instant de publication, à résoudre par reçu vivant. Worktree/note
 MVP non suivie préservés ; aucun APK/OTA/déploiement. NUT406 et MOB06408 restent
 les scopes suivants, sans transfert implicite d'acceptation de pixels.
+
+
+## MOB-07 — constructeur personnel natif proposé,15novembre2026
+
+[Proposition mob07-owned-program-builder](../../openspec/changes/mob07-owned-program-builder/proposal.md), [scope](../../openspec/changes/mob07-owned-program-builder/BUILD_SCOPE.md), [design](../../openspec/changes/mob07-owned-program-builder/design.md) et [G1 proposé](../../openspec/changes/mob07-owned-program-builder/UX_BOARD.md). Parent59a28dc après408/411 ; **PROPOSED / NO_GO_BUILD / G1_NOT_ACCEPTED**. Création/composition/validation/publication par domaines UserProgram existants et identités canoniques, reprise durable proposée ; aucun moteur scientifique client. Revue builder : deux Important traités dans le design (CAS web+natif/quota, slots historiques non résolus préservés), pas de seconde revue prétendue. Préparation OpenSpec28/28,42gardes documentaires et sécurité du paquet passantes ; aucun code produit, migration active, pixel, APK/OTA ou déploiement. Les GO des scopes précédents ne sont pas transférés. Le plan détaillé et les leases seront arrêtés après décision propre, avant apply.
+
+
+### MOB-07 — GO et implémentation en cours,15novembre2026
+
+Le statut de préparation ci-dessus est historique. Décision propre reçue : **« Autoriser MOB-07, l’amendement et G1 »**, call_dd254c785ba7430897ac13dc9b579cbc, conservée dans BUILD_AUTHORIZATION.json du change. Parent réel f31b6e7 après correction REL03 #412/#413 ; backend/CAS/migration/client/SQLite/ConnectedApp implémentés, trois Important corrigés et relus.127suites/1448tests mobiles+TypeScript passent localement ; sweep MIGRATION final en cours. Gate pixels MOB07 soumis, non encore accepté. Aucune PR/CI/merge MOB07 ni APK/OTA/déploiement par ce statut. GOV-MERGE-01 reste applicable après tous les contrôles et la validation humaine requise.
+
+MOB07 execution checkpoint15novembre2026 : GO BUILD/amendement/G1 et pixels pilote acquis (BUILD_AUTHORIZATION.json / NATIVE_PIXEL_ACCEPTANCE.json). Parent f31b6e7 ; implémentation complète non encore committée, suite locale MIGRATION454fichiers verte puis recheck270QA du modèle PREPARE, mobile1448+TS et visuel77. PR/CI/merge/closeout encore à accomplir ; Android physique et releaseNOT_READY conservés.

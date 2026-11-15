@@ -1,3 +1,4 @@
+import {attachProgramBuilderPending} from './programBuilderPendingCommands';
 /**
  * Expo SQLite journal + outbox (N0 §12) — native implementation.
  *
@@ -66,7 +67,7 @@ const UPSERT_SNAPSHOT =
  * `name`: the lab keeps its own file; the connected app (D9) uses another, so a
  * lab command aimed at a fixture session can never reach the real server.
  */
-export async function openJournal(name = 'auren-n0-lab.db', options: {planV3OwnerId?:number;bodyOwner?:{userId:number;backendScope:string};nutritionOwner?:{userId:number;backendScope:string};libraryOwner?:LibraryJournalOwner} = {}): Promise<Journal> {
+export async function openJournal(name = 'auren-n0-lab.db', options: {planV3OwnerId?:number;bodyOwner?:{userId:number;backendScope:string};nutritionOwner?:{userId:number;backendScope:string};libraryOwner?:LibraryJournalOwner;builderOwner?:{ownerId:number;backendScope:string;sha256:(value:string)=>Promise<string>;current:()=>boolean}} = {}): Promise<Journal> {
   const db = await SQLite.openDatabaseAsync(name);
   await db.execAsync(SCHEMA);
   // a command caught in flight by a force-kill has an unknown outcome: send it
@@ -79,6 +80,7 @@ export async function openJournal(name = 'auren-n0-lab.db', options: {planV3Owne
   const bodyPending=options.bodyOwner===undefined?undefined:await attachBodyPending(db as unknown as PlanSQL,serial,options.bodyOwner.userId,options.bodyOwner.backendScope,s=>Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256,s));
   const nutritionPending=options.nutritionOwner===undefined?undefined:await attachNutritionPending(db as unknown as PlanSQL,serial,options.nutritionOwner.userId,options.nutritionOwner.backendScope,s=>Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256,s));
   const library = options.libraryOwner ? await attachLibraryPendingOpenings(db as unknown as PlanSQL,serial,options.libraryOwner.ownerId,options.libraryOwner.backendScope,options.libraryOwner.sha256,options.libraryOwner.current) : undefined;
+  const builderPending=options.builderOwner?await attachProgramBuilderPending(db as unknown as PlanSQL,serial,options.builderOwner.ownerId,options.builderOwner.backendScope,options.builderOwner.sha256,options.builderOwner.current):undefined;
   const saveLegacySnapshot = async (txn: Pick<SQLite.SQLiteDatabase,'getFirstAsync'|'runAsync'>, snapshot: WorkoutState, at: number) => {
     const row = await txn.getFirstAsync<{snapshot:string}>('SELECT snapshot FROM active_session WHERE id=1');
     if (row && JSON.parse(row.snapshot)?.profile === 'PLAN_V3') return;
@@ -90,6 +92,7 @@ export async function openJournal(name = 'auren-n0-lab.db', options: {planV3Owne
     bodyPending,
     nutritionPending,
     library,
+    builderPending,
     beginLegacy: (snapshot,current) => serial(async()=>{
       if(!current())throw Error('stale_identity');
       await db.withExclusiveTransactionAsync(async tx=>{

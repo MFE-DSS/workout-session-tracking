@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% from "user_programs/_status.html" import status_label %}
 {% block content %}
+<div hidden data-source-digest="{{ source_digest }}"></div>
 {% set editable = program.archived_at is none and program.status in ['draft', 'validated'] %}
 <h1 class="page-title">{{ program.title }}</h1>
 
@@ -31,6 +32,7 @@
     <p class="pd-actions--wrap">
       <a class="btn btn--ghost" href="{{ url_for('user_program_publish_form', program_id=program.id) }}">Voir la publication</a>
       <form method="post" action="{{ url_for('user_program_new_version', program_id=program.id) }}" class="pd-inline">
+    <input type="hidden" name="source_digest" value="{{ source_digest }}">
         <button type="submit" class="btn btn--primary">Créer une nouvelle version modifiable</button>
       </form>
     </p>
@@ -59,6 +61,7 @@
                pas à dominer ce qu'elle détruit ; elle reste reconnaissable par
                le soulignement et garde ses 44 px de cible. #}
             <form method="post" action="{{ url_for('user_program_delete_session', program_id=program.id, position=session.position) }}" class="pd-inline">
+    <input type="hidden" name="source_digest" value="{{ source_digest }}">
               <button type="submit" class="btn pd-destroy">Supprimer la séance</button>
             </form>
           {% endif %}
@@ -73,6 +76,7 @@
                 <span>{{ exercise.exercise_name }} — <span class="text-dim">{{ exercise.set_scheme }}</span></span>
                 {% if editable %}
                   <form method="post" action="{{ url_for('user_program_delete_exercise', program_id=program.id, session_position=session.position, exercise_position=exercise.position) }}" class="pd-inline">
+    <input type="hidden" name="source_digest" value="{{ source_digest }}">
                     <button type="submit" class="btn btn--ghost" aria-label="Supprimer l'exercice">×</button>
                   </form>
                 {% endif %}
@@ -92,6 +96,7 @@
           <details class="pd-drawer">
             <summary>Ajouter un exercice</summary>
             <form method="post" action="{{ url_for('user_program_add_exercise', program_id=program.id, position=session.position) }}" class="pd-form">
+    <input type="hidden" name="source_digest" value="{{ source_digest }}">
               <div class="field pd-form__wide">
                 <label class="field__label" for="ex-{{ session.position }}">Exercice</label>
                 <input type="text" id="ex-{{ session.position }}" name="exercise_name" list="ekb-exercises" required maxlength="255" class="field__input" placeholder="Développé couché haltères" />
@@ -119,6 +124,7 @@
            program is published, not archived, and this session is linked to its template. #}
         {% if program.status == 'published' and program.archived_at is none and session.published_template_id %}
           <form method="post" action="{{ url_for('user_program_start_session', program_id=program.id, session_id=session.id) }}" class="pd-action">
+    <input type="hidden" name="source_digest" value="{{ source_digest }}">
             <button type="submit" class="btn btn--primary">Démarrer cette séance</button>
           </form>
         {% endif %}
@@ -129,6 +135,7 @@
 
 {% if editable %}
   <form method="post" action="{{ url_for('user_program_add_session', program_id=program.id) }}" class="card pd-newsession">
+    <input type="hidden" name="source_digest" value="{{ source_digest }}">
     <div class="field">
       <label class="field__label" for="session-name">Nouvelle séance</label>
       <input type="text" id="session-name" name="name" required maxlength="128" class="field__input" placeholder="Push A" />
@@ -142,6 +149,7 @@
      L'écran en portait cinq. Répété cinq fois, l'ambre ne désigne plus rien —
      il redevient un fond parmi d'autres. #}
   <form method="post" action="{{ url_for('user_program_validate', program_id=program.id) }}" class="pd-block">
+    <input type="hidden" name="source_digest" value="{{ source_digest }}">
     <button type="submit" class="btn btn--primary">Valider le brouillon</button>
   </form>
 

@@ -10,6 +10,7 @@ export type Restored = {
 };
 
 export interface Journal {
+  readonly builderPending?: import('./programBuilderPendingCommands').ProgramBuilderPendingCommands;
   readonly nutritionPending?: import('./nutritionPendingCommands').NutritionPendingCommands;
   readonly bodyPending?: import('./bodyPendingCommands').BodyPendingCommands;
   readonly library?: import('./libraryPendingOpenings').LibraryPendingOpenings;

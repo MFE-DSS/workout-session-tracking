@@ -13,7 +13,7 @@ import {InstrumentSurface} from '../body/InstrumentSurface';
 import {color,space,type} from '../theme';
 export type LibraryScreenProps={state:LibraryState;opening:LibraryOpeningState;query:LibraryQuery;existingSession?:LibrarySessionIdentity|null;
  onFilter:(section:LibraryQuery['section'])=>void;onRefresh:()=>void;onMore:()=>void;onSelect:(ref:string)=>void;onBack:()=>void;
- onAskStart:()=>void;onConfirm:()=>void;onVerify:()=>void;onResume:()=>void;onCancel:(confirmed:boolean)=>void;onResumeExisting:()=>void};
+ onAskStart:()=>void;onConfirm:()=>void;onVerify:()=>void;onResume:()=>void;onCancel:(confirmed:boolean)=>void;onResumeExisting:()=>void;onBuilder?:()=>void};
 const labels={programs:'Mes programmes',core:'Catalogue',utility:'Compléments',specialization:'Spécialisation'};
 const statuses={AVAILABLE:'Catalogue',DRAFT:'Brouillon',VALIDATED:'Validé · non publié',PUBLISHED:'Publié'};
 const previousLabel=(at?:number)=>at===undefined?'Lecture précédente · à actualiser':`Lecture précédente · reçue le ${new Date(at).toLocaleString('fr-FR',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',timeZoneName:'short'})}`;
@@ -75,6 +75,7 @@ export function LibraryScreen(p:LibraryScreenProps){
  if(s.view==='INDEX')return <FlatList<LibraryEntry> style={{flex:1,backgroundColor:color.field}} contentInsetAdjustmentBehavior="never" contentContainerStyle={padding} keyboardShouldPersistTaps="handled"
   data={v?.entries??[]} keyExtractor={e=>e.source_ref} initialNumToRender={8}
   ListHeaderComponent={<View style={{gap:8}}>{header}
+   {p.onBuilder?<CalibrationLink testID="library-builder" label="Mes brouillons · Créer un programme" onPress={p.onBuilder}/>:null}
    {filters?<CalibrationChoices label="Sources" value={p.query.section} options={[{value:'all',label:'Tout'},{value:'programs',label:'Mes programmes'},{value:'core',label:'Catalogue'},{value:'utility',label:'Compléments'},{value:'specialization',label:'Spécialisation'}]} onChange={p.onFilter}/>:null}
    {index.previous?<Text testID="library-previous" style={type.small}>{previousLabel(index.receivedAtMs)}</Text>:null}
    {index.status!=='confirmed'?<Text accessibilityLiveRegion="polite" style={type.small}>{readStatus(index.status)}</Text>:null}

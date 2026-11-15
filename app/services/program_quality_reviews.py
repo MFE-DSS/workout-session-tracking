@@ -40,6 +40,7 @@ from app.models.user_program import (
     UserProgramQualityReview,
     UserProgramSession,
 )
+from app.services.program_builder_transactions import program_writer
 from app.services.program_quality_engine import (
     ExerciseKnowledgeBase,
     ExerciseSlot,
@@ -154,6 +155,7 @@ def _dump(payload) -> str:
     return json.dumps(payload, ensure_ascii=False, default=lambda o: o.__dict__)
 
 
+@program_writer
 def compute_and_store_quality_review(
     db: Session,
     user_id: int,
@@ -162,6 +164,7 @@ def compute_and_store_quality_review(
     ekb: ExerciseKnowledgeBase | None = None,
     profile: UserProfile | None = None,
     computed_at: datetime | None = None,
+    commit: bool = True,
 ) -> StoredQualityReview:
     """Score un programme possédé et écrit sa trace figée.
 
@@ -197,6 +200,6 @@ def compute_and_store_quality_review(
         computed_at=computed_at or datetime.now(UTC),
     )
     db.add(review)
-    db.commit()
+    db.flush()
     db.refresh(review)
     return StoredQualityReview(review=review, created=True)

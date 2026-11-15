@@ -1,0 +1,20 @@
+{
+  "date": "2026-11-15",
+  "question_id": "call_8c8924d28fa04247b1cfb692f2868145",
+  "decision": "Accepter pour le pilote, avec les limites indiquées",
+  "board": "http://127.0.0.1:8290/",
+  "scope": "MOB07 actual ConnectedApp iOS creation/manual composition/publication/MOB06 readback/sameToday+journal/lost receipt recovery; small SSR CAS delta",
+  "limits": [
+    "Android pixels not accepted; Expo Go Host obscured and Qt automation unavailable",
+    "No physical device acceptance",
+    "Exhaustive focus, gestures, insets and enlarged-text access not closed"
+  ],
+  "not_authorized": [
+    "APK",
+    "OTA",
+    "deployment",
+    "new scientific producer",
+    "locked primitive or baseline change"
+  ],
+  "artifact_zip_sha256": "940cacbcbeeca5f4991d678b2216496fc6bb0a0869f1f71265f335b6e4ea3cbe"
+}

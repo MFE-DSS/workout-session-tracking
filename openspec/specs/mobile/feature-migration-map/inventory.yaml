@@ -757,3 +757,23 @@ features:
     dependencies: [MOB-06, BODY-01, NUT-01, acceptation pixels et intégration]
     visual_assets: [Frame C, RecessedWindow, NumericReadout, onglet Programmes D4]
     migration_risk: "montage candidat non livré ; acquisition synthétique fermée par défaut ; aucun planning ou programme actif inventé"
+
+  - id: owned-native-program-builder
+    feature: Construction propriétaire de programmes et reçus atomiques
+    family: programmes
+    routes:
+      - GET /api/mobile/v1/me/program-builder/exercises
+      - GET /api/mobile/v1/me/program-builder/programs
+      - GET /api/mobile/v1/me/program-builder/programs/{program_id}
+      - POST /api/mobile/v1/me/program-builder/commands
+      - GET /api/mobile/v1/me/program-builder/operations/{command_id}
+    legacy_location: mobile_program_builder → program_builder_commands et services UserProgram canoniques
+    domain_owner: [program_builder_commands, user_program_drafts, user_program_publish, user_program_versioning]
+    api: program-builder/1.0.0 négocié ; Bearer seul ; no-store ; CAS et reçu historique exact
+    data: [user_programs, user_program_sessions, user_program_exercises, user_program_rep_targets, program_builder_operations_v1]
+    user_actions: [créer, composer, conserver un slot historique, valider la structure, publier, ouvrir un cycle, archiver, lire un reçu]
+    native_destination: PROGRAMMES — constructeur propriétaire et départ MOB06
+    status: REWRITE_NATIVE
+    dependencies: [MOB-07, acceptation pixels, CI finale et intégration]
+    visual_assets: [Frame C, RecessedWindow, NumericReadout, famille DA08 et onglets D4]
+    migration_risk: "migration additive de reçus ; acquisition synthétique fermée par défaut ; publications et séances historiques conservées"

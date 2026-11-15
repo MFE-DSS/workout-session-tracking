@@ -1,0 +1,15 @@
+{
+  "decision": "Autoriser MOB-07, l’amendement et G1",
+  "received_date": "2026-11-15",
+  "question_id": "call_dd254c785ba7430897ac13dc9b579cbc",
+  "scope": [
+    "BUILD_SCOPE.md",
+    "CONTRACT_RECONCILIATION.md",
+    "UX_BOARD.md"
+  ],
+  "authorization": "CONTROLLED_BUILD_AND_FUNCTIONAL_G1",
+  "visual_pixel_gate": "PENDING_BEFORE_UI_COMMIT",
+  "external_release_authorized": false,
+  "standing_merge": "GOV-MERGE-01 after all applicable gates",
+  "historical_proposed_documents": "Superseded for this approved scope only; preserve their publication instant."
+}

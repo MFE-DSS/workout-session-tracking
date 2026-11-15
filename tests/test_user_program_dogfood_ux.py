@@ -11,6 +11,7 @@ F2 — after publishing, the publish page explained the sessions were launchable
 """
 from __future__ import annotations
 
+from program_builder_web_helpers import post_program
 from sqlalchemy import select
 
 # ─────────────────────────────── helpers ───────────────────────────────
@@ -138,7 +139,7 @@ def test_publish_success_offers_launch_path(client):
     """Publishing (POST) lands on a page that routes the owner to the launch CTAs."""
     with _session() as db:
         pid = _make_validated(db, _uid_in(db), "df-cta2").id
-    r = client.post(f"/programs/{pid}/publish", follow_redirects=False)
+    r = post_program(client, f"/programs/{pid}/publish", follow_redirects=False)
     assert r.status_code == 200  # publish renders in place (idempotent, safe to refresh)
     assert "Voir et démarrer mes séances" in r.text
     assert "Publié" in r.text  # French label on the success page too

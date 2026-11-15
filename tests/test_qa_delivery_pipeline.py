@@ -69,11 +69,19 @@ def test_tracked_candidate_prepares_for_current_canonical_schema_without_distrib
     from tools.qa_delivery.pipeline import prepare
 
     root = Path(__file__).resolve().parents[1]
-    raw = json.loads((root / "docs/release/rel-03/candidate.json").read_text())
-    prepared = prepare(raw, checkout)
-    assert prepared["compatibility"]["server_schema"] == "nutrition_manual_01"
+    template = json.loads((root / "docs/release/rel-03/candidate.json").read_text())
+    prepared = prepare(template, checkout)
+    assert prepared["compatibility"]["server_schema"] == "program_builder_operations_01"
     assert prepared["distributable"] is False
     assert prepared["target"] is None
+    assert prepared["native"]["fingerprint"] is None
+    assert prepared["eas"]["build_id"] is None
+    # Older nutrition inputs remain fail-closed; the active default is current.
+    stale = deepcopy(template)
+    stale["compatibility"]["server_schema"] = "nutrition_manual_01"
+    with pytest.raises(ValueError, match="qa_release_refused"):
+        prepare(stale, checkout)
+    assert template["compatibility"]["server_schema"] == "program_builder_operations_01"
 
 
 def github_payloads(c):
@@ -1031,11 +1039,22 @@ def test_current_runtime_rollout_is_queried_even_if_channel_latest_is_another_ru
                 check_current_runtime_rollout(c, "test-only", client)
 
 
-def test_cli_prepare_uses_real_template_without_external_credentials(checkout, tmp_path):
+@pytest.mark.parametrize("stale_schema", [False, True])
+def test_cli_prepare_uses_real_template_and_refuses_stale_copy_without_external_credentials(
+    checkout, tmp_path, stale_schema
+):
     import os
     import sys
 
     root = Path(__file__).resolve().parents[1]
+    template_path = root / "docs/release/rel-03/candidate.json"
+    template_bytes = template_path.read_bytes()
+    candidate_path = template_path
+    if stale_schema:
+        stale = json.loads(template_bytes)
+        stale["compatibility"]["server_schema"] = "nutrition_manual_01"
+        candidate_path = tmp_path / "stale-nutrition-candidate.json"
+        candidate_path.write_text(json.dumps(stale))
     output = tmp_path / "qa-prepared.json"
     result = subprocess.run(
         [
@@ -1044,7 +1063,7 @@ def test_cli_prepare_uses_real_template_without_external_credentials(checkout, t
             "tools.qa_delivery.pipeline",
             "prepare",
             "--candidate",
-            str(root / "docs/release/rel-03/candidate.json"),
+            str(candidate_path),
             "--checkout",
             str(checkout),
             "--output",
@@ -1056,6 +1075,12 @@ def test_cli_prepare_uses_real_template_without_external_credentials(checkout, t
         text=True,
         timeout=10,
     )
+    assert template_path.read_bytes() == template_bytes
+    if stale_schema:
+        assert result.returncode != 0
+        assert result.stderr.strip() == "qa_release_refused"
+        assert result.stdout == "" and not output.exists()
+        return
     assert result.returncode == 0, result.stderr
     assert result.stdout.strip() == "QA_PREPARED_NON_DISTRIBUTABLE"
     package = json.loads(output.read_text())

@@ -1,0 +1,37 @@
+{
+  "feature": "MOB-07",
+  "status": "IMPLEMENTED_NOT_DELIVERED",
+  "canonical_parent": "f31b6e7b8411bf9668906a3a5dc38b22fef8ae55",
+  "feature_commit": null,
+  "pull_request": null,
+  "schema": "program_builder_operations_01",
+  "schema_parent": "nutrition_manual_01",
+  "api": "program-builder/1.0.0",
+  "new_local_table": "program_builder_pending_commands_v1",
+  "science_producer_changed": false,
+  "native_dependencies_changed": false,
+  "lock_changed": false,
+  "app_id_changed": false,
+  "signing_changed": false,
+  "new_binary_built": false,
+  "OTA_published": false,
+  "pixel_acceptance": {
+    "decision": "Accepter pour le pilote, avec les limites indiquées",
+    "question_id": "call_8c8924d28fa04247b1cfb692f2868145",
+    "Android": "NOT_ACCEPTED",
+    "physical": "UNAVAILABLE"
+  },
+  "Android_physical": "UNAVAILABLE",
+  "release_candidate": "NOT_READY",
+  "REL03_compatibility": "Snapshot-coupled schema pins and active default PREPARE template aligned with program_builder_operations_01. Prior f31 template bytes and actual PREPARE/binary receipts preserved. Actual-default positive RED→GREEN then270QA tests PASS. Exact remote CI/merge not yet performed; no deployment/release.",
+  "update_classification": {
+    "native_modules_and_dependencies": "UNCHANGED_BY_MOB07_DIFF",
+    "application": "JS/TS logic and additive owner-bound SQLite command table",
+    "backend": "New builder API and additive program_builder_operations_01 migration",
+    "native_runtime_fingerprint": "NOT_COMPUTED_FOR_FUTURE_STABLE_QA_TARGET",
+    "current_QA02_OTA": "UNSUPPORTED_BY_EXISTING_APK; new REL03-capable binary required first",
+    "future_OTA": "Only after actual installed runtime/channel compatibility and controlled release approval",
+    "rollback": "Must preserve new pending builder intents and server receipts; an older JS bundle cannot be presumed able to reconcile that table. Candidate-specific rollback/readback remains UNVERIFIED.",
+    "storage_source_boundary": "Existing guard hashes every production src/storage/*.ts file, including new builder store. No OTA across changed storage bytes is presumed compatible with an old native receipt."
+  }
+}

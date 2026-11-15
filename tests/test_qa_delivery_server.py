@@ -90,7 +90,7 @@ async def test_version_is_current_redacted_and_withdrawal_does_not_remove_transp
         identity = response.json()
         assert identity["source_sha"] == "a" * 40
         assert identity["environment_id"] == "qa-rel03-isolated"
-        assert identity["server_schema"] == "nutrition_manual_01"
+        assert identity["server_schema"] == "program_builder_operations_01"
         assert identity["authority"] == {"state": "WITHDRAWN", "generation": 3, "publication": None}
         with sqlite3.connect(qa_database) as db:
             db.execute("UPDATE first_plan_runtime_authorities SET generation=4,state='DISABLED'")

@@ -6,6 +6,7 @@
    action that can never succeed. #}
 {% set editable = program.archived_at is none and program.status in ['draft', 'validated'] %}
 {% block content %}
+<div hidden data-source-digest="{{ source_digest }}"></div>
 <h1 class="page-title">Générer une base de programme</h1>
 
 {% if error %}
@@ -49,6 +50,7 @@
 
 {% if editable %}
 <form method="post" action="{{ url_for('user_program_generate', program_id=program.id) }}" class="card pd-page--narrow pd-section">
+    <input type="hidden" name="source_digest" value="{{ source_digest }}">
   <div class="field">
     <label class="field__label" for="split">Style de split</label>
     {{ select_shell("split", split_labels.items() | list,

@@ -27,3 +27,4 @@ from app.models import (  # noqa: F401
     user,
     user_program,
 )
+from app.models.program_builder_operations import ProgramBuilderOperation  # noqa: F401

@@ -9,6 +9,7 @@ scoring). Every `app.*` import is inside the test/helper (conftest resets the
 from __future__ import annotations
 
 import pytest
+from program_builder_web_helpers import post_program
 from sqlalchemy import func, select
 
 # ─────────────────────────── helpers ───────────────────────────
@@ -107,7 +108,7 @@ def test_get_generate_unauthenticated_redirects(client):
 def test_post_generate_unauthenticated_redirects(client):
     pid = _make_program("Auth", "gen-auth-p")
     client.cookies.clear()
-    r = client.post(
+    r = post_program(client,
         f"/programs/{pid}/generate",
         data={"split": "ppl", "sessions": 3},
         follow_redirects=False,
@@ -130,7 +131,7 @@ def test_generate_ppl_three_creates_tree(client):
     from app.models.user_program import UserProgramExercise
 
     pid = _make_program("PPL", "gen-ppl")
-    r = client.post(
+    r = post_program(client,
         f"/programs/{pid}/generate",
         data={"split": "ppl", "sessions": 3},
         follow_redirects=False,
@@ -142,7 +143,7 @@ def test_generate_ppl_three_creates_tree(client):
 
 def test_generate_upper_lower_creates_tree(client):
     pid = _make_program("UL", "gen-ul")
-    r = client.post(
+    r = post_program(client,
         f"/programs/{pid}/generate",
         data={"split": "upper_lower", "sessions": 2},
         follow_redirects=False,
@@ -154,7 +155,7 @@ def test_generate_upper_lower_creates_tree(client):
 def test_generate_on_nonempty_program_refused(client):
     pid = _make_program("NonEmpty", "gen-ne")
     _seed_one_session(pid)
-    r = client.post(
+    r = post_program(client,
         f"/programs/{pid}/generate",
         data={"split": "ppl", "sessions": 3},
         follow_redirects=False,
@@ -166,7 +167,7 @@ def test_generate_on_nonempty_program_refused(client):
 
 def test_generate_invalid_split_rerenders_no_creation(client):
     pid = _make_program("BadSplit", "gen-badsplit")
-    r = client.post(
+    r = post_program(client,
         f"/programs/{pid}/generate",
         data={"split": "bro-split", "sessions": 3},
         follow_redirects=False,
@@ -177,7 +178,7 @@ def test_generate_invalid_split_rerenders_no_creation(client):
 
 def test_generate_invalid_sessions_rerenders_no_creation(client):
     pid = _make_program("BadSessions", "gen-badsessions")
-    r = client.post(
+    r = post_program(client,
         f"/programs/{pid}/generate",
         data={"split": "ppl", "sessions": 0},
         follow_redirects=False,
@@ -191,7 +192,7 @@ def test_generate_invalid_sessions_rerenders_no_creation(client):
 
 def test_generate_on_foreign_program_is_404(client):
     _other_id, pid = _make_other_program("Foreign", "gen-foreign")
-    r = client.post(
+    r = post_program(client,
         f"/programs/{pid}/generate",
         data={"split": "ppl", "sessions": 3},
         follow_redirects=False,
@@ -200,7 +201,7 @@ def test_generate_on_foreign_program_is_404(client):
 
 
 def test_generate_on_absent_program_is_same_404(client):
-    r = client.post(
+    r = post_program(client,
         "/programs/999999/generate",
         data={"split": "ppl", "sessions": 3},
         follow_redirects=False,
@@ -220,7 +221,7 @@ def test_generate_on_locked_program_refused(client, locked):
         else:
             db.get(UserProgram, pid).status = "published"
             db.commit()
-    r = client.post(
+    r = post_program(client,
         f"/programs/{pid}/generate",
         data={"split": "ppl", "sessions": 3},
         follow_redirects=False,
@@ -236,7 +237,7 @@ def test_no_quality_review_written(client):
     from app.models.user_program import UserProgramQualityReview
 
     pid = _make_program("NoRev", "gen-norev")
-    client.post(
+    post_program(client,
         f"/programs/{pid}/generate",
         data={"split": "ppl", "sessions": 3},
         follow_redirects=False,
@@ -249,7 +250,7 @@ def test_no_workout_template_created(client):
 
     before = _count(WorkoutTemplate)
     pid = _make_program("NoTpl", "gen-notpl")
-    client.post(
+    post_program(client,
         f"/programs/{pid}/generate",
         data={"split": "ppl", "sessions": 3},
         follow_redirects=False,
@@ -259,7 +260,7 @@ def test_no_workout_template_created(client):
 
 def test_generated_editor_shows_no_scoring(client):
     pid = _make_program("NoScore", "gen-noscore")
-    client.post(
+    post_program(client,
         f"/programs/{pid}/generate",
         data={"split": "ppl", "sessions": 3},
         follow_redirects=False,
@@ -274,7 +275,7 @@ def test_wizard01_02_routes_still_green(client):
     assert client.get("/programs/new").status_code == 200
     pid = _make_program("NonReg", "gen-nonreg")
     assert client.get(f"/programs/{pid}").status_code == 200
-    r = client.post(
+    r = post_program(client,
         f"/programs/{pid}/sessions", data={"name": "S1"}, follow_redirects=False
     )
     assert r.status_code == 303
@@ -323,7 +324,7 @@ def test_empty_program_generation_is_unchanged_by_wizard06(client):
     """The existing path keeps working without any confirmation: an empty program has
     nothing to lose, so asking for consent would be ceremony."""
     pid = _make_program("Still Empty", "gen06-empty")
-    r = client.post(
+    r = post_program(client,
         f"/programs/{pid}/generate",
         data={"split": "ppl", "sessions": 3},
         follow_redirects=False,
@@ -337,7 +338,7 @@ def test_nonempty_without_confirm_leaves_the_tree_untouched(client):
     pid = _make_program("Guard", "gen06-guard")
     _seed_one_session(pid)
     before = _first_session_name(pid)
-    r = client.post(
+    r = post_program(client,
         f"/programs/{pid}/generate",
         data={"split": "ppl", "sessions": 3},
         follow_redirects=False,
@@ -352,7 +353,7 @@ def test_nonempty_with_confirm_replaces_the_tree(client):
     pid = _make_program("Replace", "gen06-replace")
     _seed_one_session(pid)
     assert _session_count(pid) == 1
-    r = client.post(
+    r = post_program(client,
         f"/programs/{pid}/generate",
         data={"split": "ppl", "sessions": 3, "confirm_replace": "true"},
         follow_redirects=False,
@@ -374,7 +375,7 @@ def test_validated_program_regenerates_and_reopens_as_draft(client):
         validate_draft(db, _uid(), pid)
     assert _status(pid) == "validated"
 
-    r = client.post(
+    r = post_program(client,
         f"/programs/{pid}/generate",
         data={"split": "ppl", "sessions": 3, "confirm_replace": "true"},
         follow_redirects=False,
@@ -402,7 +403,7 @@ def test_locked_program_refuses_even_with_confirmation(client, locked):
             db.get(UserProgram, pid).status = "published"
             db.commit()
 
-    r = client.post(
+    r = post_program(client,
         f"/programs/{pid}/generate",
         data={"split": "ppl", "sessions": 3, "confirm_replace": "true"},
         follow_redirects=False,
@@ -444,7 +445,7 @@ def test_empty_program_shows_no_confirmation_checkbox(client):
 def test_regeneration_on_foreign_program_is_404(client):
     """Owner-scope is not relaxed by the confirmation."""
     _other_id, pid = _make_other_program("Foreign06", "gen06-foreign")
-    r = client.post(
+    r = post_program(client,
         f"/programs/{pid}/generate",
         data={"split": "ppl", "sessions": 3, "confirm_replace": "true"},
         follow_redirects=False,
@@ -454,7 +455,7 @@ def test_regeneration_on_foreign_program_is_404(client):
 
 def test_regeneration_on_absent_program_is_the_same_404(client):
     """Indistinct from the foreign case: a 404 that differed would leak existence."""
-    r = client.post(
+    r = post_program(client,
         "/programs/999998/generate",
         data={"split": "ppl", "sessions": 3, "confirm_replace": "true"},
         follow_redirects=False,
@@ -472,7 +473,7 @@ def test_regeneration_writes_no_quality_review_and_no_workout_template(client):
     reviews_before = _count(UserProgramQualityReview)
     templates_before = _count(WorkoutTemplate)
 
-    r = client.post(
+    r = post_program(client,
         f"/programs/{pid}/generate",
         data={"split": "ppl", "sessions": 3, "confirm_replace": "true"},
         follow_redirects=False,
@@ -493,7 +494,7 @@ def test_unaccepted_confirmation_values_never_replace_the_tree(client, value):
     """
     pid = _make_program("Bypass", f"gen06-bypass-{abs(hash(value))}")
     _seed_one_session(pid)
-    r = client.post(
+    r = post_program(client,
         f"/programs/{pid}/generate",
         data={"split": "ppl", "sessions": 3, "confirm_replace": value},
         follow_redirects=False,
@@ -507,7 +508,7 @@ def test_a_duplicated_confirmation_field_cannot_smuggle_consent(client):
     """`false` then `true` in the same body is refused outright, not resolved to the last."""
     pid = _make_program("Dup", "gen06-dup")
     _seed_one_session(pid)
-    r = client.post(
+    r = post_program(client,
         f"/programs/{pid}/generate",
         data=[
             ("split", "ppl"),
@@ -556,7 +557,7 @@ def test_the_unconfirmed_page_is_not_presented_as_an_error(client):
     """
     pid = _make_program("Tone", "gen06-tone")
     _seed_one_session(pid)
-    r = client.post(
+    r = post_program(client,
         f"/programs/{pid}/generate",
         data={"split": "ppl", "sessions": 3},
         follow_redirects=False,
@@ -572,7 +573,7 @@ def test_the_unconfirmed_page_is_not_presented_as_an_error(client):
 def test_a_real_error_is_still_rendered_as_an_error(client):
     """The danger styling is not removed — it is reserved for actual input errors."""
     pid = _make_program("RealErr", "gen06-realerr")
-    r = client.post(
+    r = post_program(client,
         f"/programs/{pid}/generate",
         data={"split": "bro-split", "sessions": 3},
         follow_redirects=False,
@@ -589,7 +590,7 @@ def test_the_unconfirmed_page_can_be_resubmitted_with_confirmation(client):
     """The returned form carries everything a confirmed retry needs — no re-navigation."""
     pid = _make_program("Retry", "gen06-retry")
     _seed_one_session(pid)
-    first = client.post(
+    first = post_program(client,
         f"/programs/{pid}/generate",
         data={"split": "ppl", "sessions": 3},
         follow_redirects=False,
@@ -599,7 +600,7 @@ def test_the_unconfirmed_page_can_be_resubmitted_with_confirmation(client):
     assert 'name="sessions"' in first.text
     assert 'name="confirm_replace"' in first.text
 
-    second = client.post(
+    second = post_program(client,
         f"/programs/{pid}/generate",
         data={"split": "ppl", "sessions": 3, "confirm_replace": "true"},
         follow_redirects=False,
