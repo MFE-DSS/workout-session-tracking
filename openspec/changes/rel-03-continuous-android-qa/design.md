@@ -1,5 +1,9 @@
 # Design REL-03 — pipeline QA Android
 
+## Amendement OVH proposé —15novembre2026
+
+Les observations et choix Render ci-dessous conservent leur instant historique. Le code préparatoire et les corrections de schéma sont livrés ; la cible opérationnelle demeure non provisionnée. Sur le canonique683e883 après BODY/NUT/MOB06/MOB07, le [scope technique OVH](OVH_AMENDMENT_SCOPE_20261115.md) et son [contrat de preuve/configuration](OVH_EVIDENCE_AND_CONFIG.md) proposent l’adaptation au VPS existant demandée par l’opérateur. **TECHNICAL_BUILD_AUTHORIZED / NO_DEPLOYMENT_AUTHORIZATION** : ils ne réinterprètent pas le GO initial comme une permission de modifier un service, DNS, secret ou appareil. Le GO technique propre call_657199a80f2441d3b3bd3d450dfaaabf est enregistré avant code ; les GOs produit et merge acquis restent conservés.
+
 **Base vérifiée : b9a334d22e6b75e9b83650eb1b2b833d4ed5d169, 10 novembre 2026. PROPOSED / NO_GO_BUILD.** [Périmètre](BUILD_SCOPE.md), [tests](TEST_SPEC.md), [décisions externes](HOSTING_DECISION.md).
 
 ## Observé et autorité

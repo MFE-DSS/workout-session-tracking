@@ -26,9 +26,16 @@ function applyQADelivery(config, env=process.env, target) {
     throw Error('Invalid continuous QA profile');
   }
   target ??= require('./qa-delivery-target.json');
-  if (target.schemaVersion !== 'qa-delivery-target/1.0.0' || target.state !== 'ATTESTED' ||
+  const profiles={BODY:'body-measurements/1.0.0',NUT:'nutrition-manual/1.0.0',
+    LIBRARY:'owned-library/1.0.0',BUILDER:'program-builder/1.0.0'};
+  const ovh=target.schemaVersion === 'qa-delivery-target/2.0.0';
+  const validOVH=ovh && target.provider === 'OVH' && target.apiUrl === 'https://qa.spignos.com' &&
+    /^[a-f0-9]{64}$/.test(target.configurationSha256 || '') &&
+    target.featureProfiles && Object.keys(target.featureProfiles).length === 4 &&
+    Object.entries(profiles).every(([k,v])=>target.featureProfiles[k]===v);
+  if ((ovh ? !validOVH : target.schemaVersion !== 'qa-delivery-target/1.0.0') || target.state !== 'ATTESTED' ||
       target.availability !== 'STABLE' || target.dataScope !== 'SYNTHETIC_ONLY' ||
-      !/^qa-[a-z0-9_-]{3,60}$/.test(target.environmentId) || !stableQAOrigin(target.apiUrl) ||
+      !/^qa-[a-z0-9_-]{3,60}$/.test(target.environmentId) || !(ovh ? validOVH : stableQAOrigin(target.apiUrl)) ||
       env.EXPO_PUBLIC_API_URL !== target.apiUrl || config.extra?.eas?.projectId !== PROJECT ||
       target.apiContract !== 'first-session-runtime/3.0.0' || target.localSchema !== 'first-session-local/3.0.0' ||
       !['deploymentReference','continuityReference','backupReference'].every(k =>

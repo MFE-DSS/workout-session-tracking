@@ -448,6 +448,12 @@ def verify_release_backup(root, c, package, gate, acquired):
 
 
 def observe_target(c, proof, token, client):
+    if c.get("target", {}).get("schema_version") == "qa-target-attestation/2.0.0":
+        from tools.qa_delivery.ovh_observation import observe_ovh
+        from tools.qa_delivery.releases import _target
+
+        _target(c["target"], c["compatibility"])
+        return observe_ovh(c, proof, client)
     try:
         t, provider = c["target"], proof["provider"]
         require(token and stable_qa_url(t["url"]), "qa_target_credentials_or_origin_missing")
@@ -777,7 +783,11 @@ def publish(package, checkout, proof_root, gate=None, eas_factory=EAS, client=No
     """
     try:
         require(
-            os.environ.get("EXPO_TOKEN") and os.environ.get("RENDER_API_KEY"),
+            os.environ.get("EXPO_TOKEN")
+            and (
+                (package.get("candidate", {}).get("target") or {}).get("provider") == "OVH"
+                or os.environ.get("RENDER_API_KEY")
+            ),
             "qa_publish_credentials_missing",
         )
         gate = gate or GitHubGate()
@@ -804,6 +814,12 @@ def publish(package, checkout, proof_root, gate=None, eas_factory=EAS, client=No
             == c["source"]["native_sha"],
             "qa_publish_native_source_not_canonical_ancestor",
         )
+        if c["target"].get("provider") == "OVH":
+            require(
+                git(checkout, "merge-base", c["target"]["source_sha"], canonical)
+                == c["target"]["source_sha"],
+                "qa_backend_source_not_canonical_ancestor",
+            )
         proof = verify_continuity(proof_root, c)
         verify_release_backup(proof_root, c, package, gate, acquired)
         previous = json.loads((Path(proof_root) / "previous-native.json").read_text())
@@ -819,7 +835,7 @@ def publish(package, checkout, proof_root, gate=None, eas_factory=EAS, client=No
         own_client = client is None
         client = client or httpx.Client(trust_env=False, follow_redirects=False)
         try:
-            target = observe_target(c, proof, os.environ["RENDER_API_KEY"], client)
+            target = observe_target(c, proof, os.environ.get("RENDER_API_KEY", ""), client)
             check_remote_environment(c, os.environ["EXPO_TOKEN"], client)
         finally:
             if own_client:
@@ -914,7 +930,7 @@ def publish(package, checkout, proof_root, gate=None, eas_factory=EAS, client=No
             client if not own_client else httpx.Client(trust_env=False, follow_redirects=False)
         )
         try:
-            observe_target(c, proof, os.environ["RENDER_API_KEY"], final_client)
+            observe_target(c, proof, os.environ.get("RENDER_API_KEY", ""), final_client)
             check_current_runtime_rollout(c, os.environ["EXPO_TOKEN"], final_client)
             check_remote_environment(c, os.environ["EXPO_TOKEN"], final_client)
         finally:

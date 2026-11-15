@@ -11,6 +11,12 @@ import re
 from copy import deepcopy
 from urllib.parse import urlsplit
 
+FEATURE_PROFILES = {
+    "BODY": "body-measurements/1.0.0",
+    "NUT": "nutrition-manual/1.0.0",
+    "LIBRARY": "owned-library/1.0.0",
+    "BUILDER": "program-builder/1.0.0",
+}
 PROJECT = "c7243bfc-29b3-4486-aafe-e69b9c904bbe"
 PACKAGE = "dev.auren.releaseqa02"
 CERTIFICATE = "12b13109a2a41e2e2c0e97578364793e659a7548da4ce210d0dbd2f912f4bc75"
@@ -76,11 +82,23 @@ def stable_qa_url(value):
 
 def _target(target, compatibility):
     _require(isinstance(target, dict))
-    _require(target.get("schema_version") == "qa-target-attestation/1.0.0")
+    ovh = target.get("schema_version") == "qa-target-attestation/2.0.0"
+    _require(ovh or target.get("schema_version") == "qa-target-attestation/1.0.0")
+    if ovh:
+        _require(target.get("provider") == "OVH" and target.get("url") == "https://qa.spignos.com")
+        _require(
+            target.get("feature_profiles") == FEATURE_PROFILES
+            and _hex(target.get("configuration_sha256"), 64)
+        )
+        _require(
+            re.fullmatch(
+                r"ovh:auren-qa-rel03/sha256:[a-f0-9]{64}", target.get("deployment_reference", "")
+            )
+        )
     _require(target.get("state") == "ATTESTED" and target.get("availability") == "STABLE")
     _require(target.get("data_scope") == "SYNTHETIC_ONLY")
     _require(re.fullmatch(r"qa-[a-z0-9_-]{3,60}", target.get("environment_id", "")))
-    _require(stable_qa_url(target.get("url")) and _hex(target.get("source_sha"), 40))
+    _require((ovh or stable_qa_url(target.get("url"))) and _hex(target.get("source_sha"), 40))
     _require(_hex(target.get("ownership_anchor_sha256"), 64))
     _require(
         set(target)
@@ -98,6 +116,7 @@ def _target(target, compatibility):
             "deployment_reference",
             "ownership_anchor_sha256",
         }
+        | ({"provider", "configuration_sha256", "feature_profiles"} if ovh else set())
     )
     _require(target.get("compatibility") == compatibility)
     for key in ("backup_reference", "continuity_reference", "deployment_reference"):

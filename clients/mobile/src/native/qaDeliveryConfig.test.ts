@@ -46,3 +46,14 @@ test('non-QA actual consumer keeps accepted config with Updates installed',()=>{
 test('continuous QA refuses missing deterministic JS metadata even when target exists',()=>{
   expect(()=>applyQADelivery(base,{...env,EXPO_PUBLIC_QA_NATIVE_SHA:undefined},target)).toThrow();
 });
+test('OVH origin is admitted only as exact explicit v2 target, v1 remains closed',()=>{
+  const ovh={...target,schemaVersion:'qa-delivery-target/2.0.0',provider:'OVH',
+    apiUrl:'https://qa.spignos.com',configurationSha256:'c'.repeat(64),
+    featureProfiles:{BODY:'body-measurements/1.0.0',NUT:'nutrition-manual/1.0.0',LIBRARY:'owned-library/1.0.0',BUILDER:'program-builder/1.0.0'}};
+  expect(applyQADelivery(base,{...env,EXPO_PUBLIC_API_URL:ovh.apiUrl},ovh).android.package).toBe('dev.auren.releaseqa02');
+  for (const apiUrl of ['https://qa.spignos.com:443','https://qa.spignos.com/','https://QA.spignos.com','https://spignos.com','https://other.spignos.com']) {
+    expect(()=>applyQADelivery(base,{...env,EXPO_PUBLIC_API_URL:apiUrl},{...ovh,apiUrl})).toThrow();
+  }
+  expect(()=>applyQADelivery(base,{...env,EXPO_PUBLIC_API_URL:ovh.apiUrl},{...ovh,schemaVersion:'qa-delivery-target/1.0.0'})).toThrow();
+  expect(()=>applyQADelivery(base,{...env,EXPO_PUBLIC_API_URL:ovh.apiUrl},{...ovh,featureProfiles:{}})).toThrow();
+});

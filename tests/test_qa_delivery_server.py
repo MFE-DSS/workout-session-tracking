@@ -579,3 +579,250 @@ def test_unknown_or_malformed_admission_cannot_start_facade_or_writer(
         server.create_qa_app(cfg)
     with pytest.raises(ValueError):
         server.supervise(cfg, "test-secret", tmp_path / "config", 8080)
+
+
+def test_feature_config_private_references_and_distinct_child_environments(tmp_path):
+    from tools.qa_delivery.server import (
+        QAConfig,
+        _child_environment,
+        _facade_environment,
+        load_feature_config,
+    )
+
+    tmp_path.chmod(0o700)
+    refs = {}
+    for name in ("NUT", "LIBRARY", "BUILDER"):
+        key = tmp_path / (name + ".key")
+        key.write_text("synthetic-signing-" + name + "-" * 40)
+        key.chmod(0o600)
+        refs[name] = {"identity": "qa-rel03-" + name.lower(), "signing_key_file": str(key)}
+    source = tmp_path / "features.json"
+    raw = {
+        "schema_version": "qa-feature-config/1.0.0",
+        "included_features": ["BODY", "NUT", "LIBRARY", "BUILDER"],
+        "signatures": refs,
+    }
+    source.write_text(json.dumps(raw))
+    source.chmod(0o600)
+    env, profiles = load_feature_config(source)
+    c = QAConfig(
+        tmp_path / "db",
+        tmp_path / "bundle",
+        "qa-isolated",
+        "a" * 40,
+        feature_environment=env,
+        feature_profiles=profiles,
+    )
+    backend = _child_environment(c, "private-synthetic-secret")
+    facade = _facade_environment()
+    assert backend["BODY_ASSESSMENT_ENABLED"] == "true"
+    assert backend["NUTRITION_MANUAL_CONTROLLED_TEST_ENABLED"] == "true"
+    assert backend["PROGRAM_BUILDER_SIGNING_KEY"].startswith("synthetic-signing-BUILDER")
+    assert not any(
+        k.startswith(("BODY_", "NUTRITION_", "LIBRARY_", "PROGRAM_BUILDER_")) for k in facade
+    )
+    assert "APP_SECRET_KEY" not in facade and "DATABASE_URL" not in facade
+    assert not any("SIGNING_KEY" in k for k in profiles)
+    assert set(profiles) == {"BODY", "NUT", "LIBRARY", "BUILDER"}
+    for mutation in ("unknown", "duplicate", "shared_key", "permissions", "link"):
+        changed = json.loads(json.dumps(raw))
+        if mutation == "unknown":
+            changed["ambient"] = True
+        if mutation == "duplicate":
+            changed["included_features"].append("BODY")
+        if mutation == "shared_key":
+            changed["signatures"]["NUT"] = refs["LIBRARY"]
+        if mutation == "permissions":
+            source.chmod(0o644)
+        if mutation == "link":
+            link = tmp_path / "linked.key"
+            link.symlink_to(refs["NUT"]["signing_key_file"])
+            changed["signatures"]["NUT"]["signing_key_file"] = str(link)
+        source.write_text(json.dumps(changed))
+        with pytest.raises(ValueError, match="qa_feature"):
+            load_feature_config(source)
+        source.chmod(0o600)
+    source.write_text('{"schema_version":"qa-feature-config/1.0.0","schema_version":"other"}')
+    with pytest.raises(ValueError, match="qa_feature"):
+        load_feature_config(source)
+
+
+def test_plan_only_environment_remains_without_feature_flags(tmp_path):
+    from tools.qa_delivery.server import QAConfig, _child_environment
+
+    c = QAConfig(tmp_path / "db", tmp_path / "bundle", "qa-isolated", "a" * 40)
+    env = _child_environment(c, "synthetic-secret")
+    assert not any(
+        k.startswith(("BODY_", "NUTRITION_", "LIBRARY_", "PROGRAM_BUILDER_")) for k in env
+    )
+
+
+def test_real_supervisor_serves_explicit_families_with_separate_consent(
+    qa_database, bundle, tmp_path
+):
+    import os
+    import socket
+    import time
+
+    from app.services.auth import hash_password
+    from tools.qa_delivery.ownership import anchor_digest, capture_anchor
+    from tools.qa_delivery.server import _source_sha
+
+    tmp_path.chmod(0o700)
+    with sqlite3.connect(qa_database) as db:
+        db.execute(
+            "UPDATE users SET password_hash=? WHERE id=42",
+            (hash_password("synthetic-qa-password"),),
+        )
+
+    def private(name, value):
+        path = tmp_path / name
+        path.write_text(value)
+        path.chmod(0o600)
+        return path
+
+    refs = {}
+    for family in ("NUT", "LIBRARY", "BUILDER"):
+        refs[family] = {
+            "identity": "qa-rel03-" + family.lower(),
+            "signing_key_file": str(private(family + ".key", "synthetic-" + family + "-" * 40)),
+        }
+    features = private(
+        "features.json",
+        json.dumps(
+            {
+                "schema_version": "qa-feature-config/1.0.0",
+                "included_features": ["BODY", "NUT", "LIBRARY", "BUILDER"],
+                "signatures": refs,
+            }
+        ),
+    )
+    anchor = capture_anchor(qa_database, "qa-rel03-isolated")
+    cfg = private(
+        "config.json",
+        json.dumps(
+            dict(
+                db_path=str(qa_database),
+                bundle_root=str(bundle),
+                environment_id="qa-rel03-isolated",
+                source_sha=_source_sha(),
+                data_scope="SYNTHETIC_ONLY",
+                access_file=str(
+                    private(
+                        "access.json",
+                        json.dumps({"signup_users": [], "login_users": ["qa02-assigned"]}),
+                    )
+                ),
+                secret_file=str(private("secret", "synthetic-app-secret-" + "s" * 40)),
+                ownership_anchor_file=str(private("anchor.json", json.dumps(anchor))),
+                ownership_anchor_sha256=anchor_digest(anchor),
+                feature_config_file=str(features),
+            )
+        ),
+    )
+    with socket.socket() as sock:
+        sock.bind(("127.0.0.1", 0))
+        port = sock.getsockname()[1]
+    child = subprocess.Popen(
+        [
+            sys.executable,
+            "-m",
+            "tools.qa_delivery.server",
+            "--config",
+            str(cfg),
+            "--port",
+            str(port),
+        ],
+        cwd=ROOT,
+        env={"PATH": os.environ["PATH"], "PYTHONPATH": str(ROOT)},
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.PIPE,
+    )
+    try:
+        with httpx.Client(
+            base_url=f"http://127.0.0.1:{port}", trust_env=False, timeout=5
+        ) as client:
+            deadline = time.monotonic() + 20
+            while True:
+                assert child.poll() is None, child.stderr.read().decode()
+                try:
+                    response = client.get("/__qa_version")
+                    if response.status_code == 200:
+                        break
+                except httpx.TransportError:
+                    pass
+                assert time.monotonic() < deadline, "QA facade did not start"
+                time.sleep(0.05)
+            assert set(response.json()["feature_profiles"]) == {"BODY", "NUT", "LIBRARY", "BUILDER"}
+            while True:
+                try:
+                    login = client.post(
+                        "/api/mobile/v1/auth/login",
+                        json={
+                            "username": "qa02-assigned",
+                            "password": "synthetic-qa-password",
+                            "device_label": "synthetic-release-test",
+                        },
+                    )
+                    if login.status_code == 200:
+                        break
+                except httpx.TransportError:
+                    pass
+                assert time.monotonic() < deadline, "canonical backend did not start"
+                time.sleep(0.05)
+            headers = {"Authorization": "Bearer " + login.json()["access_token"]}
+            body_headers = {**headers, "X-Auren-Body-Contract": "body-measurements/1.0.0"}
+            nut_headers = {**headers, "X-Auren-Nutrition-Contract": "nutrition-manual/1.0.0"}
+            assert (
+                client.get("/api/mobile/v1/me/body/consent", headers=body_headers).json()["granted"]
+                is False
+            )
+            assert (
+                client.get("/api/mobile/v1/me/body/measurements", headers=body_headers).status_code
+                == 403
+            )
+            caps = client.get(
+                "/api/mobile/v1/me/nutrition/capabilities", headers=nut_headers
+            ).json()
+            assert caps["state"] == "AVAILABLE" and caps["can_write"] is False
+            assert caps["assisted_modes"] == []
+            for path, header, version in [
+                ("/api/mobile/v1/me/library", "X-Auren-Library-Contract", "owned-library/1.0.0"),
+                (
+                    "/api/mobile/v1/me/program-builder/programs",
+                    "X-Auren-Program-Builder",
+                    "program-builder/1.0.0",
+                ),
+            ]:
+                result = client.get(path, headers={**headers, header: version})
+                assert result.status_code == 200, result.text
+    finally:
+        child.terminate()
+        try:
+            child.wait(timeout=15)
+        except subprocess.TimeoutExpired:
+            child.kill()
+            child.wait()
+        child.stderr.close()
+
+
+def test_private_feature_fifo_refuses_without_blocking_before_ssh_deadline(tmp_path):
+    import os
+
+    tmp_path.chmod(0o700)
+    fifo = tmp_path / "not-a-regular-key"
+    os.mkfifo(fifo, 0o600)
+    code = 'from pathlib import Path; from tools.qa_delivery.server import _private_feature_text; _private_feature_text(Path(__import__("sys").argv[1]))'
+    timed_out = False
+    try:
+        result = subprocess.run(
+            [sys.executable, "-c", code, str(fifo)],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            timeout=2,
+        )
+    except subprocess.TimeoutExpired:
+        timed_out = True
+    assert not timed_out, "private FIFO must refuse before any blocking open"
+    assert result.returncode != 0 and "qa_feature_private_reference_required" in result.stderr

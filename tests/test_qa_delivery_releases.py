@@ -433,3 +433,40 @@ def test_public_target_cannot_carry_private_ownership_tuples():
     c["target"]["ownership_anchor"] = {"users": [[42, "qa02-private"]]}
     with pytest.raises(ValueError):
         validate_candidate(c, e)
+
+
+def test_ovh_origin_requires_complete_v2_and_never_weakens_render_v1():
+    from tools.qa_delivery.releases import _target, stable_qa_url
+    from tools.qa_delivery.server import FEATURE_PROFILES
+
+    c = candidate()
+    target = evidence(c)["target"]
+    target.update(
+        schema_version="qa-target-attestation/2.0.0",
+        provider="OVH",
+        url="https://qa.spignos.com",
+        configuration_sha256="f" * 64,
+        feature_profiles=FEATURE_PROFILES,
+        deployment_reference="ovh:auren-qa-rel03/sha256:" + "1" * 64,
+    )
+    _target(target, c["compatibility"])
+    assert not stable_qa_url("https://qa.spignos.com")
+    for bad in (
+        "https://spignos.com",
+        "https://www.spignos.com",
+        "https://other.spignos.com",
+        "https://qa.spignos.com:443",
+        "https://qa.spignos.com/",
+        "https://QA.spignos.com",
+        "https://user@qa.spignos.com",
+        "https://qa.spignos.com/path",
+        "https://qa.spignos.com?x=1",
+    ):
+        with pytest.raises(ValueError):
+            _target({**target, "url": bad}, c["compatibility"])
+    with pytest.raises(ValueError):
+        _target({**target, "schema_version": "qa-target-attestation/1.0.0"}, c["compatibility"])
+    incomplete = deepcopy(target)
+    del incomplete["feature_profiles"]
+    with pytest.raises(ValueError):
+        _target(incomplete, c["compatibility"])

@@ -1,6 +1,10 @@
 # REL-03 — scope soumis au GO BUILD
 
-**PROPOSED. Aucun apply REL-03 autorisé à ce stade.**
+## Extension OVH proposée —15novembre2026
+
+Le GO technique initial est conservé dans BUILD_AUTHORIZATION.md ; les statuts PROPOSED historiques ci-dessous ne l’annulent pas. Le nouveau [delta OVH](OVH_AMENDMENT_SCOPE_20261115.md), [preuve/configuration](OVH_EVIDENCE_AND_CONFIG.md), a reçu son acceptation technique propre, call_657199a80f2441d3b3bd3d450dfaaabf ; voir OVH_BUILD_AUTHORIZATION.json. Source683e883, schéma program_builder_operations_01 déjà livré : aucune réimplémentation BODY/NUT/MOB06/MOB07 ou du repair de sauvegarde. Aucune opération distante, nouveau coût, APK/OTA ou nouvelle composition UI dans cette extension technique.
+
+**Instant historique du scope initial : PROPOSED, avant son GO. État courant : code initial livré, amendement technique OVH autorisé ; aucune opération externe autorisée.**
 
 ## Ingénierie contrôlée proposée
 - Nouveaux outils/entrypoint de livraison QA, cible attestée, versions/compatibilité, sauvegarde complète en copie et reçus ; façade bornée réutilisée sans toucher au banc QA02 vivant.

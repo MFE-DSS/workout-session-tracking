@@ -1,0 +1,18 @@
+{
+  "schema_version": "operator-authorization/1.0.0",
+  "decision": "Autoriser le build technique REL‑03 OVH",
+  "question_id": "call_657199a80f2441d3b3bd3d450dfaaabf",
+  "base_sha": "683e88313b0c2c5866f0594766213569628d1659",
+  "scope": [
+    "OVH_AMENDMENT_SCOPE_20261115.md",
+    "OVH_EVIDENCE_AND_CONFIG.md"
+  ],
+  "excluded": [
+    "remote changes",
+    "secrets creation",
+    "DNS/TLS",
+    "image upload/transfer",
+    "APK/OTA",
+    "deployment"
+  ]
+}

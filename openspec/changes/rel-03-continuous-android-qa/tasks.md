@@ -37,3 +37,15 @@ Le §3 reste ouvert ; aucun archivage COMPLETE ni faux nouveau binaire.
 - [x] Aligner les pins database/release/candidate sans affaiblir schéma exact/intégrité/FK, conserver les faits auth/PLAN/BODY/NUT en backup/export/restore neufs.
 - [ ] Terminer broad consommateurs, revue indépendante et livraison CI/PR du correctif ; [plan et preuves](SCHEMA_COMPATIBILITY_REPAIR.md).
 - Les opérations du §3 et les propositions OVH/origine/configuration de fonctionnalités restent distinctes et non exécutées.
+
+## Reçu de réconciliation —15novembre, canonique683e883
+
+Le repair schéma précédent est effectivement livré par412/413, puis ses consommateurs suivent program_builder_operations_01 avec414/415. Leurs reçus finaux et les CI exactes résolvent le suivi laissé ouvert ci-dessus ; aucune nouvelle migration/repair à réaliser. PREPARE_ONLY43759443931 réel sur683e883 est non distribuable, sans build/release. Les tâches opérationnelles du §3 restent ouvertes.
+
+## Extension OVH, avant toute nouvelle application
+- [x] Réconcilier les trois blockers actuels : observation fournisseur, origine exacte et configuration des fonctionnalités réellement livrées.
+- [x] Préparer scope et contrat proposés, conserver les autorisations déjà acquises et les frontières de données/déploiement.
+- [x] Revue indépendante du paquet concret ; un Important de liaison origine→upstream→conteneur corrigé dans le contrat et les témoins requis. Les autres détails sont d’implémentation ; aucune seconde revue indépendante du texte corrigé prétendue.
+- [x] Acceptation opérateur du seul delta technique OVH avant code : call_657199a80f2441d3b3bd3d450dfaaabf, « Autoriser le build technique REL‑03 OVH » ; aucun nouveau GO des scopes produit.
+- [ ] Après ce GO : plan/leases, RED→GREEN, préparation locale, tests/CI/revue et livraison scopée sous GOV-MERGE-01.
+- [ ] Sous autorisations opérationnelles ultérieures seulement : producteur/transport privé réel, hôte supporté, observateur installé, service synthétique isolé, DNS/TLS et candidat installé.

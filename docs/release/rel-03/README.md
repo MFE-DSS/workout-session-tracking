@@ -5,7 +5,7 @@ approval does not authorize hosting, spend, cutover, cloud build or APK/OTA
 publication. Target configuration remains UNPROVISIONED. No stable URL, APK,
 OTA result, provider deployment or physical-device acceptance is claimed.
 
-The current engineering compatibility boundary is `nutrition_manual_01`, including
+The current engineering compatibility boundary is `program_builder_operations_01`, including
 the additive PLAN/BODY lineage and the exact canonical schema snapshot. A real
 Alembic-migrated synthetic fixture exercises verification, whole-DB export/restore,
 identity and release consumers; no old revision is stamped onto a new schema.
@@ -312,3 +312,7 @@ Primary contracts: [release assets](https://docs.github.com/en/rest/releases/ass
 [Render Docker secrets](https://render.com/docs/docker),
 [Render blueprint](https://render.com/docs/blueprint-spec),
 [EAS environments](https://docs.expo.dev/eas/environment-variables/).
+
+## OVH technical amendment
+
+The separately approved technical implementation and strict v2 origin/configuration policy are described in [OVH_TECHNICAL_RUNBOOK.md](OVH_TECHNICAL_RUNBOOK.md). This code approval does not activate or provision that origin. Render v1 remains available unchanged.

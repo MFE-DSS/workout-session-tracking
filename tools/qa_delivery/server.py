@@ -11,6 +11,7 @@ import shutil
 import signal
 import socket
 import sqlite3
+import stat
 import subprocess
 import sys
 import tempfile
@@ -28,6 +29,7 @@ from starlette.routing import Mount, Route
 from tools.qa_delivery.database import ROOT, SCHEMA, _expected_schema, _schema, connect_readonly
 from tools.qa_delivery.identity import read_version
 from tools.qa_delivery.ownership import load_anchor, verify_ownership
+from tools.qa_delivery.releases import FEATURE_PROFILES
 from tools.release_qa_gateway import WindowBudget, allowed_path, create_gateway, failure
 
 
@@ -41,6 +43,8 @@ class QAConfig:
     backend_port: int = 8140
     ownership_anchor: dict = field(default_factory=dict)
     ownership_anchor_sha256: str = ""
+    feature_environment: dict = field(default_factory=dict, repr=False)
+    feature_profiles: dict = field(default_factory=dict)
 
 
 async def _liveness_only(request, call_next):
@@ -65,6 +69,7 @@ def create_qa_app(config: QAConfig) -> Starlette:
             bundle_root=config.bundle_root,
             ownership_anchor=config.ownership_anchor,
             ownership_anchor_sha256=config.ownership_anchor_sha256,
+            feature_profiles=config.feature_profiles,
         )
 
     # Full attestation once before exposing this app. No startup seeds/migrations.
@@ -187,9 +192,103 @@ def _source_sha():
     return value
 
 
+FEATURE_PREFIXES = {"NUT": "NUTRITION", "LIBRARY": "LIBRARY", "BUILDER": "PROGRAM_BUILDER"}
+
+
+def _closed_pairs(pairs):
+    value = {}
+    for key, item in pairs:
+        if key in value:
+            raise ValueError("qa_feature_duplicate_key")
+        value[key] = item
+    return value
+
+
+def _private_feature_text(path):
+    """Read only current-user, nonlinked 0600 file in private 0700 directory."""
+    path = Path(path)
+    if not path.is_absolute() or any(p.is_symlink() for p in (path, *path.parents)):
+        raise ValueError("qa_feature_private_reference_required")
+    parent = path.parent.stat()
+    if parent.st_uid != os.getuid() or stat.S_IMODE(parent.st_mode) != 0o700:
+        raise ValueError("qa_feature_private_directory_required")
+    fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
+    with os.fdopen(fd) as stream:
+        info = os.fstat(stream.fileno())
+        if (
+            not stat.S_ISREG(info.st_mode)
+            or info.st_uid != os.getuid()
+            or stat.S_IMODE(info.st_mode) != 0o600
+            or info.st_size > 16384
+        ):
+            raise ValueError("qa_feature_private_reference_required")
+        return stream.read(16385)
+
+
+def load_feature_config(path):
+    """Optional synthetic capability config. Never creates consent or rotates keys."""
+    try:
+        raw = json.loads(_private_feature_text(path), object_pairs_hook=_closed_pairs)
+        if (
+            set(raw) != {"schema_version", "included_features", "signatures"}
+            or raw["schema_version"] != "qa-feature-config/1.0.0"
+        ):
+            raise ValueError
+        included = raw["included_features"]
+        if (
+            not isinstance(included, list)
+            or not included
+            or any(not isinstance(x, str) for x in included)
+            or len(set(included)) != len(included)
+            or not set(included) <= set(FEATURE_PROFILES)
+            or ("BUILDER" in included and "LIBRARY" not in included)
+            or set(raw["signatures"]) != set(included) - {"BODY"}
+        ):
+            raise ValueError
+        env, identities, keys = {}, set(), set()
+        for name in included:
+            if name == "BODY":
+                env["BODY_ASSESSMENT_ENABLED"] = "true"
+                continue
+            reference = raw["signatures"][name]
+            if set(reference) != {"identity", "signing_key_file"}:
+                raise ValueError
+            identity = reference["identity"]
+            key = _private_feature_text(reference["signing_key_file"]).strip()
+            if (
+                not isinstance(identity, str)
+                or not re.fullmatch(r"qa-[a-z0-9_-]{5,60}", identity)
+                or len(key) < 32
+                or len(key) > 4096
+                or "\n" in key
+                or identity in identities
+                or key in keys
+            ):
+                raise ValueError
+            identities.add(identity)
+            keys.add(key)
+            prefix = FEATURE_PREFIXES[name]
+            flag = "NUTRITION_MANUAL" if name == "NUT" else prefix
+            env[flag + "_CONTROLLED_TEST_ENABLED"] = "true"
+            env[prefix + "_BACKEND_IDENTITY"] = identity
+            env[prefix + "_SIGNING_KEY"] = key
+        return env, {name: FEATURE_PROFILES[name] for name in sorted(included)}
+    except (OSError, ValueError, TypeError, KeyError, AttributeError):
+        raise ValueError("qa_feature_configuration_refused") from None
+
+
+def _facade_environment():
+    return {
+        "PATH": os.environ.get("PATH", "/usr/local/bin:/usr/bin:/bin"),
+        "PYTHONPATH": str(ROOT),
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "APP_ENV": "test",
+    }
+
+
 def _load_config(path):
     _safe_environment()
-    raw = json.loads(path.read_text())
+    raw = json.loads(path.read_text(), object_pairs_hook=_closed_pairs)
     expected = {
         "db_path",
         "bundle_root",
@@ -201,7 +300,10 @@ def _load_config(path):
         "ownership_anchor_file",
         "ownership_anchor_sha256",
     }
-    if set(raw) != expected or raw["data_scope"] != "SYNTHETIC_ONLY":
+    if (
+        set(raw) not in (expected, expected | {"feature_config_file"})
+        or raw["data_scope"] != "SYNTHETIC_ONLY"
+    ):
         raise ValueError("qa_config_invalid")
     paths = {
         key: Path(raw[key])
@@ -218,12 +320,19 @@ def _load_config(path):
     secret = paths["secret_file"].read_text().strip()
     if len(secret) < 32 or "\n" in secret:
         raise ValueError("qa_secret_invalid")
+    feature_env, profiles = (
+        load_feature_config(raw["feature_config_file"])
+        if "feature_config_file" in raw
+        else ({}, {})
+    )
     config = QAConfig(
         db_path=paths["db_path"],
         bundle_root=paths["bundle_root"],
         environment_id=raw["environment_id"],
         source_sha=raw["source_sha"],
         access=json.loads(paths["access_file"].read_text()),
+        feature_environment=feature_env,
+        feature_profiles=profiles,
         ownership_anchor=load_anchor(
             paths["ownership_anchor_file"],
             environment_id=raw["environment_id"],
@@ -239,6 +348,7 @@ def _load_config(path):
         bundle_root=config.bundle_root,
         ownership_anchor=config.ownership_anchor,
         ownership_anchor_sha256=config.ownership_anchor_sha256,
+        feature_profiles=config.feature_profiles,
     )
     return config, secret
 
@@ -257,6 +367,7 @@ def _child_environment(config, secret):
     }
     for key in ("CONTROLLED_TEST", "ACQUISITION", "EVALUATION", "CREATION", "GUIDANCE"):
         env[f"PLAN_V3_{key}_ENABLED"] = "true"
+    env.update(config.feature_environment)
     return env
 
 
@@ -326,12 +437,12 @@ def supervise(config, secret, config_path, port):
                     str(port),
                 ],
             ]
-            for command in commands:
+            for index, command in enumerate(commands):
                 children.append(
                     subprocess.Popen(  # noqa: S603 — fixed interpreter/modules, no shell
                         command,
                         cwd=runtime,
-                        env=env,
+                        env=env if index == 0 else _facade_environment(),
                         stdin=subprocess.DEVNULL,
                         stdout=subprocess.DEVNULL,
                         stderr=subprocess.DEVNULL,
