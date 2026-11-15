@@ -19,6 +19,11 @@
 - [x] Exposer les vrais pixels iOS normaux/grande fonte/clavier, readback MOB06, réponse perdue et petit delta SSR ; limites Android/gestes documentées.
 - [x] Pixels MOB07 acceptés pour le pilote avec limites, call_8c8924d28fa04247b1cfb692f2868145 ; reçu NATIVE_PIXEL_ACCEPTANCE.json. Aucun GO BUILD/G1 redemandé.
 - [x] check_scope MIGRATION, ciblés/broad et sweep454fichiers8764PASS/1ignoré, puis270QA recheck du delta final JSON/test ; mobile1448+TS, visuel77, revue/corrections et sécurité conservés.
-- [ ] PR unique du scope, CI HEAD exact, merge gardé GOV-MERGE-01, canonique/Sonar, archive/closeout/conservation.
+- [x] PR414 unique du scope, CI HEADc614241 success11jobs, merge gardé GOV-MERGE-01 dbad35d ; arbres identiques.
+- [ ] Publier/vérifier le closeout et conserver les éléments sans travail unique ; reçus vivants de suivi.
 
 Aucun APK/OTA/déploiement, programme généré scientifiquement ou traitement réel par ce scope. Les contrôles finaux et la CI restent distincts des campagnes ciblées.
+
+## Reçu engineering avant archive
+
+Code414 fusionné après pixels pilote et contrôles obligatoires verts. CI canonique43753463939 completed/success11jobs,8755backend/3ignorés,1448mobiles+TypeScript et77visuels ; Sonar ERROR consultatif consigné ; PREPARE43753502730 success non distribuable, release skipped. Aucun nouveau binaire, OTA ou déploiement. Le suivi de clôture reste ouvert jusqu’aux reçus finaux.
