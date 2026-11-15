@@ -147,3 +147,6 @@ Parent réel NUTcloseout47c7411 intégré normalement (HEADf6d9b1d), sans fichie
 
 ### Gate humain final15novembre
 « Accepter pour le pilote, avec réserves artistiques », call_b56c9db4e9754b4fb7435df10a6fda49, reçu avant commit UI. Les30chemins soumis ont leurs empreintes identiques au retour ; aucun nouveau pixel après exposition. Relecture décision par décision consignée dans REAL_PARENT_INTEGRATION_20261115.md. Suite commit/push/CI/merge sous GOV-MERGE-01 ; physique/Android complet/release non acquis.
+
+### Correction CI bornée — routeurs FastAPI verrouillés
+Première CI43715588625, HEAD6de5891 : pytest shard5 / Run pytest with coverage échoue sur test_library_parent_mount_is_unique_and_classified, routes[] au lieu des3attendues. Reproduction exacte en environnement de test isolé FastAPI0.141.1/Starlette1.6.0 du lock :1FAIL. La venv locale0.135.3 aplatit les routeurs ; la version verrouillée conserve original_router/include_context.prefix. Correctif du seul test : application du client de fixture, parcours imbriqué conservant la multiplicité, assertion stricte des3routes et401/no-store inchangée. Témoin de double inclusion ajouté.17PASS avec versions verrouillées et17PASS avec venv locale ; aucun runtime, dépendance, lock ou pixel modifié. Nouveau HEAD/CI à suivre sans réutiliser l’ancien run.

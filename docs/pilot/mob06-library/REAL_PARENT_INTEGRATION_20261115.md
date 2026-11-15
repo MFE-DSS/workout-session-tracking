@@ -60,3 +60,6 @@ Les deux registres DESIGN_DECISIONS_HOME_UIV2 et DESIGN_DECISIONS_UIV2_SURFACES 
 | SURFACES Q8 | Supersédée en mobile, tokens respectés | Aucun hex/opacité décoratif ajouté ; primitives et baselines inchangées. |
 
 Aucune décision applicable violée. Réserves artistiques gardées au backlog, sans promesse state-of-the-art universelle. Le reçu n’accorde aucun traitement réel, activation, publication APK/OTA ou acceptation physique.
+
+## Échec CI conservé et correction du garde de montage
+CI43715588625, shard5/Run pytest with coverage : la liste de routes lue directement à plat est vide sous FastAPI0.141.1 du lock. RED reproduit localement dans un overlay de test isolé ; garde corrigé pour parcourir les routeurs inclus de client.app, avec multiplicité conservée et vrai HTTP401/no-store inchangés.17PASS dans le framework verrouillé et17PASS dans la venv locale. Pas de changement des dépendances installées du projet, du lock, des routes runtime ou des pixels acceptés ; pas de baisse de gate. Le nouveau HEAD aura sa propre CI.
