@@ -14,8 +14,9 @@
 - [x] Migration additive/copies synthétiques, non-régression héritage/formules/query budget et rollback compatible.
 - [x] DTO/API propriétaires + natif/local exact command recovery ; vrai Progrès utilise source-aware et graphique existant.
 - [x] Board réel familial et petit delta SSR comparés LOCKED, décision opérateur avant commit UI (DA08_NATIVE_ACCEPTANCE.json ; réserves tracées).
-- [ ] check_scope et tous contrôles exigés, revue indépendante, sécurité/CI réelle du HEAD final ; corrections dans scope autonomes.
-- [ ] Commit/push/PR/merge GOV-MERGE-01, CI canonique/Sonar réel, manifeste MVP + smoke composé, archive/closeout/cleanup des seuls éléments possédés.
+- [x] check_scope et tous contrôles exigés, revue indépendante, sécurité/CI réelle du HEAD final ; corrections dans scope autonomes (0aec100, CI43654940898).
+- [x] Commit/push/PR407/merge GOV-MERGE-01, CI canonique43656641030/Sonar réel, manifeste BODY et smoke ConnectedApp/Progrès/reprise du slice ; NUT/MOB06 ne deviennent pas une intégration testée.
+- [ ] Publication du closeout/archivage, CI/merge de clôture et conservation/nettoyage des seuls éléments possédés ; suivi à résoudre par reçu vivant.
 - [x] Distinguer sortie engineering et gates encore ouvertes DATA/physique/release. Aucun APK/OTA automatique.
 
 ## Décision native du 14 novembre après revue DA08
@@ -31,3 +32,15 @@ Les quatre casestechniques ci-dessus désignent le travail contrôlé vérifié,
 
 ## Relevé DA‑08 du 14 novembre
 Famille acceptée (reçu DA08_FAMILY_ACCEPTANCE.json) et reconstruction réelle ConnectedApp ; voir DA08_NATIVE_GATE.md. 100 suites/1215 tests mobiles+TS,179 ciblés backend et244 broad/SSR passants. Board8260 et gate de pixels toujours pending ; CI, merge et clôture restent ouverts. Ce relevé remplace le statut artistique ancien sans réécrire ses preuves historiques.
+
+## 15 novembre — engineering merge vérifié
+
+PR407 HEAD0aec100b14d72813f5c915c2471bf256d9a6b859, merge045a3dbc35fdd0bb6ab49fe50a25ebddeb984af0.
+CI PR43654940898 et canonique43656641030 completed/success11jobs chacune :
+8588backend/3ignorés,1215mobiles/100suites+TS,77visuels réellement exécutés.
+SonarPR ERROR19smells ; canonique ERROR8bugs/582smells/8entrées Bandit/0hotspot,
+coverage92,4%/nouvelle92,41514442829151%. Reçus dans docs/pilot/body-01/CLOSEOUT.md.
+Pixels acceptés avec réserves, aucune retouche après acceptation. Native iOS
+contrôlé seulement ; Android complet/physique/DATA/release distincts. Le parcours
+minimal d'effacement après retrait déjà implémenté/accepté est consolidé dans
+le scénario canonique ; aucun nouveau comportement runtime par le closeout.

@@ -1002,7 +1002,21 @@ mesure, cible ou score, pas de writer corporel/nutrition. Revue complète unique
 
 ### BODY-01 — acquisition propriétaire versionnée
 
-Change : `openspec/changes/body-01-owned-measurements/`. GO BODY/amendement/G1
-reçu (call_106057b169a74bc9887b1fea9f527f5d). Première étape : fondation
-transactionnelle additive sans nouvelle acquisition montée ni livraison UI.
-Le change reste ouvert jusqu’aux consommateurs, pixels, CI et merge applicables.
+**Engineering contrôlé terminé**,15novembre2026. [PR407](https://github.com/MFE-DSS/workout-session-tracking/pull/407),
+HEAD0aec100b14d72813f5c915c2471bf256d9a6b859, merge045a3dbc35fdd0bb6ab49fe50a25ebddeb984af0.
+GO/amendement/G1, familleDA08 et pixels contrôlés acceptés avant commitUI,
+avec réserves de finition conservées. ConnectedApp iOS, API/SQLite et Progrès
+raccordés ; originaux/corrections liés, effacement minimal après retrait sans
+mesures numériques ni nouveau grant. Android complet/physique/DATA/release ouverts.
+
+CI PR43654940898 et canonique43656641030 completed/success11jobs chacune :
+8588backend/3ignorés,100suites/1215mobiles+TS et77visuels réellement rejoués.
+SonarPR ERROR19smells ; canonique ERROR8bugs/582smells/8entrées Bandit/0hotspot,
+coverage92,4%/nouvelle92,41514442829151%. Aucun seuil modifié ou faux vert.
+[Closeout](../pilot/body-01/CLOSEOUT.md), [passation MVP](../pilot/body-01/MVP_INTEGRATION_HANDOFF.md),
+[contrat canonique](../../openspec/specs/mobile/owned-body-measurements/spec.md).
+Archive CLI `openspec/changes/archive/2026-11-15-body-01-owned-measurements/`,
+9exigences,14/15tâches : seul suivi publication/CI/merge du closeout et conservation
+reste ouvert à l'instant de publication, à résoudre par reçu vivant. Worktree/note
+MVP non suivie préservés ; aucun APK/OTA/déploiement. NUT406 et MOB06408 restent
+les scopes suivants, sans transfert implicite d'acceptation de pixels.

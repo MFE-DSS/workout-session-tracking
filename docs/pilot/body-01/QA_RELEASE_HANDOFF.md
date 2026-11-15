@@ -1,6 +1,8 @@
 # BODY-01 — compatibilité du prochain candidat QA
 
-Code de travail non encore fusionné. À intégrer au manifeste REL-03 après preuve du merge exact. Aucun build APK/OTA n’est déclenché par ce document.
+Code fusionné par PR407 au merge045a3dbc35fdd0bb6ab49fe50a25ebddeb984af0,
+source0aec100b14d72813f5c915c2471bf256d9a6b859 ; CI canonique43656641030 success.
+À intégrer au manifeste REL03 avec ces références exactes et les gates restantes. Aucun build APK/OTA n’est déclenché par ce document.
 
 - Backend : migration additive body_measurement_operations_01, parent plan_v3_20261107_01 ; nouveaux writers et lecteurs de têtes doivent être déployés ensemble. Zéro DDL startup, zéro backfill des valeurs historiques.
 - API : body-measurements/1.0.0, en-tête X-Auren-Body-Contract, Bearer/no-store, onze routes sous /api/mobile/v1/me/body. Contrat weight-history/1.0.0 conservé ; Progrès nouveau utilise la projection source-aware.
