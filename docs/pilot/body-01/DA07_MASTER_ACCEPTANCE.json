@@ -1,0 +1,12 @@
+{
+  "question": "call_e22888c3c8c64715bb1544af27dc95fb",
+  "package": "/Users/martinfeldmann/auren-review/da07-abc-proof-20261114/AUREN_DA07_EDITABLE.zip",
+  "sha256": "45fd765cdbe95c05b3598e8bc2bfd75136697558f30732d1fcd04c9100f1a697",
+  "decisions": {
+    "A": "Accepter A — BODY",
+    "B": "Accepter B — NUT",
+    "C": "Accepter C — Programmes"
+  },
+  "scope": "Master artistique de reconstruction seulement. Pixels ConnectedApp, appareils, CI et release distincts.",
+  "recorded_at": "2026-11-14T16:17:52.288761+00:00"
+}

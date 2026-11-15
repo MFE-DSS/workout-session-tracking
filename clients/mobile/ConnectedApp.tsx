@@ -57,6 +57,11 @@ import { restNotification } from './src/native/restNotification';
 import { initialSpace } from './src/native/shellNav';
 import { ShellProvider } from './src/shell/ShellContext';
 import {TrainingHistoryHost} from './src/ui/history/TrainingHistoryHost';
+import {NutritionClient,createNutritionTransport} from './src/api/nutrition';
+import {NutritionSurface} from './src/ui/nutrition/NutritionSurface';
+import {BodyMeasurementsClient,createBodyTransport} from './src/api/bodyMeasurements';
+import {BodyMeasurementsSurface} from './src/ui/body/BodyMeasurementsSurface';
+import {BodyTabConsumer} from './src/ui/body/BodyTabConsumer';
 import { shellRoutes } from './src/shell/routeContext';
 import { openJournal } from './src/storage/journal';
 import { resolveJournal } from './src/storage/ownership';
@@ -148,6 +153,13 @@ export default function ConnectedApp() {
   const stateRef = useRef(state);
   const journalRef = useRef<Journal | null>(null);
   const [journal, setJournal] = useState<Journal | null>(null);
+  const [bodyRuntime,setBodyRuntime]=useState<{client:BodyMeasurementsClient;current:()=>boolean}|null>(null);
+  const [nutritionRuntime,setNutritionRuntime]=useState<{client:NutritionClient;current:()=>boolean}|null>(null);
+  const nutritionExit=useRef<(()=>boolean)|null>(null);
+  const registerNutritionExit=useCallback((exit:(()=>boolean)|null)=>{nutritionExit.current=exit;},[]);
+  const [bodyOrigin,setBodyOrigin]=useState<'profile'|'progress'>('profile');
+  const bodyExit=useRef<(()=>boolean)|null>(null);
+  const registerBodyExit=useCallback((exit:(()=>boolean)|null)=>{bodyExit.current=exit;},[]);
   const engineRef = useRef<SyncEngine | null>(null);
   const anchorRef = useRef<TimeAnchor>(NO_ANCHOR);
   const notifRef = useRef<string | null>(null);
@@ -160,7 +172,7 @@ export default function ConnectedApp() {
   const [account, setAccount] = useState<string | null>(null);
   const [loginError, setLoginError] = useState<'invalid' | 'network' | null>(null);
   const [busy, setBusy] = useState(false);
-  const [accountView, setAccountView] = useState<'signup' | 'password' | 'created' | 'password-done' | 'preferences' | 'first-use' | 'first-use-preferences' | null>(null);
+  const [accountView, setAccountView] = useState<'signup' | 'password' | 'created' | 'password-done' | 'preferences' | 'first-use' | 'first-use-preferences' | 'body' | 'nutrition' | null>(null);
   const preferencesExit = useRef<(() => void) | null>(null);
   const registerPreferencesExit = useCallback((handler: (() => void) | null) => { preferencesExit.current = handler; }, []);
   const [accountOutcome, setAccountOutcome] = useState<AccountOutcome | null>(null);
@@ -386,12 +398,16 @@ export default function ConnectedApp() {
     });
     if (!appAlive.current || revision !== auth.revision) return false;
     if (owned.state !== 'ready') { setScreen('OWNERSHIP'); return false; }
-    const j = await openJournal(owned.name, PLAN_V3_CONTROLLED_TEST ? {planV3OwnerId:owned.userId} : {});
+    const bodyTransport=API_URL?createBodyTransport(API_URL):null;
+    const nutritionTransport=API_URL?createNutritionTransport(API_URL):null;
+    const j = await openJournal(owned.name, {...(PLAN_V3_CONTROLLED_TEST ? {planV3OwnerId:owned.userId} : {}),...(bodyTransport?{bodyOwner:{userId:owned.userId,backendScope:bodyTransport.scope}}:{}),...(nutritionTransport?{nutritionOwner:{userId:owned.userId,backendScope:nutritionTransport.scope}}:{})});
     if (!appAlive.current || revision !== auth.revision) return false;
     engineRef.current?.stop();
     journalRef.current = j;
     setJournal(j);
     const active = () => appAlive.current && revision === auth.revision && journalRef.current === j;
+    setBodyRuntime(bodyTransport?{client:new BodyMeasurementsClient(auth,transport,bodyTransport,owned.userId),current:active}:null);
+    setNutritionRuntime(nutritionTransport?{client:new NutritionClient(auth,{scope:nutritionTransport.scope,call:transport},nutritionTransport,owned.userId),current:active}:null);
     const v3Runtime = new RuntimeV3Client(auth,transport,createV3Transport(API_URL,fetch,{calibrationInventory:"plan-calibration-inventory/2.0.0"}));
     const v3Sessions = new FirstSessionV3Client(v3Runtime);
     if(PLAN_V3_CONTROLLED_TEST && j.planV3){
@@ -567,7 +583,7 @@ export default function ConnectedApp() {
     accountFlight.current = true;
     ownershipFlight.current = null; setOwnershipChecking(false);
     if (undoTimer.current) clearTimeout(undoTimer.current); undoTimer.current = null; setUndo(null);
-    engineRef.current?.stop(); engineRef.current = null; journalRef.current = null; setJournal(null);
+    engineRef.current?.stop(); engineRef.current = null; journalRef.current = null; setJournal(null); setNutritionRuntime(null);
     apply({ type: 'RESET' }); setServerSets({}); setMission(null); setNext(null); setBilanContext(null);
     setBusy(true); setLoginError(null);
     const pending = auth.login(username, password, deviceLabel(deviceIdentity()));
@@ -862,6 +878,8 @@ export default function ConnectedApp() {
     const sub = BackHandler.addEventListener('hardwareBackPress', () => {
       if(missionMenu){setMissionMenu(false);return true;}
       if (accountView) {
+        if(accountView==='body'){bodyExit.current?.();return true;}
+        if(accountView==='nutrition'){nutritionExit.current?.();return true;}
         if (accountView === 'preferences' || accountView === 'first-use-preferences') { preferencesExit.current?.(); return true; }
         if (!accountFlight.current) { setAccountView(null); setAccountOutcome(null); }
         return true;
@@ -973,7 +991,7 @@ export default function ConnectedApp() {
     cancelRestNotification();
     if (undoTimer.current) clearTimeout(undoTimer.current); undoTimer.current = null; setUndo(null);
     engineRef.current?.stop(); engineRef.current = null;
-    journalRef.current = null; setJournal(null);
+    journalRef.current = null; setJournal(null); setNutritionRuntime(null);
     apply({ type: 'RESET' }); setServerSets({}); setSubstitutions({}); setBilanContext(null); setNext(null);
     const signingOut = auth.logout();
     const logoutRevision = auth.revision;
@@ -1008,11 +1026,12 @@ export default function ConnectedApp() {
   const reconnectAccount = () => {
     if (accountFlight.current) return;
     // Keep owned pending workout facts in their partition during reauthentication.
-    engineRef.current?.stop(); engineRef.current = null; journalRef.current = null; setJournal(null);
+    engineRef.current?.stop(); engineRef.current = null; journalRef.current = null; setJournal(null); setNutritionRuntime(null);
     apply({ type: 'RESET' }); setAccount(null); setMission(null); setNext(null); setBilanContext(null); setServerSets({});
     setAccountView(null); setAccountOutcome(null); setScreen('LOGIN');
   };
   const accountSettings = <AccountSettingsScreen username={account} onPassword={() => { setAccountOutcome(null); setAccountView('password'); }}
+    onBody={bodyRuntime?()=>{setBodyOrigin('profile');setAccountView('body');}:undefined}
     onPreferences={() => setAccountView('preferences')}
     onExport={API_URL ? () => openWeb('/export') : undefined} onPrivacy={privacy}
     onWebProfile={API_URL ? () => openWeb('/profile') : undefined} onSignOut={() => void signOut()} />;
@@ -1020,7 +1039,15 @@ export default function ConnectedApp() {
     const resume = state.phase === 'SET' || state.phase === 'REST' || mission?.state === 'RESUME';
     if (!accountFlight.current) setAccountView(screen === 'APP' && !resume ? 'first-use' : null);
   };
-  const accountOverlay = screen !== 'APP' ? null : accountView === 'first-use'
+  const bodyInShell=screen==='APP'&&accountView==='body'&&state.phase!=='SET'&&state.phase!=='REST';
+  const nutritionInShell=screen==='APP'&&accountView==='nutrition'&&state.phase!=='SET'&&state.phase!=='REST';
+  const nutritionSurface=nutritionRuntime?<BodyTabConsumer><NutritionSurface key={`nutrition-${auth.revision}`} auth={auth} client={nutritionRuntime.client} pending={journal?.nutritionPending} current={nutritionRuntime.current} newId={()=>Crypto.randomUUID()} onClose={leaveAccountView} registerExit={registerNutritionExit}/></BodyTabConsumer>:null;
+  const bodySurface=bodyRuntime?<BodyTabConsumer><BodyMeasurementsSurface inTab key={`body-${auth.revision}`} auth={auth} client={bodyRuntime.client} pending={journal?.bodyPending} current={bodyRuntime.current} newId={()=>Crypto.randomUUID()} onClose={leaveAccountView} registerExit={registerBodyExit}/></BodyTabConsumer>:null;
+  const accountOverlay = screen !== 'APP' ? null : accountView==='nutrition'&&nutritionRuntime
+    ? nutritionInShell?null:<NutritionSurface key={`nutrition-${auth.revision}`} auth={auth} client={nutritionRuntime.client} pending={journal?.nutritionPending} current={nutritionRuntime.current} newId={()=>Crypto.randomUUID()} onClose={leaveAccountView} registerExit={registerNutritionExit}/>
+    : accountView==='body'&&bodyRuntime
+    ? bodyInShell?null:<BodyMeasurementsSurface key={`body-${auth.revision}`} auth={auth} client={bodyRuntime.client} pending={journal?.bodyPending} current={bodyRuntime.current} newId={()=>Crypto.randomUUID()} onClose={leaveAccountView} registerExit={registerBodyExit}/>
+    : accountView === 'first-use'
     ? planV3?.active ? <PlanV3Host controller={planV3} onExit={()=>{setPlanV3Open(false);leaveAccountView();}} onPreferences={()=>setAccountView('first-use-preferences')} onSync={async()=>{await engineRef.current?.kick();}}/> : <FirstUseScreen key={auth.revision} controller={firstUse} onPreferences={() => setAccountView('first-use-preferences')} onToday={leaveAccountView} onBack={leaveAccountView} />
     : accountView === 'preferences' || accountView === 'first-use-preferences'
     ? <TrainingPreferencesScreen key={auth.revision} client={preferencesClient} onClose={accountView === 'first-use-preferences' ? () => setAccountView('first-use') : leaveAccountView}
@@ -1111,7 +1138,7 @@ export default function ConnectedApp() {
         onAction={openMissionAction} onVerify={verifyMission} onSelectPath={path=>{setMissionRefusal(null);missionResource.selectPath(path);setMission(null);void loadMission();}}
         onOpenJournal={openJournalSheet} historical={historical}/>;
       body = (
-        <ShellProvider value={{ today, openJournal: openJournalSheet, siteUrl: API_URL, account: accountSettings, progress:<TrainingHistoryHost auth={auth} call={transport} typed={historicalSessions}/> }}>
+        <ShellProvider value={{ today, openJournal: openJournalSheet, siteUrl: API_URL, account: bodyInShell&&bodyOrigin==='profile'?bodySurface:accountSettings, progress:nutritionInShell?nutritionSurface:bodyInShell&&bodyOrigin==='progress'?bodySurface:<TrainingHistoryHost auth={auth} call={transport} typed={historicalSessions} bodyClient={bodyRuntime?.client} onBody={bodyRuntime?()=>{setBodyOrigin('progress');setAccountView('body');}:undefined} onNutrition={nutritionRuntime?()=>setAccountView('nutrition'):undefined}/> }}>
           <ExpoRoot context={shellRoutes} />
         </ShellProvider>
       );

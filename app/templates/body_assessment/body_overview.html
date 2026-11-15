@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% block extra_head %}{{ super() }}<link rel="stylesheet" href="{{ asset_url('css/body_measurements.css') }}" />{% endblock %}
 {% block content %}
 <h1 class="page-title">Profil corporel</h1>
 <p class="text-dim" style="font-size:13px;">
@@ -6,7 +7,31 @@
   aucune photo, aucun service externe.
 </p>
 
-{% if not consented %}
+{% if erasure_page is not none %}
+  <h2 class="card__title">Effacer mes relevés</h2>
+  <p class="text-dim">Relevés datés et versions, sans réactiver la collecte.</p>
+  {% for m in erasure_page.entries %}
+    <div class="card">
+      <b>Relevé {{ m.root_ref }} · {{ m.measured_at }}</b>
+      <details class="disclosure body-lineage-action">
+        <summary>Supprimer</summary>
+        <p>Supprimer ce relevé et l’ensemble de ses versions ? ({{ m.version_count }} {{ 'version' | pluriel(m.version_count) }})</p>
+        <form method="post" action="{{ url_for('body_measurement_delete', measurement_id=m.measurement_id) }}">
+          <input type="hidden" name="request_id" value="{{ new_request_id() }}" />
+          <input type="hidden" name="expected_head_token" value="{{ m.head_token }}" />
+          <input type="hidden" name="confirm_all_versions" value="yes" />
+          <button type="submit" class="btn btn--ghost btn--sm btn--danger body-command">Confirmer la suppression</button>
+        </form>
+      </details>
+    </div>
+  {% else %}
+    <p>Aucun relevé à effacer.</p>
+  {% endfor %}
+  {% if erasure_page.next_cursor %}
+    <a class="btn btn--ghost" href="{{ url_for('body_overview') }}?manage_erasure=1&amp;cursor={{ erasure_page.next_cursor | urlencode }}">Relevés suivants</a>
+  {% endif %}
+  <a class="btn btn--ghost" href="{{ url_for('body_overview') }}">Quitter la gestion</a>
+{% elif not consented %}
   <div class="card" style="margin-top:var(--space-md);">
     <h2 class="card__title">Consentement requis</h2>
     <p class="text-dim" style="font-size:13px;">
@@ -19,6 +44,7 @@
       <button type="submit" class="btn btn--primary btn--wide">Je consens</button>
     </form>
   </div>
+  <a class="btn btn--ghost" href="{{ url_for('body_overview') }}?manage_erasure=1">Effacer mes relevés sans réactiver la collecte</a>
 {% else %}
   <div style="display:flex;gap:var(--space-xs);flex-wrap:wrap;margin-top:var(--space-md);">
     <a class="btn btn--primary" href="{{ url_for('body_measurement_new') }}">+ Nouvelle mesure</a>
@@ -66,9 +92,16 @@
           <b style="font-size:14px;">{{ m.measured_at | local }}</b>
           <span style="display:flex;gap:var(--space-xs);">
             <a class="btn btn--ghost btn--sm" href="{{ url_for('body_measurement_edit', measurement_id=m.id) }}">Éditer</a>
-            <form method="post" action="{{ url_for('body_measurement_delete', measurement_id=m.id) }}" style="display:inline;">
-              <button type="submit" class="btn btn--ghost btn--sm btn--danger">Supprimer</button>
-            </form>
+            <details class="disclosure body-lineage-action">
+              <summary>Supprimer</summary>
+              <p>Supprimer ce relevé et l’ensemble de ses versions ? ({{ body_contexts[m.id].version_count }} {{ 'version' | pluriel(body_contexts[m.id].version_count) }})</p>
+              <form method="post" action="{{ url_for('body_measurement_delete', measurement_id=m.id) }}">
+                <input type="hidden" name="request_id" value="{{ new_request_id() }}" />
+                <input type="hidden" name="expected_head_token" value="{{ body_contexts[m.id].token }}" />
+                <input type="hidden" name="confirm_all_versions" value="yes" />
+                <button type="submit" class="btn btn--ghost btn--sm btn--danger body-command">Confirmer la suppression</button>
+              </form>
+            </details>
           </span>
         </div>
         <div class="text-mono text-dim" style="font-size:12px;margin-top:var(--space-xs);">

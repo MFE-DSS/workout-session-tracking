@@ -8,7 +8,7 @@ from __future__ import annotations
 from datetime import UTC, datetime
 from typing import Annotated
 
-from fastapi import APIRouter, Form, Request
+from fastapi import APIRouter, Form, HTTPException, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy import select
 
@@ -640,18 +640,21 @@ async def profile_measurements_submit(
     # Parse date — fallback to today if empty/invalid.
     now = datetime.now(UTC)
     dt = now
+    date_precision = "SERVER_CAPTURE_TIME"
     measured_at = (form.get("measured_at") or "").strip()
     if measured_at:
         try:
             dt = datetime.strptime(measured_at, "%Y-%m-%d").replace(
                 tzinfo=UTC
             )
+            date_precision = "DAY_UTC_CONVENTION"
         except ValueError:
             pass
 
     # Cap future dates to today.
     if dt.date() > now.date():
         dt = now
+        date_precision = "SERVER_CAPTURE_TIME"
 
     raw = {
         spec.key: (form.get(spec.key) or "")
@@ -669,7 +672,14 @@ async def profile_measurements_submit(
     except ValueError:
         return RedirectResponse(url="/profile?measure_error=1", status_code=303)
 
-    bp.create_measurement(db, user.id, cleaned, measured_at=dt)
+    from app.services.body_measurement_reads import BodyCommandError
+    from app.services.plan_v3.transactions import RuntimeFailure, guard_owner
+
+    try:
+        guard_owner(db, user.id, expected_epoch=user.session_epoch, expected_hash=user.password_hash)
+        bp.create_measurement(db, user.id, cleaned, measured_at=dt, date_precision=date_precision)
+    except (BodyCommandError, RuntimeFailure) as exc:
+        raise HTTPException(exc.status, detail={"error": exc.code}) from None
 
     return RedirectResponse(url="/profile?measure_saved=1", status_code=303)
 

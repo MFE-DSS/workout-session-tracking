@@ -1,0 +1,11 @@
+{
+  "received_at": "2026-11-13T22:25:51.041470+00:00",
+  "question_id": "call_4cb89afa5a174deeb907e6a2f4864053",
+  "operator_answer": "Valider le G1 fonctionnel uniquement",
+  "scope": "dated manual day/timezone, optional energy/macros, explicit completeness, declared STANDARD/TRAINING/REST targets, history/versions and explicit unknown-command recovery",
+  "reviewed_ux_board_sha256": "cc6358dd5f8423dfbe307929953dd7f47da96c463143c9c28649313ff5e326b2",
+  "technical_build_authorization_unchanged": true,
+  "artistic_composition_accepted": false,
+  "native_pixels_accepted": false,
+  "APK_OTA_or_deployment_authorized": false
+}

@@ -7,6 +7,9 @@
 -- index: ix_body_measurements_user_date
 CREATE INDEX ix_body_measurements_user_date ON body_measurements (user_id, measured_at);
 
+-- index: ix_body_operation_root
+CREATE INDEX ix_body_operation_root ON body_measurement_operations_v1 (owner_id, root_ref);
+
 -- index: ix_decision_traces_fingerprint
 CREATE INDEX ix_decision_traces_fingerprint ON decision_traces (decision_fingerprint);
 
@@ -33,6 +36,12 @@ CREATE INDEX ix_exercises_name ON exercises (name);
 
 -- index: ix_first_plan_evaluation_snapshot
 CREATE INDEX ix_first_plan_evaluation_snapshot ON first_plan_evaluations (owner_id, snapshot_id, created_at);
+
+-- index: ix_nutrition_day_key
+CREATE INDEX ix_nutrition_day_key ON nutrition_day_revisions_v1 (user_id, local_day, revision);
+
+-- index: ix_nutrition_target_key
+CREATE INDEX ix_nutrition_target_key ON nutrition_target_revisions_v1 (user_id, variant, effective_from, revision);
 
 -- index: ix_plan_adapt_dismissal_user
 CREATE INDEX ix_plan_adapt_dismissal_user ON plan_adaptation_dismissals (user_id);
@@ -82,6 +91,9 @@ CREATE INDEX ix_workout_sessions_user_id ON workout_sessions (user_id);
 -- index: ix_ws_user_status_excl_started
 CREATE INDEX ix_ws_user_status_excl_started ON workout_sessions (user_id, status, excluded_from_stats, started_at);
 
+-- index: uq_body_correction_parent
+CREATE UNIQUE INDEX uq_body_correction_parent ON body_measurement_operations_v1 (owner_id, parent_ref) WHERE operation = 'CORRECT';
+
 -- index: uq_first_created_handoff_owner
 CREATE UNIQUE INDEX uq_first_created_handoff_owner ON first_session_requests (owner_id) WHERE state = 'CREATED';
 
@@ -99,6 +111,9 @@ CREATE TABLE blueprint_source_events ( id VARCHAR(36) NOT NULL, owner_id INTEGER
 
 -- table: body_consents
 CREATE TABLE body_consents ( id INTEGER NOT NULL, user_id INTEGER NOT NULL, consent_type VARCHAR(64) NOT NULL, granted BOOLEAN NOT NULL, consent_version INTEGER NOT NULL, granted_at DATETIME, withdrawn_at DATETIME, created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, PRIMARY KEY (id), CONSTRAINT uq_body_consent_user_type UNIQUE (user_id, consent_type), FOREIGN KEY(user_id) REFERENCES users (id) ON DELETE CASCADE );
+
+-- table: body_measurement_operations_v1
+CREATE TABLE body_measurement_operations_v1 ( id INTEGER NOT NULL, owner_id INTEGER NOT NULL, request_id VARCHAR(64) NOT NULL, command_digest VARCHAR(64) NOT NULL, operation VARCHAR(8) NOT NULL, root_ref INTEGER NOT NULL, parent_ref INTEGER, measurement_ref INTEGER NOT NULL, applied_revision INTEGER NOT NULL, changed_fields JSON NOT NULL, provenance_by_changed_field JSON NOT NULL, date_provenance JSON, before_fingerprint VARCHAR(64), after_fingerprint VARCHAR(64), receipt JSON NOT NULL, recorded_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, PRIMARY KEY (id), FOREIGN KEY(owner_id) REFERENCES users (id) ON DELETE CASCADE, CONSTRAINT uq_body_operation_request UNIQUE (owner_id, request_id), CONSTRAINT uq_body_operation_revision UNIQUE (owner_id, root_ref, applied_revision), CONSTRAINT ck_body_operation_kind CHECK (operation IN ('CREATE','CORRECT','ERASE')), CONSTRAINT ck_body_operation_positive CHECK (applied_revision > 0 AND root_ref > 0 AND measurement_ref > 0), CONSTRAINT ck_body_operation_parent CHECK ((operation = 'CORRECT' AND parent_ref IS NOT NULL) OR (operation != 'CORRECT' AND parent_ref IS NULL)) );
 
 -- table: body_measurements
 CREATE TABLE "body_measurements" ( id INTEGER NOT NULL, user_id INTEGER NOT NULL, measured_at DATETIME NOT NULL, weight_kg FLOAT, chest_cm FLOAT, waist_cm FLOAT, calf_cm FLOAT, created_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, arm_cm_left FLOAT, arm_cm_right FLOAT, thigh_cm_left FLOAT, thigh_cm_right FLOAT, hip_cm FLOAT, neck_cm FLOAT, shoulder_width_cm FLOAT, calf_cm_left FLOAT, calf_cm_right FLOAT, wingspan_cm FLOAT, PRIMARY KEY (id), FOREIGN KEY(user_id) REFERENCES users (id) ON DELETE CASCADE );
@@ -141,6 +156,12 @@ CREATE TABLE method_rules ( id INTEGER NOT NULL, slug VARCHAR(64) NOT NULL, posi
 
 -- table: muscles
 CREATE TABLE muscles ( id INTEGER NOT NULL, code VARCHAR(64) NOT NULL, name VARCHAR(128) NOT NULL, body_zone_code VARCHAR(64), category VARCHAR(32), is_active BOOLEAN DEFAULT '1' NOT NULL, created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, PRIMARY KEY (id), UNIQUE (code), FOREIGN KEY(body_zone_code) REFERENCES body_zones (code) ON DELETE SET NULL );
+
+-- table: nutrition_day_revisions_v1
+CREATE TABLE nutrition_day_revisions_v1 ( local_day VARCHAR(10) NOT NULL, timezone VARCHAR(128) NOT NULL, state VARCHAR(9) NOT NULL, declared_complete BOOLEAN NOT NULL, target_ref INTEGER, id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, revision INTEGER NOT NULL, parent_ref INTEGER, kcal_milli INTEGER, protein_milli INTEGER, carbohydrate_milli INTEGER, fat_milli INTEGER, provenance JSON NOT NULL, request_id VARCHAR(64) NOT NULL, command_digest VARCHAR(64) NOT NULL, receipt JSON NOT NULL, recorded_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, CONSTRAINT ck_nutrition_day_state CHECK ((state = 'ACTIVE' AND (kcal_milli IS NOT NULL OR protein_milli IS NOT NULL OR carbohydrate_milli IS NOT NULL OR fat_milli IS NOT NULL)) OR (state = 'WITHDRAWN' AND (kcal_milli IS NULL AND protein_milli IS NULL AND carbohydrate_milli IS NULL AND fat_milli IS NULL) AND target_ref IS NULL AND declared_complete = 0)), CONSTRAINT ck_nutrition_day_carbohydrate_milli CHECK (carbohydrate_milli IS NULL OR (typeof(carbohydrate_milli) = 'integer' AND carbohydrate_milli BETWEEN 0 AND 999999999)), CONSTRAINT ck_nutrition_day_fat_milli CHECK (fat_milli IS NULL OR (typeof(fat_milli) = 'integer' AND fat_milli BETWEEN 0 AND 999999999)), CONSTRAINT ck_nutrition_day_objects CHECK (json_type(receipt) = 'object' AND json_type(provenance) = 'object'), CONSTRAINT ck_nutrition_day_kcal_milli CHECK (kcal_milli IS NULL OR (typeof(kcal_milli) = 'integer' AND kcal_milli BETWEEN 0 AND 999999999)), CONSTRAINT ck_nutrition_day_digest CHECK (length(command_digest) = 64 AND command_digest NOT GLOB '*[^0-9a-f]*'), CONSTRAINT ck_nutrition_day_protein_milli CHECK (protein_milli IS NULL OR (typeof(protein_milli) = 'integer' AND protein_milli BETWEEN 0 AND 999999999)), CONSTRAINT ck_nutrition_day_revision CHECK (typeof(revision) = 'integer' AND revision BETWEEN 1 AND 9007199254740991 AND ((revision = 1 AND parent_ref IS NULL) OR (revision > 1 AND parent_ref IS NOT NULL AND parent_ref > 0))), CONSTRAINT ck_nutrition_day_date CHECK (length(local_day) = 10 AND length(timezone) BETWEEN 1 AND 128), CONSTRAINT ck_nutrition_day_request CHECK (length(request_id) BETWEEN 1 AND 64), CONSTRAINT fk_nutrition_day_parent FOREIGN KEY(user_id, parent_ref) REFERENCES nutrition_day_revisions_v1 (user_id, id) ON DELETE NO ACTION DEFERRABLE INITIALLY DEFERRED, CONSTRAINT fk_nutrition_day_owned_target FOREIGN KEY(user_id, target_ref) REFERENCES nutrition_target_revisions_v1 (user_id, id) ON DELETE NO ACTION DEFERRABLE INITIALLY DEFERRED, FOREIGN KEY(user_id) REFERENCES users (id) ON DELETE CASCADE, CONSTRAINT uq_nutrition_day_owner_id UNIQUE (user_id, id), CONSTRAINT uq_nutrition_day_revision UNIQUE (user_id, local_day, revision), CONSTRAINT uq_nutrition_day_successor UNIQUE (user_id, parent_ref), CONSTRAINT uq_nutrition_day_request UNIQUE (user_id, request_id), CHECK (declared_complete IN (0, 1)) );
+
+-- table: nutrition_target_revisions_v1
+CREATE TABLE nutrition_target_revisions_v1 ( variant VARCHAR(8) NOT NULL, effective_from VARCHAR(10) NOT NULL, enabled BOOLEAN NOT NULL, id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, revision INTEGER NOT NULL, parent_ref INTEGER, kcal_milli INTEGER, protein_milli INTEGER, carbohydrate_milli INTEGER, fat_milli INTEGER, provenance JSON NOT NULL, request_id VARCHAR(64) NOT NULL, command_digest VARCHAR(64) NOT NULL, receipt JSON NOT NULL, recorded_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, CONSTRAINT ck_nutrition_target_carbohydrate_milli CHECK (carbohydrate_milli IS NULL OR (typeof(carbohydrate_milli) = 'integer' AND carbohydrate_milli BETWEEN 0 AND 999999999)), CONSTRAINT ck_nutrition_target_fat_milli CHECK (fat_milli IS NULL OR (typeof(fat_milli) = 'integer' AND fat_milli BETWEEN 0 AND 999999999)), CONSTRAINT ck_nutrition_target_objects CHECK (json_type(receipt) = 'object' AND json_type(provenance) = 'object'), CONSTRAINT ck_nutrition_target_kcal_milli CHECK (kcal_milli IS NULL OR (typeof(kcal_milli) = 'integer' AND kcal_milli BETWEEN 0 AND 999999999)), CONSTRAINT ck_nutrition_target_digest CHECK (length(command_digest) = 64 AND command_digest NOT GLOB '*[^0-9a-f]*'), CONSTRAINT ck_nutrition_target_protein_milli CHECK (protein_milli IS NULL OR (typeof(protein_milli) = 'integer' AND protein_milli BETWEEN 0 AND 999999999)), CONSTRAINT ck_nutrition_target_revision CHECK (typeof(revision) = 'integer' AND revision BETWEEN 1 AND 9007199254740991 AND ((revision = 1 AND parent_ref IS NULL) OR (revision > 1 AND parent_ref IS NOT NULL AND parent_ref > 0))), CONSTRAINT ck_nutrition_target_variant CHECK (variant IN ('STANDARD','TRAINING','REST')), CONSTRAINT ck_nutrition_target_state CHECK ((enabled = 1 AND (kcal_milli IS NOT NULL OR protein_milli IS NOT NULL OR carbohydrate_milli IS NOT NULL OR fat_milli IS NOT NULL)) OR (enabled = 0 AND (kcal_milli IS NULL AND protein_milli IS NULL AND carbohydrate_milli IS NULL AND fat_milli IS NULL))), CONSTRAINT ck_nutrition_target_date CHECK (length(effective_from) = 10), CONSTRAINT ck_nutrition_target_request CHECK (length(request_id) BETWEEN 1 AND 64), CONSTRAINT fk_nutrition_target_parent FOREIGN KEY(user_id, parent_ref) REFERENCES nutrition_target_revisions_v1 (user_id, id) ON DELETE NO ACTION DEFERRABLE INITIALLY DEFERRED, FOREIGN KEY(user_id) REFERENCES users (id) ON DELETE CASCADE, CONSTRAINT uq_nutrition_target_owner_id UNIQUE (user_id, id), CONSTRAINT uq_nutrition_target_successor UNIQUE (user_id, parent_ref), CONSTRAINT uq_nutrition_target_request UNIQUE (user_id, request_id), CONSTRAINT uq_nutrition_target_revision UNIQUE (user_id, variant, effective_from, revision), CHECK (enabled IN (0, 1)) );
 
 -- table: owned_blueprint_snapshots
 CREATE TABLE owned_blueprint_snapshots ( id VARCHAR(36) NOT NULL, owner_id INTEGER NOT NULL, request_id VARCHAR(64) NOT NULL, body_digest VARCHAR(64) NOT NULL, source_revision INTEGER NOT NULL, as_of DATETIME NOT NULL, snapshot_json TEXT NOT NULL, snapshot_digest VARCHAR(64) NOT NULL, created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, PRIMARY KEY (id), CONSTRAINT ck_snapshot_revision CHECK (source_revision >= 0), FOREIGN KEY(owner_id) REFERENCES users (id), CONSTRAINT uq_blueprint_snapshot_owner UNIQUE (owner_id, id), CONSTRAINT uq_blueprint_snapshot_request UNIQUE (owner_id, request_id) );

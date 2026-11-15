@@ -9,7 +9,7 @@ import {dateLabel,periodLabel,sessionStatus} from './historyView';
 import {WeightTrend} from './WeightTrend';
 import {SessionFactsScreen} from './SessionFactsScreen';
 import {ExerciseHistoryScreen} from './ExerciseHistoryScreen';
-export type ProgressProps={state:TrainingHistoryState;weight:WeightWindowState;period:HistoryPeriod;onPeriod:(period:HistoryPeriod)=>void;onRefresh:()=>void;onMore:()=>void;onExercises:()=>void;onExercise:(ref:string)=>void;onMoreExercises:()=>void;onOccurrence:(entry:HistoryOccurrence)=>void;onMoreOccurrences:()=>void;onEntry:(entry:HistoryEntry)=>void;onBack:()=>void;onMoreWeight:()=>void;onDetailExercise?:(seId:number,ref:string)=>void};
+export type ProgressProps={state:TrainingHistoryState;weight:WeightWindowState;period:HistoryPeriod;onPeriod:(period:HistoryPeriod)=>void;onRefresh:()=>void;onMore:()=>void;onExercises:()=>void;onExercise:(ref:string)=>void;onMoreExercises:()=>void;onOccurrence:(entry:HistoryOccurrence)=>void;onMoreOccurrences:()=>void;onEntry:(entry:HistoryEntry)=>void;onBack:()=>void;onMoreWeight:()=>void;onDetailExercise?:(seId:number,ref:string)=>void;onBody?:()=>void;onNutrition?:()=>void};
 export function TrainingHistoryScreen(p:ProgressProps){
  const [help,setHelp]=useState(false),[sessionsExpanded,setSessionsExpanded]=useState<string|null>(null),[weeksExpanded,setWeeksExpanded]=useState<string|null>(null),s=p.state,r=s.sessions,v=r.value,timeZone=v?.window.time_zone??'UTC';
  if(s.selectedEntry!==null){
@@ -43,7 +43,8 @@ export function TrainingHistoryScreen(p:ProgressProps){
    {s.exercises.value?.state==='EMPTY'?<Text testID="progress-empty-exercises" style={type.small}>Aucun exercice regroupable dans cette période.</Text>:null}
    {s.exercises.value?.next_cursor&&s.exercises.status==='confirmed'?<CalibrationLink label="Continuer la recherche" onPress={p.onMoreExercises}/>:null}
   </View>
-  <View style={{gap:8}}><Text accessibilityRole="header" style={type.bodyStrong}>Poids</Text><WeightTrend state={p.weight} onMore={p.onMoreWeight}/></View>
+  <View style={{gap:8}}><View style={{flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}><Text accessibilityRole="header" style={type.bodyStrong}>Poids</Text>{p.onBody?<CalibrationLink testID="progress-weight-write" label="Saisir" onPress={p.onBody}/>:null}</View><WeightTrend state={p.weight} onMore={p.onMoreWeight}/>{p.onBody?<CalibrationLink label="Mensurations et historique" onPress={p.onBody}/>:null}</View>
+  {p.onNutrition?<CalibrationLink testID="progress-nutrition" label="Journal Nutrition" onPress={p.onNutrition}/>:null}
   <CalibrationLink label="Actualiser" onPress={p.onRefresh} disabled={r.status==='pending'}/>
   <CalibrationLink testID="progress-help" label="Aide" expanded={help} onPress={()=>setHelp(!help)}/>
   {help?<View testID="progress-help-body" style={{gap:8}}><Text style={type.small}>Les comptes couvrent la période entière : séances terminées, non exclues, avec au moins une série de travail complétée et un fait de répétitions ou de charge. Un statut terminé seul ne prouve pas un entraînement effectué.</Text>

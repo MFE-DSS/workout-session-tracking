@@ -20,6 +20,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.models.measurement import BodyMeasurement
+from app.services.body_measurement_reads import current_measurement_predicate
 from app.models.readiness import ReadinessEntry
 from app.models.session import WorkoutSession
 from app.services.measurements import compute_arm_avg, compute_thigh_avg
@@ -245,6 +246,7 @@ def compute_body_trend_axis(
         select(BodyMeasurement)
         .where(
             BodyMeasurement.user_id == user_id,
+            current_measurement_predicate(),
             BodyMeasurement.measured_at >= window_start,
         )
         .order_by(BodyMeasurement.measured_at.asc())

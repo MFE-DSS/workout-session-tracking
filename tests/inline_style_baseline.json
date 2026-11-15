@@ -5,7 +5,7 @@
     "dashboard.html": 1
   },
   "static_debt": {
-    "body_assessment/body_overview.html": 21,
+    "body_assessment/body_overview.html": 20,
     "body_assessment/measurement_form.html": 9,
     "dashboard.html": 12,
     "index.html": 0,
