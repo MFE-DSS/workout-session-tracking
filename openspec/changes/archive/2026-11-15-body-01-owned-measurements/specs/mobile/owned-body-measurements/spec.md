@@ -34,9 +34,16 @@ L'allocation SQLite CREATE/CORRECT SHALL dépasser les ids et références globa
 
 ### Requirement: Effacement réel explicite
 L'effacement individuel confirmé SHALL supprimer les nombres de toutes les versions de la racine possédée, sans résurrection. Metadata/réservations/copies locales MUST rester identifiées comme copies DATA ; une correction conservée MUST NOT être présentée comme effacement.
+L'accès minimal propriétaire à l'effacement SHALL rester disponible sans nouveau grant de collecte après retrait, sans valeurs corporelles.
 #### Scenario: Supprimer une tête corrigée
 - **WHEN** l'utilisateur confirme l'effacement de son relevé et de ses versions sous token courant
 - **THEN** aucune version numérique de cette racine ne reste dans BodyMeasurement et le reçu minimal est rejouable
+#### Scenario: Gérer l'effacement après retrait d'accord
+- **WHEN** l'utilisateur ouvre la gestion d'effacement après retrait de l'accord
+- **THEN** la projection montre uniquement identité, date et version ; la lignée sélectionnée et sa révision courante sont relues avant confirmation explicite de toutes les versions
+#### Scenario: Réponse d'effacement perdue après retrait
+- **WHEN** la réponse d'une commande d'effacement confirmée est perdue après retrait de l'accord
+- **THEN** le client conserve la même intention durable et vérifie son reçu propriétaire exact sans nouveau grant, sans mesures numériques exposées, sans réussite présumée ni second POST automatique
 
 ### Requirement: Compatibilité et incertitude
 Poids v1 SHALL conserver sa forme et son décodeur tout en filtrant les versions remplacées ; le nouveau client BODY SHALL afficher provenance/qualité réelles dans Progrès avec le graphique existant. Nonfinis/missing/UNKNOWN MUST rester distincts sans NaN JSON ou zéro inventé.

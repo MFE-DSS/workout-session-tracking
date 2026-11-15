@@ -2,7 +2,7 @@
 
 15 novembre 2026. PR #407, parent canonique
 `1462482a4e2bcd1fcde121d6f207a2131616e849`. Pixels BODY acceptés globalement
-avec réserves de finition ; vérifications locales terminées, CI et livraison canonique en cours.
+avec réserves de finition ; code fusionné et CI canonique completed/success ; publication du closeout en cours.
 Aucune acceptation physique, activation réelle, nouvelle APK, OTA ou déploiement.
 
 ## Comportement livré par le changement
@@ -77,3 +77,10 @@ partagées vérifiées. Les trois PR restent des scopes distincts ; BODY ne vaut
 acceptation des pixels NUT/Programmes. Aucun APK par merge. QA02 ne contient pas
 cette fonctionnalité. DATA, copies/sauvegardes, backend QA stable autorisé,
 compatibilité runtime/signature, smoke installé et recette physique restent ouverts.
+
+## Reçu code et canonique —15novembre
+
+PR407 HEAD0aec100b14d72813f5c915c2471bf256d9a6b859, merge045a3dbc35fdd0bb6ab49fe50a25ebddeb984af0.
+CI43654940898/43656641030 success11jobs chacune :8588backend/3ignorés,1215mobiles
++TS/100suites,77visuels. Sonar réel et limites dans CLOSEOUT.md. Archive CLI
+9exigences BODY ; les suites NUT/MOB06 et le futur candidat restent distincts.
