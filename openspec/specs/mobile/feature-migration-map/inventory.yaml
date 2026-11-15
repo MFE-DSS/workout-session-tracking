@@ -46,9 +46,9 @@ features:
     api: "nutrition-manual/1.0.0 ; X-Auren-Nutrition-Contract explicite, Bearer et no-store"
     data: [nutrition_day_revisions_v1, nutrition_target_revisions_v1, body_consents]
     user_actions: [déclarer un jour, corriger, déclarer la complétude, définir ses cibles, lire les sources et versions]
-    native_destination: "PROGRÈS — consommateur à raccorder après G1/pixels, domaine technique seulement à ce stade"
+    native_destination: "PROGRÈS — ConnectedApp iOS contrôlé, entrée Journal Nutrition ; Host Android de production distinct, app Android complète non recettée"
     status: REWRITE_NATIVE
-    dependencies: [NUT-01, migration parent BODY, G1 et pixels NUT, DATA pour activation réelle]
+    dependencies: [NUT-01, parent BODY canonique, DATA pour activation réelle, recette physique et release distinctes]
     visual_assets: []
     migration_risk: "Nouveau schéma additif ; correction append-only, aucun objectif ou apport inféré ; aucune parité native déclarée depuis les routes"
 

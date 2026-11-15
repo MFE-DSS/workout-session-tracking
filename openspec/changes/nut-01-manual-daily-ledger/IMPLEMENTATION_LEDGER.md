@@ -112,3 +112,6 @@ Paquet pixels unique17captures et preuves servi uniquement sur127.0.0.1:8264, op
 
 ### Décision native finale reçue —15novembre
 **« Accepter les pixels NUT pour le pilote, avec réserves artistiques »**, questioncall_ac972e9af5dd4c2698c6f2c131cce4eb. Le refus précédent est levé pour ce périmètre contrôlé. Reçu exactNATIVE_PIXEL_ACCEPTANCE.json ; aucun nouveau GO technique/G1/famille demandé. Les réserves artistiques, limites Android/physique et gates de CI/merge/release restent conservées.
+
+### Ascendance de livraison réelle —15novembre
+Intégration normale du canonique BODY5b19dc77071a0bcab3d8048ed7a61e2e0b0e3084 dans la branche NUT existante ; sept conflits partagés résolus avec les sources additives déjà testées. Arbre complet e49eea3dd6c9bde36d25f66976bc5ffaf08a6c3d identique avant/après merge de parent, pas de stratégie ours ni patch obsolète. Dernier run108suites/1292mobiles et TypeScript PASS ; quatre checks migration et25gardes UI/doc PASS. Inventaire natif actualisé sans transformer les Hosts Android en recette ConnectedApp complète. CI distante du HEAD final encore à observer.
