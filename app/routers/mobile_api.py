@@ -41,6 +41,7 @@ from app.models.user import User
 from app.routers import sessions as web_sessions
 from app.routers.mobile_body import router as body_router
 from app.routers.mobile_body_measurements import router as body_measurements_router
+from app.routers.mobile_library import configured_library_runtime, create_library_router
 from app.routers.mobile_mission import router as mission_action_router
 from app.routers.mobile_nutrition import router as nutrition_router
 from app.routers.mobile_training_history import router as training_history_router
@@ -577,6 +578,9 @@ def abandon(session_id: int, body: CloseBody, user: ApiUser, db: DbSession) -> d
 
 
 # MOB-03 read-only body history; no new measurement writer or deletion route.
+# MOB-06 is mounted together with its canonical route inventory.
+
+router.include_router(create_library_router(configured_library_runtime))
 router.include_router(body_router)
 router.include_router(body_measurements_router)
 router.include_router(mission_action_router)

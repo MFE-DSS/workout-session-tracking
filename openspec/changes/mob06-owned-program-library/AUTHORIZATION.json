@@ -1,0 +1,11 @@
+{
+  "decision": "Autoriser MOB-06 et valider G1",
+  "question_id": "call_4321044cec284c79898cb7d2dd483990",
+  "date": "2026-11-12",
+  "scope": ["BUILD_SCOPE.md", "design.md", "WIRE_AND_RECOVERY.md", "UX_BOARD.md"],
+  "visual_pixels": "PENDING",
+  "real_data_activation": false,
+  "deployment": false,
+  "APK_OTA": false,
+  "standing_delivery": "GOV-MERGE-01 after mandatory gates"
+}

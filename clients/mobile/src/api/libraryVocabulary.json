@@ -1,0 +1,17 @@
+{
+  "source": "app/services/muscle_mapping.py:ZONE_LABELS",
+  "contract": "owned-library/1.0.0",
+  "zones": [
+    "pecs",
+    "delt_lat",
+    "delt_post",
+    "lats",
+    "upper_back",
+    "biceps",
+    "triceps",
+    "quads",
+    "posterior",
+    "calves",
+    "core"
+  ]
+}

@@ -8,7 +8,7 @@ from __future__ import annotations
 from functools import lru_cache
 from pathlib import Path
 
-from pydantic import Field
+from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -31,6 +31,9 @@ class Settings(BaseSettings):
     nutrition_manual_controlled_test_enabled: bool = Field(default=False)
     nutrition_backend_identity: str = Field(default="")
     nutrition_signing_key: str = Field(default="")
+    library_controlled_test_enabled: bool = Field(default=False)
+    library_backend_identity: str = Field(default="")
+    library_signing_key: SecretStr = Field(default="")
     app_secret_key: str = Field(default="dev-secret-change-me")
     app_base_url: str = Field(default="http://localhost:8000")
 

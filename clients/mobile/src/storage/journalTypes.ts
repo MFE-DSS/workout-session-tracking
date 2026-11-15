@@ -12,6 +12,7 @@ export type Restored = {
 export interface Journal {
   readonly nutritionPending?: import('./nutritionPendingCommands').NutritionPendingCommands;
   readonly bodyPending?: import('./bodyPendingCommands').BodyPendingCommands;
+  readonly library?: import('./libraryPendingOpenings').LibraryPendingOpenings;
   beginLegacy?(snapshot:WorkoutState,current:()=>boolean):Promise<void>;
   readonly planV3?: import('./planV3Journal').PlanV3Journal;
   readonly kind: 'sqlite' | 'memory';

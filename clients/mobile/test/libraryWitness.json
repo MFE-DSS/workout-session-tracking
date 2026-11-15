@@ -1,0 +1,494 @@
+{
+  "source": "synthetic-real-router-domain-SQLite-test",
+  "base_sha": "1462482a4e2bcd1fcde121d6f207a2131616e849",
+  "page": {
+    "contract_version": "owned-library/1.0.0",
+    "owner_id": 1,
+    "read_revision": "dbd5e3ef67a08985b4e4cf462618a9cacd0642245574a9b0729760f7a9dd9e0e",
+    "section": "all",
+    "requested_zone": null,
+    "applied_zone": null,
+    "groups": [
+      "programs",
+      "core",
+      "utility",
+      "specialization"
+    ],
+    "entries": [
+      {
+        "kind": "CATALOG_SESSION",
+        "source_ref": "eyJiaW5kaW5nIjp7ImJhY2tlbmQiOiJzeW50aGV0aWMtaHR0cCIsImNvbnRyYWN0Ijoib3duZWQtbGlicmFyeS8xLjAuMCIsImVwb2NoIjowLCJvd25lciI6MSwic2NoZW1hIjoiY2F0YWxvZy1wcm9ncmFtLXNvdXJjZS8xLjAuMCJ9LCJraW5kIjoic291cmNlIiwidmFsdWUiOnsiaWQiOjEsImtpbmQiOiJDQVRBTE9HX1NFU1NJT04iLCJwcm9ncmFtX2lkIjpudWxsfX0.82ea2b6ca5b882a3c63676553f927147c57f7f3d42eb8fe2cc63251c7f91506c",
+        "name": "Push A — Pecs épaisseur + Delts + Triceps",
+        "source_status": "AVAILABLE",
+        "section": "core",
+        "counts": {
+          "sessions": 1,
+          "exercise_slots": 7,
+          "prescribed_sets": 21,
+          "count_state": "KNOWN"
+        },
+        "zones": {
+          "state": "MAPPED",
+          "codes": [
+            "pecs",
+            "delt_lat",
+            "delt_post",
+            "triceps"
+          ]
+        }
+      },
+      {
+        "kind": "CATALOG_SESSION",
+        "source_ref": "eyJiaW5kaW5nIjp7ImJhY2tlbmQiOiJzeW50aGV0aWMtaHR0cCIsImNvbnRyYWN0Ijoib3duZWQtbGlicmFyeS8xLjAuMCIsImVwb2NoIjowLCJvd25lciI6MSwic2NoZW1hIjoiY2F0YWxvZy1wcm9ncmFtLXNvdXJjZS8xLjAuMCJ9LCJraW5kIjoic291cmNlIiwidmFsdWUiOnsiaWQiOjIsImtpbmQiOiJDQVRBTE9HX1NFU1NJT04iLCJwcm9ncmFtX2lkIjpudWxsfX0.1d0075f8397ca2754d9227704dfd2d7e04e96dc9798a6d37b80924f68a8ac75a",
+        "name": "Push B — Pecs largeur/stretch + Delts latéraux + Triceps",
+        "source_status": "AVAILABLE",
+        "section": "core",
+        "counts": {
+          "sessions": 1,
+          "exercise_slots": 7,
+          "prescribed_sets": 22,
+          "count_state": "KNOWN"
+        },
+        "zones": {
+          "state": "MAPPED",
+          "codes": [
+            "pecs",
+            "delt_lat",
+            "delt_post",
+            "triceps"
+          ]
+        }
+      },
+      {
+        "kind": "CATALOG_SESSION",
+        "source_ref": "eyJiaW5kaW5nIjp7ImJhY2tlbmQiOiJzeW50aGV0aWMtaHR0cCIsImNvbnRyYWN0Ijoib3duZWQtbGlicmFyeS8xLjAuMCIsImVwb2NoIjowLCJvd25lciI6MSwic2NoZW1hIjoiY2F0YWxvZy1wcm9ncmFtLXNvdXJjZS8xLjAuMCJ9LCJraW5kIjoic291cmNlIiwidmFsdWUiOnsiaWQiOjMsImtpbmQiOiJDQVRBTE9HX1NFU1NJT04iLCJwcm9ncmFtX2lkIjpudWxsfX0.8878c708c0d81fd2dd74668b7221eb9ebd8ac20d3b6c3eb09b9f69f41cb0ddf5",
+        "name": "Pull A — Dos largeur + Delts postérieurs",
+        "source_status": "AVAILABLE",
+        "section": "core",
+        "counts": {
+          "sessions": 1,
+          "exercise_slots": 7,
+          "prescribed_sets": 20,
+          "count_state": "KNOWN"
+        },
+        "zones": {
+          "state": "MAPPED",
+          "codes": [
+            "delt_post",
+            "lats"
+          ]
+        }
+      },
+      {
+        "kind": "CATALOG_SESSION",
+        "source_ref": "eyJiaW5kaW5nIjp7ImJhY2tlbmQiOiJzeW50aGV0aWMtaHR0cCIsImNvbnRyYWN0Ijoib3duZWQtbGlicmFyeS8xLjAuMCIsImVwb2NoIjowLCJvd25lciI6MSwic2NoZW1hIjoiY2F0YWxvZy1wcm9ncmFtLXNvdXJjZS8xLjAuMCJ9LCJraW5kIjoic291cmNlIiwidmFsdWUiOnsiaWQiOjQsImtpbmQiOiJDQVRBTE9HX1NFU1NJT04iLCJwcm9ncmFtX2lkIjpudWxsfX0.f73cd3f105e138283b3382ff49146a2d7bc98cbde18f8b4fc7a377612c1b152e",
+        "name": "Pull B — Dos épaisseur + Biceps",
+        "source_status": "AVAILABLE",
+        "section": "core",
+        "counts": {
+          "sessions": 1,
+          "exercise_slots": 7,
+          "prescribed_sets": 20,
+          "count_state": "KNOWN"
+        },
+        "zones": {
+          "state": "MAPPED",
+          "codes": [
+            "upper_back",
+            "biceps"
+          ]
+        }
+      },
+      {
+        "kind": "CATALOG_SESSION",
+        "source_ref": "eyJiaW5kaW5nIjp7ImJhY2tlbmQiOiJzeW50aGV0aWMtaHR0cCIsImNvbnRyYWN0Ijoib3duZWQtbGlicmFyeS8xLjAuMCIsImVwb2NoIjowLCJvd25lciI6MSwic2NoZW1hIjoiY2F0YWxvZy1wcm9ncmFtLXNvdXJjZS8xLjAuMCJ9LCJraW5kIjoic291cmNlIiwidmFsdWUiOnsiaWQiOjUsImtpbmQiOiJDQVRBTE9HX1NFU1NJT04iLCJwcm9ncmFtX2lkIjpudWxsfX0.af9ea802f534121c274cc8b2402572c00d76449a8280aa694e5e019dc179d33b",
+        "name": "Legs A — Quad dominant",
+        "source_status": "AVAILABLE",
+        "section": "core",
+        "counts": {
+          "sessions": 1,
+          "exercise_slots": 7,
+          "prescribed_sets": 22,
+          "count_state": "KNOWN"
+        },
+        "zones": {
+          "state": "MAPPED",
+          "codes": [
+            "quads",
+            "posterior",
+            "calves",
+            "core"
+          ]
+        }
+      },
+      {
+        "kind": "CATALOG_SESSION",
+        "source_ref": "eyJiaW5kaW5nIjp7ImJhY2tlbmQiOiJzeW50aGV0aWMtaHR0cCIsImNvbnRyYWN0Ijoib3duZWQtbGlicmFyeS8xLjAuMCIsImVwb2NoIjowLCJvd25lciI6MSwic2NoZW1hIjoiY2F0YWxvZy1wcm9ncmFtLXNvdXJjZS8xLjAuMCJ9LCJraW5kIjoic291cmNlIiwidmFsdWUiOnsiaWQiOjYsImtpbmQiOiJDQVRBTE9HX1NFU1NJT04iLCJwcm9ncmFtX2lkIjpudWxsfX0.48b3038ed3501a452a75984f2c27a905df46aecd7428f4e43dff6e2c61ae55f2",
+        "name": "Legs B — Postérieur dominant",
+        "source_status": "AVAILABLE",
+        "section": "core",
+        "counts": {
+          "sessions": 1,
+          "exercise_slots": 7,
+          "prescribed_sets": 22,
+          "count_state": "KNOWN"
+        },
+        "zones": {
+          "state": "MAPPED",
+          "codes": [
+            "quads",
+            "posterior",
+            "calves",
+            "core"
+          ]
+        }
+      },
+      {
+        "kind": "CATALOG_SESSION",
+        "source_ref": "eyJiaW5kaW5nIjp7ImJhY2tlbmQiOiJzeW50aGV0aWMtaHR0cCIsImNvbnRyYWN0Ijoib3duZWQtbGlicmFyeS8xLjAuMCIsImVwb2NoIjowLCJvd25lciI6MSwic2NoZW1hIjoiY2F0YWxvZy1wcm9ncmFtLXNvdXJjZS8xLjAuMCJ9LCJraW5kIjoic291cmNlIiwidmFsdWUiOnsiaWQiOjE5LCJraW5kIjoiQ0FUQUxPR19TRVNTSU9OIiwicHJvZ3JhbV9pZCI6bnVsbH19.06abcdcfa76b0aad231e10eca328ef593c56c74aa9a9455ec9c2d5b7229107bb",
+        "name": "qa-http",
+        "source_status": "AVAILABLE",
+        "section": "utility",
+        "counts": {
+          "sessions": 1,
+          "exercise_slots": 1,
+          "prescribed_sets": 2,
+          "count_state": "KNOWN"
+        },
+        "zones": {
+          "state": "ZONES_UNKNOWN",
+          "codes": []
+        }
+      },
+      {
+        "kind": "CATALOG_SESSION",
+        "source_ref": "eyJiaW5kaW5nIjp7ImJhY2tlbmQiOiJzeW50aGV0aWMtaHR0cCIsImNvbnRyYWN0Ijoib3duZWQtbGlicmFyeS8xLjAuMCIsImVwb2NoIjowLCJvd25lciI6MSwic2NoZW1hIjoiY2F0YWxvZy1wcm9ncmFtLXNvdXJjZS8xLjAuMCJ9LCJraW5kIjoic291cmNlIiwidmFsdWUiOnsiaWQiOjExLCJraW5kIjoiQ0FUQUxPR19TRVNTSU9OIiwicHJvZ3JhbV9pZCI6bnVsbH19.4ed03380798e8a15d3237f8ea5a840b11b7802d1346ca191ac4d96dedee0533c",
+        "name": "LISS cardio pur",
+        "source_status": "AVAILABLE",
+        "section": "utility",
+        "counts": {
+          "sessions": 1,
+          "exercise_slots": 0,
+          "prescribed_sets": 0,
+          "count_state": "KNOWN"
+        },
+        "zones": {
+          "state": "NO_ZONES_DEFINED",
+          "codes": []
+        }
+      },
+      {
+        "kind": "CATALOG_SESSION",
+        "source_ref": "eyJiaW5kaW5nIjp7ImJhY2tlbmQiOiJzeW50aGV0aWMtaHR0cCIsImNvbnRyYWN0Ijoib3duZWQtbGlicmFyeS8xLjAuMCIsImVwb2NoIjowLCJvd25lciI6MSwic2NoZW1hIjoiY2F0YWxvZy1wcm9ncmFtLXNvdXJjZS8xLjAuMCJ9LCJraW5kIjoic291cmNlIiwidmFsdWUiOnsiaWQiOjEzLCJraW5kIjoiQ0FUQUxPR19TRVNTSU9OIiwicHJvZ3JhbV9pZCI6bnVsbH19.9ca5d925e4b20dca0de5c6c6806a260b295c59181e3c8e89010189a2f461f005",
+        "name": "Session courte — Full upper 45 min",
+        "source_status": "AVAILABLE",
+        "section": "utility",
+        "counts": {
+          "sessions": 1,
+          "exercise_slots": 7,
+          "prescribed_sets": 18,
+          "count_state": "KNOWN"
+        },
+        "zones": {
+          "state": "MAPPED",
+          "codes": [
+            "pecs",
+            "delt_lat",
+            "delt_post",
+            "lats",
+            "biceps",
+            "triceps"
+          ]
+        }
+      },
+      {
+        "kind": "CATALOG_SESSION",
+        "source_ref": "eyJiaW5kaW5nIjp7ImJhY2tlbmQiOiJzeW50aGV0aWMtaHR0cCIsImNvbnRyYWN0Ijoib3duZWQtbGlicmFyeS8xLjAuMCIsImVwb2NoIjowLCJvd25lciI6MSwic2NoZW1hIjoiY2F0YWxvZy1wcm9ncmFtLXNvdXJjZS8xLjAuMCJ9LCJraW5kIjoic291cmNlIiwidmFsdWUiOnsiaWQiOjEyLCJraW5kIjoiQ0FUQUxPR19TRVNTSU9OIiwicHJvZ3JhbV9pZCI6bnVsbH19.71a96a3efd88bba7100f760e322c342ce25beba110d5994526d187d7d45a8181",
+        "name": "LISS cardio + abdos",
+        "source_status": "AVAILABLE",
+        "section": "utility",
+        "counts": {
+          "sessions": 1,
+          "exercise_slots": 4,
+          "prescribed_sets": 12,
+          "count_state": "KNOWN"
+        },
+        "zones": {
+          "state": "MAPPED",
+          "codes": [
+            "core"
+          ]
+        }
+      },
+      {
+        "kind": "CATALOG_SESSION",
+        "source_ref": "eyJiaW5kaW5nIjp7ImJhY2tlbmQiOiJzeW50aGV0aWMtaHR0cCIsImNvbnRyYWN0Ijoib3duZWQtbGlicmFyeS8xLjAuMCIsImVwb2NoIjowLCJvd25lciI6MSwic2NoZW1hIjoiY2F0YWxvZy1wcm9ncmFtLXNvdXJjZS8xLjAuMCJ9LCJraW5kIjoic291cmNlIiwidmFsdWUiOnsiaWQiOjE4LCJraW5kIjoiQ0FUQUxPR19TRVNTSU9OIiwicHJvZ3JhbV9pZCI6bnVsbH19.4d95c56446e2a9e5d513a93402a7f9839f7db4599a72d69ba0685f9e45ff829e",
+        "name": "Sans matériel — corps entier",
+        "source_status": "AVAILABLE",
+        "section": "utility",
+        "counts": {
+          "sessions": 1,
+          "exercise_slots": 4,
+          "prescribed_sets": 12,
+          "count_state": "KNOWN"
+        },
+        "zones": {
+          "state": "MAPPED",
+          "codes": [
+            "pecs",
+            "quads",
+            "posterior"
+          ]
+        }
+      },
+      {
+        "kind": "CATALOG_SESSION",
+        "source_ref": "eyJiaW5kaW5nIjp7ImJhY2tlbmQiOiJzeW50aGV0aWMtaHR0cCIsImNvbnRyYWN0Ijoib3duZWQtbGlicmFyeS8xLjAuMCIsImVwb2NoIjowLCJvd25lciI6MSwic2NoZW1hIjoiY2F0YWxvZy1wcm9ncmFtLXNvdXJjZS8xLjAuMCJ9LCJraW5kIjoic291cmNlIiwidmFsdWUiOnsiaWQiOjE0LCJraW5kIjoiQ0FUQUxPR19TRVNTSU9OIiwicHJvZ3JhbV9pZCI6bnVsbH19.1fa549416b12d9ce95d422fc1061646177332b18377779a9364364e0b61a37b9",
+        "name": "Rattrapage épaules",
+        "source_status": "AVAILABLE",
+        "section": "specialization",
+        "counts": {
+          "sessions": 1,
+          "exercise_slots": 6,
+          "prescribed_sets": 19,
+          "count_state": "KNOWN"
+        },
+        "zones": {
+          "state": "MAPPED",
+          "codes": [
+            "delt_lat",
+            "delt_post"
+          ]
+        }
+      },
+      {
+        "kind": "CATALOG_SESSION",
+        "source_ref": "eyJiaW5kaW5nIjp7ImJhY2tlbmQiOiJzeW50aGV0aWMtaHR0cCIsImNvbnRyYWN0Ijoib3duZWQtbGlicmFyeS8xLjAuMCIsImVwb2NoIjowLCJvd25lciI6MSwic2NoZW1hIjoiY2F0YWxvZy1wcm9ncmFtLXNvdXJjZS8xLjAuMCJ9LCJraW5kIjoic291cmNlIiwidmFsdWUiOnsiaWQiOjE1LCJraW5kIjoiQ0FUQUxPR19TRVNTSU9OIiwicHJvZ3JhbV9pZCI6bnVsbH19.b823de0678f83aef083c78d4edd7c1d173d424563141724a55c753b71c8a0d1b",
+        "name": "Rattrapage bras",
+        "source_status": "AVAILABLE",
+        "section": "specialization",
+        "counts": {
+          "sessions": 1,
+          "exercise_slots": 7,
+          "prescribed_sets": 20,
+          "count_state": "KNOWN"
+        },
+        "zones": {
+          "state": "MAPPED",
+          "codes": [
+            "biceps",
+            "triceps"
+          ]
+        }
+      },
+      {
+        "kind": "CATALOG_SESSION",
+        "source_ref": "eyJiaW5kaW5nIjp7ImJhY2tlbmQiOiJzeW50aGV0aWMtaHR0cCIsImNvbnRyYWN0Ijoib3duZWQtbGlicmFyeS8xLjAuMCIsImVwb2NoIjowLCJvd25lciI6MSwic2NoZW1hIjoiY2F0YWxvZy1wcm9ncmFtLXNvdXJjZS8xLjAuMCJ9LCJraW5kIjoic291cmNlIiwidmFsdWUiOnsiaWQiOjE2LCJraW5kIjoiQ0FUQUxPR19TRVNTSU9OIiwicHJvZ3JhbV9pZCI6bnVsbH19.c83852113fdb75ffc10a4b1b95be0482df41ffd6ad22f00032405af885d46722",
+        "name": "Rattrapage dos largeur",
+        "source_status": "AVAILABLE",
+        "section": "specialization",
+        "counts": {
+          "sessions": 1,
+          "exercise_slots": 6,
+          "prescribed_sets": 18,
+          "count_state": "KNOWN"
+        },
+        "zones": {
+          "state": "MAPPED",
+          "codes": [
+            "lats",
+            "upper_back"
+          ]
+        }
+      },
+      {
+        "kind": "CATALOG_SESSION",
+        "source_ref": "eyJiaW5kaW5nIjp7ImJhY2tlbmQiOiJzeW50aGV0aWMtaHR0cCIsImNvbnRyYWN0Ijoib3duZWQtbGlicmFyeS8xLjAuMCIsImVwb2NoIjowLCJvd25lciI6MSwic2NoZW1hIjoiY2F0YWxvZy1wcm9ncmFtLXNvdXJjZS8xLjAuMCJ9LCJraW5kIjoic291cmNlIiwidmFsdWUiOnsiaWQiOjE3LCJraW5kIjoiQ0FUQUxPR19TRVNTSU9OIiwicHJvZ3JhbV9pZCI6bnVsbH19.a18d9958abfa2de8a4f5a952986dfb16ae0b142db89c330c907b5602e0c57feb",
+        "name": "Full Body — Morphotype Priority",
+        "source_status": "AVAILABLE",
+        "section": "specialization",
+        "counts": {
+          "sessions": 1,
+          "exercise_slots": 8,
+          "prescribed_sets": 24,
+          "count_state": "KNOWN"
+        },
+        "zones": {
+          "state": "MAPPED",
+          "codes": [
+            "pecs",
+            "delt_lat",
+            "delt_post",
+            "upper_back",
+            "quads",
+            "posterior",
+            "calves"
+          ]
+        }
+      }
+    ],
+    "next_cursor": null,
+    "collection_state": "COMPLETE"
+  },
+  "detail": {
+    "contract_version": "owned-library/1.0.0",
+    "owner_id": 1,
+    "source": {
+      "id": 19,
+      "kind": "CATALOG_SESSION",
+      "program_id": null,
+      "name": "qa-http",
+      "status": "AVAILABLE",
+      "version": null
+    },
+    "composition": [
+      {
+        "source_ref": "eyJiaW5kaW5nIjp7ImJhY2tlbmQiOiJzeW50aGV0aWMtaHR0cCIsImNvbnRyYWN0Ijoib3duZWQtbGlicmFyeS8xLjAuMCIsImVwb2NoIjowLCJvd25lciI6MSwic2NoZW1hIjoiY2F0YWxvZy1wcm9ncmFtLXNvdXJjZS8xLjAuMCJ9LCJraW5kIjoic291cmNlIiwidmFsdWUiOnsiaWQiOjE5LCJraW5kIjoiQ0FUQUxPR19TRVNTSU9OIiwicHJvZ3JhbV9pZCI6bnVsbH19.06abcdcfa76b0aad231e10eca328ef593c56c74aa9a9455ec9c2d5b7229107bb",
+        "name": "qa-http",
+        "kind": "strength",
+        "notes": null,
+        "exercises": [
+          {
+            "id": 111,
+            "position": 1,
+            "name": "Synthetic unmapped exercise",
+            "code": "QA",
+            "set_scheme": "2 x 8–12",
+            "notes": null,
+            "machine_slug": null,
+            "machine_family": null,
+            "equipment_context": "UNKNOWN",
+            "rep_targets": [
+              {
+                "set_index": 1,
+                "min_reps": 8,
+                "max_reps": 12,
+                "technique": null,
+                "is_warmup": false
+              },
+              {
+                "set_index": 2,
+                "min_reps": 8,
+                "max_reps": 12,
+                "technique": null,
+                "is_warmup": false
+              }
+            ]
+          }
+        ],
+        "selection": {
+          "domain_launchable": true,
+          "native_support": {
+            "state": "SUPPORTED",
+            "reason": null
+          },
+          "selection_ref": "eyJiaW5kaW5nIjp7ImJhY2tlbmQiOiJzeW50aGV0aWMtaHR0cCIsImNvbnRyYWN0Ijoib3duZWQtbGlicmFyeS8xLjAuMCIsImVwb2NoIjowLCJvd25lciI6MSwic2NoZW1hIjoiY2F0YWxvZy1wcm9ncmFtLXNvdXJjZS8xLjAuMCJ9LCJraW5kIjoic2VsZWN0aW9uIiwidmFsdWUiOnsiZmluZ2VycHJpbnQiOiI5N2Y4NTM2OTdhY2Y0YWNjNWEyNjZhNGRiMmI0OGEyOWM1ZTlmZmQ5ZThjZTY1MzIwYTJmODFlOGE2YTUxYWEzIiwic291cmNlIjp7ImlkIjoxOSwia2luZCI6IkNBVEFMT0dfU0VTU0lPTiIsInByb2dyYW1faWQiOm51bGx9fX0.3469f9d45efcb0fd69a095b790e0d79c76cdb77f828f0ad846bca756d8136609"
+        }
+      }
+    ],
+    "selection": {
+      "domain_launchable": true,
+      "native_support": {
+        "state": "SUPPORTED",
+        "reason": null
+      },
+      "selection_ref": "eyJiaW5kaW5nIjp7ImJhY2tlbmQiOiJzeW50aGV0aWMtaHR0cCIsImNvbnRyYWN0Ijoib3duZWQtbGlicmFyeS8xLjAuMCIsImVwb2NoIjowLCJvd25lciI6MSwic2NoZW1hIjoiY2F0YWxvZy1wcm9ncmFtLXNvdXJjZS8xLjAuMCJ9LCJraW5kIjoic2VsZWN0aW9uIiwidmFsdWUiOnsiZmluZ2VycHJpbnQiOiI5N2Y4NTM2OTdhY2Y0YWNjNWEyNjZhNGRiMmI0OGEyOWM1ZTlmZmQ5ZThjZTY1MzIwYTJmODFlOGE2YTUxYWEzIiwic291cmNlIjp7ImlkIjoxOSwia2luZCI6IkNBVEFMT0dfU0VTU0lPTiIsInByb2dyYW1faWQiOm51bGx9fX0.3469f9d45efcb0fd69a095b790e0d79c76cdb77f828f0ad846bca756d8136609"
+    },
+    "limitations": [
+      "SOURCE_CONTEXT_UNKNOWN"
+    ],
+    "read_revision": "8df8c5efe2a4db4d166580aa7f484afc573bbe49c0fdbcb2ebd5f9275675becc"
+  },
+  "request": {
+    "contract_version": "owned-library/1.0.0",
+    "selection_ref": "eyJiaW5kaW5nIjp7ImJhY2tlbmQiOiJzeW50aGV0aWMtaHR0cCIsImNvbnRyYWN0Ijoib3duZWQtbGlicmFyeS8xLjAuMCIsImVwb2NoIjowLCJvd25lciI6MSwic2NoZW1hIjoiY2F0YWxvZy1wcm9ncmFtLXNvdXJjZS8xLjAuMCJ9LCJraW5kIjoic2VsZWN0aW9uIiwidmFsdWUiOnsiZmluZ2VycHJpbnQiOiI5N2Y4NTM2OTdhY2Y0YWNjNWEyNjZhNGRiMmI0OGEyOWM1ZTlmZmQ5ZThjZTY1MzIwYTJmODFlOGE2YTUxYWEzIiwic291cmNlIjp7ImlkIjoxOSwia2luZCI6IkNBVEFMT0dfU0VTU0lPTiIsInByb2dyYW1faWQiOm51bGx9fX0.3469f9d45efcb0fd69a095b790e0d79c76cdb77f828f0ad846bca756d8136609"
+  },
+  "created": {
+    "contract_version": "owned-library/1.0.0",
+    "owner_id": 1,
+    "source_ref": "eyJiaW5kaW5nIjp7ImJhY2tlbmQiOiJzeW50aGV0aWMtaHR0cCIsImNvbnRyYWN0Ijoib3duZWQtbGlicmFyeS8xLjAuMCIsImVwb2NoIjowLCJvd25lciI6MSwic2NoZW1hIjoiY2F0YWxvZy1wcm9ncmFtLXNvdXJjZS8xLjAuMCJ9LCJraW5kIjoic291cmNlIiwidmFsdWUiOnsiaWQiOjE5LCJraW5kIjoiQ0FUQUxPR19TRVNTSU9OIiwicHJvZ3JhbV9pZCI6bnVsbH19.06abcdcfa76b0aad231e10eca328ef593c56c74aa9a9455ec9c2d5b7229107bb",
+    "execution_profile": "LEGACY",
+    "execution": {
+      "session_id": 1,
+      "template_slug": "qa-http",
+      "template_name": "qa-http",
+      "status": "in_progress",
+      "excluded_from_stats": false,
+      "started_at": "2026-11-12T15:26:12.598401+00:00",
+      "ended_at": null,
+      "server_now": "2026-11-12T15:26:12.603580+00:00",
+      "rest_default_seconds": 90,
+      "exercises": [
+        {
+          "se_id": 1,
+          "code": "QA",
+          "prescribed_name": "Synthetic unmapped exercise",
+          "executed_name": "Synthetic unmapped exercise",
+          "set_scheme": "2 x 8–12",
+          "rep_range": {
+            "min": 8,
+            "max": 12
+          },
+          "guidance": {
+            "state": "unknown",
+            "intent_label": "Première fois sur cet exercice",
+            "target_summary": null,
+            "reasons": [
+              "historique insuffisant"
+            ],
+            "is_silent": true
+          },
+          "previous": null,
+          "prefill": {
+            "weight_kg": null,
+            "reps": 8,
+            "origin": "NONE"
+          },
+          "substitutes": [],
+          "substitute_options": [],
+          "zone": null,
+          "secondary_zones": [],
+          "rest_seconds": null,
+          "best": null
+        }
+      ],
+      "sets": [
+        {
+          "set_id": 3,
+          "se_id": 1,
+          "index": 1
+        },
+        {
+          "set_id": 4,
+          "se_id": 1,
+          "index": 2
+        }
+      ],
+      "on_complete": {
+        "3": {
+          "kind": "REST_THEN_SET",
+          "set_id": 4
+        },
+        "4": {
+          "kind": "BILAN"
+        }
+      },
+      "done": {},
+      "cursor_set_id": 3,
+      "allowed_actions": [
+        "COMPLETE_SET",
+        "FINISH",
+        "PAUSE",
+        "ABANDON"
+      ]
+    },
+    "request_sha256": "fc0a5671891b6ac336aee59ffa6df3ecf391fc431f9e0696bfa421177a944014"
+  },
+  "refused": {
+    "contract_version": "owned-library/1.0.0",
+    "owner_id": 1,
+    "request_sha256": "fc0a5671891b6ac336aee59ffa6df3ecf391fc431f9e0696bfa421177a944014",
+    "effect": "NOT_CREATED",
+    "code": "session_open"
+  }
+}
