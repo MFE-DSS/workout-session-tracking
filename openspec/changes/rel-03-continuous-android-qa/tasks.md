@@ -30,3 +30,10 @@ PREPARE42852655171 prepare PASS/release skipped. [Reçu détaillé](../../../doc
 Candidat non distribuable. Le paquet externe est préparé et relu ; l’opérateur
 demande une explication avant décision, aucune autorisation externe acquise.
 Le §3 reste ouvert ; aucun archivage COMPLETE ni faux nouveau binaire.
+
+## Correction de compatibilité de schéma,15novembre
+
+- [x] Reproduire le refus d'une vraie base Alembic `nutrition_manual_01` et enlever la fixture estampillée artificiellement PLAN.
+- [x] Aligner les pins database/release/candidate sans affaiblir schéma exact/intégrité/FK, conserver les faits auth/PLAN/BODY/NUT en backup/export/restore neufs.
+- [ ] Terminer broad consommateurs, revue indépendante et livraison CI/PR du correctif ; [plan et preuves](SCHEMA_COMPATIBILITY_REPAIR.md).
+- Les opérations du §3 et les propositions OVH/origine/configuration de fonctionnalités restent distinctes et non exécutées.

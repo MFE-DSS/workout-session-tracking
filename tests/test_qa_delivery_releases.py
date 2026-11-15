@@ -1,5 +1,6 @@
 """Release gates consume separately collected evidence, never candidate assertions."""
 
+import sqlite3
 from copy import deepcopy
 
 import pytest
@@ -41,7 +42,7 @@ def candidate():
         "compatibility": {
             "api": "first-session-runtime/3.0.0",
             "inventory": "plan-calibration-inventory/2.0.0",
-            "server_schema": "plan_v3_20261107_01",
+            "server_schema": "nutrition_manual_01",
             "local_schema": "first-session-local/3.0.0",
         },
     }
@@ -131,6 +132,31 @@ def test_approved_build_accepts_only_separate_complete_evidence():
     c, e = approved()
     assert validate_candidate(c, e)["pending"] == ["build_artifact"]
     assert validate_candidate(c, e)["distributable"] is False
+
+
+def test_release_gate_accepts_actual_migrated_canonical_server_schema(tmp_path):
+    from test_qa_delivery_database import migrate_database
+
+    path = tmp_path / "canonical.db"
+    migrate_database(path)
+    with sqlite3.connect(path) as db:
+        head = db.execute("SELECT version_num FROM alembic_version").fetchone()[0]
+    assert head == "nutrition_manual_01"
+    c, e = approved()
+    c["compatibility"]["server_schema"] = head
+    c["target"]["compatibility"]["server_schema"] = head
+    e["target"]["compatibility"]["server_schema"] = head
+    assert validate_candidate(c, e)["pending"] == ["build_artifact"]
+
+
+@pytest.mark.parametrize("schema", ["plan_v3_20261107_01", "future", None])
+def test_release_gate_refuses_old_or_unknown_server_schema_even_when_evidence_matches(schema):
+    c, e = approved()
+    c["compatibility"]["server_schema"] = schema
+    c["target"]["compatibility"]["server_schema"] = schema
+    e["target"]["compatibility"]["server_schema"] = schema
+    with pytest.raises(ValueError, match="qa_release_refused"):
+        validate_candidate(c, e)
 
 
 @pytest.mark.parametrize(

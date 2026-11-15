@@ -5,6 +5,14 @@ approval does not authorize hosting, spend, cutover, cloud build or APK/OTA
 publication. Target configuration remains UNPROVISIONED. No stable URL, APK,
 OTA result, provider deployment or physical-device acceptance is claimed.
 
+The current engineering compatibility boundary is `nutrition_manual_01`, including
+the additive PLAN/BODY lineage and the exact canonical schema snapshot. A real
+Alembic-migrated synthetic fixture exercises verification, whole-DB export/restore,
+identity and release consumers; no old revision is stamped onto a new schema.
+Older or forged schemas remain refused. This correction does not authorize live
+migrations, OVH/provider/origin changes, feature activation or release. See the
+[bounded repair ledger](../../../openspec/changes/rel-03-continuous-android-qa/SCHEMA_COMPATIBILITY_REPAIR.md).
+
 The product repository is **PUBLIC**. Proof transport is implemented as an
 AES-256-GCM encrypted, flat ZIP plus a release asset in a separately configured
 **PRIVATE** GitHub repository. `proof-store.json` remains **UNPROVISIONED**: no

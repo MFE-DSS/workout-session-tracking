@@ -11,7 +11,7 @@
 - Base b9a334d22e6b75e9b83650eb1b2b833d4ed5d169 ; package dev.auren.releaseqa02 et certificat 12b13109a2a41e2e2c0e97578364793e659a7548da4ce210d0dbd2f912f4bc75 conservés.
 - Version proposée 0.0.2/versionCode3, canal qa et branche qa, Android uniquement ; profils historiques/pilot conservés.
 - Aucun changement du banc QA02 vivant, aucune donnée personnelle, connexion fournisseur, cloud-spend, cutover, build cloud ou publication APK/OTA autorisés.
-- Copier DB entière via SQLite backup, jamais restore JSON legacy/écrasement source ; head plan_v3_20261107_01, un writer, vrai SCI et génération courante.
+- Copier DB entière via SQLite backup, jamais restore JSON legacy/écrasement source ; head `nutrition_manual_01` depuis la [correction du15novembre](SCHEMA_COMPATIBILITY_REPAIR.md) (ancien pin PLAN remplacé), un writer, vrai SCI et génération courante.
 - Source native distincte de source JS ; métadonnées volatiles hors config native/fingerprint ; fingerprint standard sans exclusions permissives.
 - Observer sans UI limité à ConnectedApp ; ne pas modifier ses fonctionnalités ou ses contrôleurs.
 - check_scope avant vérifications ; full sweep local seulement via scripts/run_local_sweep.sh si tier requis ; CI réelle obligatoire et merge gardé sous GOV-MERGE-01.

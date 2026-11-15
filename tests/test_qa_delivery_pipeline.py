@@ -65,6 +65,17 @@ def test_prepare_without_credentials_is_pending_and_derives_storage_from_git(che
         prepare(raw, checkout)
 
 
+def test_tracked_candidate_prepares_for_current_canonical_schema_without_distribution(checkout):
+    from tools.qa_delivery.pipeline import prepare
+
+    root = Path(__file__).resolve().parents[1]
+    raw = json.loads((root / "docs/release/rel-03/candidate.json").read_text())
+    prepared = prepare(raw, checkout)
+    assert prepared["compatibility"]["server_schema"] == "nutrition_manual_01"
+    assert prepared["distributable"] is False
+    assert prepared["target"] is None
+
+
 def github_payloads(c):
     from tools.qa_delivery.pipeline import FLOOR
 
