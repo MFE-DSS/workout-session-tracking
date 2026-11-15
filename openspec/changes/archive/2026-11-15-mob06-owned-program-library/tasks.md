@@ -17,4 +17,8 @@
 - [x] Board familial iOS/Android normal/grande fonte, références intactes, pixels acceptés pour le pilote avec réserves (15novembre). Conditions iOS ConnectedApp/Android Hosts et limites clavier/retour/safe areas/physique explicitement conservées.
 - [x] Tests ciblés/broad/mobile/TS/sécurité/visuel/OpenSpec selon tier, revue indépendante et corrections (126backend broad final,1377mobile+TS,77visuels).
 - [ ] Commit/push/PR, CI HEAD exact, guarded merge GOV-MERGE-01 ; canonique/Sonar réel, archive/closeout.
-- [ ] Parité/manifest REL03 et compatibilité d'intégration ; pas d'APK par merge, physique/activation/release distinctes.
+- [x] Parité/manifest REL03 et compatibilité d'intégration ; pas d'APK par merge, physique/activation/release distinctes.
+
+
+## Reçu de livraison engineering —15novembre
+Code408 HEADc18f2783162b05d18d86d0cd405e1411732f9873 fusionné110f0a1961338f319d6deac258cd840b78c83ed5 ; CI PR43716623974 completed/success11jobs,8711backend/3ignorés,1377mobile+TS et77visuels. Pixels acceptés pour pilote avec réserves avant commit UI. La seule tâche encore ouverte décrit le suivi canonique/closeout/conservation à cet instant ; les reçus vivants finaux la résoudront sans réécrire cet instant. CI canonique43718511180 en cours, aucune réussite anticipée.

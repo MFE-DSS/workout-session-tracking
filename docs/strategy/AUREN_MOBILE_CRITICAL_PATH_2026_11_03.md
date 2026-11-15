@@ -112,3 +112,7 @@ Après le socle du critical path, enrichir les tranches successives par les comp
 ## Préparation MOB04 après livraison du socle
 
 [Proposition MISSION](../proposals/mob04-mission.md) et [10fixtures non servies](../fixtures/mob04-mission.preparation.v1.json) préparées sans GO BUILD. Le socle est archivé séparément ; MOB03 complet conserve les gates DATA/PLAN/RELEASE, dont vrai premier READY et séance exécutable. Aucun déploiement ni recette physique déduits.
+
+
+## Actualisation de livraison —15novembre2026
+BODY407/409 et NUT406/410 fusionnés ; MOB06408 code livré110f0a1 sur leur parent47c7411, pixels acceptés pour le pilote avec réserves. [Closeout et parité réels](../pilot/mob06-library/CLOSEOUT.md), [composant REL03](../pilot/mob06-library/RELEASE_CANDIDATE_COMPONENT.json). CI canonique/publication documentaire encore en suivi à cet instant. MOB07 est le prochain scope à préparer ; sa ligne dans la roadmap ne vaut pas GO BUILD/G1. MOB03 complet/DATA/physique/release restent ouverts.
