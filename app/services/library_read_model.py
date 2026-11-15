@@ -566,7 +566,7 @@ def read_library_item(db, ctx, source_ref):
                 "source_ref": ref,
                 "name": _text(row.name),
                 "kind": _text(row.kind),
-                "notes": _text(getattr(row, "notes", None), note=True, nullable=True),
+                "notes": _text(getattr(row, "notes", None) if personal else row.cardio_note, note=True, nullable=True),
                 "exercises": exercises,
                 "selection": selection,
             }

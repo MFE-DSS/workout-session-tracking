@@ -123,11 +123,13 @@ def create_library_router(runtime: LibraryRuntime):
     router = APIRouter(prefix="/me/library", route_class=LibraryRoute)
 
     def context(request, user):
+        current_runtime = runtime() if callable(runtime) else runtime
+        request.state.library_runtime = current_runtime
         request.state.library_owner = user.id
         if request.headers.getlist(HEADER) != [VERSION]:
             raise LibraryError("unsupported_contract", 406)
         return LibraryContext(
-            user.id, runtime.backend_identity, runtime.signing_key, user.session_epoch
+            user.id, current_runtime.backend_identity, current_runtime.signing_key, user.session_epoch
         )
 
     @router.get("")
@@ -174,9 +176,22 @@ def create_library_router(runtime: LibraryRuntime):
             expected_epoch=user.session_epoch,
             expected_hash=user.password_hash,
             device_id=ds.id,
-            controlled_test_enabled=runtime.controlled_test_enabled is True,
-            app_env=runtime.app_env,
+            controlled_test_enabled=request.state.library_runtime.controlled_test_enabled is True,
+            app_env=request.state.library_runtime.app_env,
         )
         return {**result, "request_sha256": request.state.library_request_sha256}
 
     return router
+
+
+def configured_library_runtime():
+    """Read configured authority once per request; no fallback signing identity."""
+    from app.config import get_settings
+
+    settings = get_settings()
+    return LibraryRuntime(
+        settings.library_backend_identity,
+        settings.library_signing_key.get_secret_value(),
+        settings.library_controlled_test_enabled,
+        settings.app_env,
+    )

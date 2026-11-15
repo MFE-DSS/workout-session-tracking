@@ -18,6 +18,7 @@ export class LibraryOpeningController{
  }
  private active=()=>!this.disposed&&this.revision===this.ports.client.auth.revision;
  get state():LibraryOpeningState{return this.active()?jsonCopy(this.value):{phase:'cancelled'};}
+ get inFlight(){return this.busy;}
  dispose(){this.disposed=true;}
  private async owned(){return this.active()&&await this.ports.client.owner(this.active)===this.ports.pending.ownerId&&this.active();}
  private async load(){
@@ -29,15 +30,16 @@ export class LibraryOpeningController{
   try{
    if(!await this.owned())return this.state;
    const p=await this.ports.pending.unresolved(this.active);
-   if(this.active())this.value=p?{phase:'unknown',pending:p}:{phase:'idle'};
+   if(p){if(this.active())this.value={phase:'unknown',pending:p};}
+   else{const read=await this.projection();if(this.active())this.value=read.state==='confirmed'?read.session?{phase:'owned_found',owned:read.session,code:'session_open'}:{phase:'idle'}:{phase:'unavailable',...(this.value.code==='session_open'?{code:'session_open'}:{})};}
   }catch{if(this.active())this.value={phase:'unavailable'};}finally{this.busy=false;}
   return this.state;
  }
  async submit(selection:CurrentLibrarySelection,selectionCurrent:()=>boolean){
-  if(this.busy||!this.active()||!selectionCurrent()||this.ports.otherActionPending()||this.value.code==='session_open')return this.state;
-  this.busy=true;const current=()=>this.active()&&selectionCurrent();
+  if(this.busy||!this.active()||!selectionCurrent()||this.ports.otherActionPending()||this.value.code==='session_open'||this.value.phase==='unavailable')return this.state;
+  this.busy=true;this.value={phase:'submitting'};const current=()=>this.active()&&selectionCurrent();
   try{
-   if(!await this.owned()||!current())return this.state;
+   if(!await this.owned()||!current())throw Error('library_owner_or_selection_changed');
    const old=await this.ports.pending.unresolved(current);
    if(old){if(this.active())this.value={phase:'unknown',pending:old};return this.state;}
    if(!current()||this.ports.otherActionPending())return this.state;
@@ -69,18 +71,19 @@ export class LibraryOpeningController{
   }finally{this.busy=false;}
   return this.state;
  }
- private async candidate():Promise<LibrarySessionIdentity|null>{
-  let r:OwnedLibraryRead;try{r=await this.ports.readOwned(this.active);}catch{return null;}
-  if(!this.active()||r.state!=='confirmed'||r.owner_id!==this.ports.pending.ownerId||r.backend_scope!==this.ports.pending.backendScope||!r.session||!positiveId(r.session.session_id)||!['LEGACY','PLAN_V3'].includes(r.session.session_profile))return null;
-  return r.session;
+ private async projection():Promise<OwnedLibraryRead>{
+  let r:OwnedLibraryRead;try{r=await this.ports.readOwned(this.active);}catch{return{state:'unknown'};}
+  if(!this.active()||r.state!=='confirmed'||r.owner_id!==this.ports.pending.ownerId||r.backend_scope!==this.ports.pending.backendScope)return{state:'unknown'};
+  if(r.session!==null&&(!positiveId(r.session.session_id)||!['LEGACY','PLAN_V3'].includes(r.session.session_profile)))return{state:'unknown'};
+  return r;
  }
+ private async candidate():Promise<LibrarySessionIdentity|null>{const r=await this.projection();return r.state==='confirmed'?r.session:null;}
  async verify(){
   if(this.busy||!this.active())return this.state;this.busy=true;
   try{
    const pending=await this.load();if(!this.active())return this.state;
-   if(!pending&&this.value.code!=='session_open')return this.state;
-   const owned=await this.candidate();
-   if(this.active())this.value=owned?{phase:'owned_found',...(pending?{pending}:{}),owned,...(!pending?{code:'session_open'}:{})}:pending?{phase:'unknown',pending}:{phase:'refused',code:'session_open'};
+   const read=await this.projection();
+   if(this.active())this.value=read.state==='confirmed'&&read.session?{phase:'owned_found',...(pending?{pending}:{}),owned:read.session,...(!pending?{code:'session_open'}:{})}:pending?{phase:'unknown',pending}:read.state==='confirmed'?{phase:'idle'}:{phase:'unavailable',...(this.value.code==='session_open'?{code:'session_open'}:{})};
   }catch{if(this.active()&&this.value.pending)this.value={phase:'unknown',pending:this.value.pending};}finally{this.busy=false;}
   return this.state;
  }

@@ -1,0 +1,18 @@
+{
+  "status": "ACCEPTED_FOR_CONTROLLED_PILOT_WITH_ARTISTIC_RESERVATIONS",
+  "date_europe_paris": "2026-11-15",
+  "question_id": "call_b56c9db4e9754b4fb7435df10a6fda49",
+  "decision": "Accepter pour le pilote, avec réserves artistiques",
+  "board": "http://127.0.0.1:8274/",
+  "scope": "Programmes native pixels only; masterC and DA08 family already accepted",
+  "source_manifest_sha256": "823a9b7ce5d829fba5fac5e6a040bd205ac86aab31be7e498f0f83116dad46fc",
+  "board_manifest_sha256": "60d358b665219ad1acf50759282ccdc9da8f465fbca3d836c2cff47c60af2524",
+  "native_evidence": "iOS actual ConnectedApp390x844; Android production Hosts360/480dp normal/130% separately labelled",
+  "limits": [
+    "No complete Android ConnectedApp in Expo Go: native module retained",
+    "No physical device acceptance",
+    "iOS large-font scroll CUA unavailable; no exhaustive focus/rotation/VoiceOver proof",
+    "Not final universal art acceptance",
+    "No APK, OTA, real-data activation or deployment"
+  ]
+}

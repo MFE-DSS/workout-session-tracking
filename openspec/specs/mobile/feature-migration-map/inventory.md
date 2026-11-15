@@ -93,3 +93,6 @@ Généré depuis `inventory.yaml` (base `36b971a`) — ne pas éditer à la main
 |---|---|---|---|---|---|---|
 | Santé du service (sondes) | WEB_ONLY | aucune | 2 | backup_verifier | — | nul |
 | Administration des séances (lister, exclure, supprimer) | WEB_ONLY | aucune | 4 | ownership · quality_score | — | faible |
+
+### MOB-06 — consommateur en cours de finalisation (15 novembre)
+Les trois routes natives `/api/mobile/v1/me/library`, `/me/library/item` et `/me/library/start` sont montées par le router canonique ; mapping exact dans inventory.yaml. Lecture et départ propriétaires via les vrais domaines. Consommateur ConnectedApp/journal intégré sur BODY/NUT47c7411 ; preuve iOS réelle et Hosts Android distincts. **PARTIAL : pixels/CI408/merge encore ouverts**, pas fonctionnalité livrée ni programme actif/agenda/constructeur natif présumés. Le catalogue est celui des modèles de séances, pas la bibliothèque d’exercices.

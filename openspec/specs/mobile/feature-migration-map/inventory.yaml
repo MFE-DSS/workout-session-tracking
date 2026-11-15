@@ -739,3 +739,21 @@ features:
     dependencies: ["DATA avant acquisition réelle", "acceptations visuelles et RELEASE physiques", "déploiement séparé"]
     visual_assets: ["primitives compte acceptées", "composition séance MOB02", "MISSION-SCREEN-V1 inchangé"]
     migration_risk: "élevé — copies propriétaires et réglages typés ; aucune activation réelle depuis le GO de test synthétique"
+
+  - id: owned-native-library
+    feature: Bibliothèque native propriétaire et départ contrôlé
+    family: programmes
+    routes:
+      - GET /api/mobile/v1/me/library
+      - GET /api/mobile/v1/me/library/items/{source_ref}
+      - POST /api/mobile/v1/me/library/start
+    legacy_location: mobile_library → library_read_model/library_start
+    domain_owner: [library_read_model, library_start, user_programs, session_state]
+    api: owned-library/1.0.0 négocié ; Bearer seul ; no-store
+    data: [workout_templates, template_exercises, user_programs, user_program_sessions, workout_sessions]
+    user_actions: [consulter, sélectionner une séance, confirmer le départ, vérifier et reprendre]
+    native_destination: PROGRAMMES — ConnectedApp et journal propriétaire
+    status: REWRITE_NATIVE
+    dependencies: [MOB-06, BODY-01, NUT-01, acceptation pixels et intégration]
+    visual_assets: [Frame C, RecessedWindow, NumericReadout, onglet Programmes D4]
+    migration_risk: "montage candidat non livré ; acquisition synthétique fermée par défaut ; aucun planning ou programme actif inventé"

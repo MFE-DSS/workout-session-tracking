@@ -13,8 +13,8 @@
 - [x] Départ transactionnel réel, contexte program/session, préflight complet et exclusion des séances ouvertes.
 - [x] Client/ressource et intention locale durable sur port contrôlé ; compte/backend/révision/late/refresh/unknown, sans auto-retry. Attachement produit partagé encore dans la tâche suivante.
 - [x] Préparer/tester le patch exact ConnectedApp/journal/router/inventaire en copie isolée (13 novembre) ; revue et corrections, sans écraser les leases.
-- [ ] Appliquer le consommateur Programmes/ConnectedApp et journal réels sur parents vérifiés après leases BODY/NUT.
-- [ ] Board familial iOS/Android normal/grande fonte, clavier/retour/safe areas, références intactes, pixels acceptés.
-- [ ] Tests ciblés/broad/mobile/TS/sécurité/visuel/OpenSpec selon tier, revue indépendante et corrections.
+- [x] Appliquer le consommateur Programmes/ConnectedApp et journal réels sur parents vérifiés après leases BODY/NUT (47c7411, preuve native15novembre).
+- [x] Board familial iOS/Android normal/grande fonte, références intactes, pixels acceptés pour le pilote avec réserves (15novembre). Conditions iOS ConnectedApp/Android Hosts et limites clavier/retour/safe areas/physique explicitement conservées.
+- [x] Tests ciblés/broad/mobile/TS/sécurité/visuel/OpenSpec selon tier, revue indépendante et corrections (126backend broad final,1377mobile+TS,77visuels).
 - [ ] Commit/push/PR, CI HEAD exact, guarded merge GOV-MERGE-01 ; canonique/Sonar réel, archive/closeout.
 - [ ] Parité/manifest REL03 et compatibilité d'intégration ; pas d'APK par merge, physique/activation/release distinctes.

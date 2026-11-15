@@ -337,3 +337,15 @@ def test_native_zone_vocabulary_matches_the_canonical_library_domain():
     vocabulary = json.loads((root / "clients/mobile/src/api/libraryVocabulary.json").read_text())
     assert vocabulary["contract"] == "owned-library/1.0.0"
     assert vocabulary["zones"] == list(ZONE_LABELS)
+
+
+def test_whole_review_cardio_prescription_is_readable_without_enabling_start(library):
+    s, db, ctx = library
+    row = template(db, "qa-cardio-notes", kind="cardio", sets=0)
+    row.cardio_note = "Consigne cardio synthétique : durée et intensité déclarées"
+    db.commit()
+    detail = s.read_library_item(db, ctx, entry(s, db, ctx, row.slug)["source_ref"])
+    assert detail["composition"][0]["notes"] == row.cardio_note
+    assert detail["composition"][0]["exercises"] == []
+    assert detail["selection"]["selection_ref"] is None
+    assert detail["selection"]["native_support"]["state"] == "UNSUPPORTED"

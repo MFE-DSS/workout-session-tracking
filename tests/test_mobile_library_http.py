@@ -11,18 +11,18 @@ VERSION = "owned-library/1.0.0"
 
 @pytest.fixture
 def api(client):
+    from pydantic import SecretStr
     from test_mobile_library_reads import template
 
+    from app.config import get_settings
     from app.database import SessionLocal
-    from app.main import app
     from app.models.user import User
-    from app.routers.mobile_library import LibraryRuntime, create_library_router
     from app.services.device_auth import open_device_session
 
-    app.include_router(
-        create_library_router(LibraryRuntime("synthetic-http", "q" * 40, True, "test")),
-        prefix="/api/mobile/v1",
-    )
+    settings = get_settings()
+    settings.library_backend_identity = "synthetic-http"
+    settings.library_signing_key = SecretStr("q" * 40)
+    settings.library_controlled_test_enabled = True
     with SessionLocal() as db:
         user = db.query(User).one()
         issued = open_device_session(db, user)
@@ -163,3 +163,45 @@ def test_source_labelled_http_witness_for_native_decoder(api):
             )
             + "\n"
         )
+
+
+def test_parent_library_adoption_identity_is_read_back_by_mission_execution_and_history(api):
+    c, headers, owner = api
+    selected = detail(c, headers)
+    body = {"contract_version": VERSION, "selection_ref": selected["selection"]["selection_ref"]}
+    created = c.post(ROOT + "/start", json=body, headers=headers)
+    assert created.status_code == 201
+    session_id = created.json()["execution"]["session_id"]
+    execution = c.get(f"/api/mobile/v1/sessions/{session_id}/execution", headers=headers)
+    assert execution.status_code == 200
+    assert execution.json()["session_id"] == session_id
+    action = c.get("/api/mobile/v1/mission-action", params={"requested_path": "FIRST_USE"},
+                   headers={**headers, "X-Auren-Mission-Action": "mission-action/1.0.0"})
+    assert action.status_code == 200
+    assert action.json()["state"] == "RESUME"
+    assert action.json()["primary_action"]["session_id"] == session_id
+    history = "/api/mobile/v1/me/training-history"
+    page = c.get(history, params={"period": "all", "time_zone": "UTC"}, headers=headers)
+    assert page.status_code == 200
+    entry = next(e for e in page.json()["entries"] if e["session_id"] == session_id)
+    facts = c.get(f"{history}/sessions/{session_id}", params={"entry_ref": entry["entry_ref"]}, headers=headers)
+    assert facts.status_code == 200
+    assert facts.json()["owner_id"] == owner
+    sets = [s for e in facts.json()["exercises"] for s in e["sets"]]
+    assert sets
+    assert all(s["completed"] is False and s["weight_kg"] is None and s["reps"] is None for s in sets)
+
+
+def test_real_parent_closed_acquisition_preserves_reads_and_does_not_create(api):
+    from app.config import get_settings
+    from app.database import SessionLocal
+    from app.models.session import WorkoutSession
+
+    c, headers, _ = api
+    selected = detail(c, headers)
+    get_settings().library_controlled_test_enabled = False
+    response = c.post(ROOT + "/start", json={"contract_version": VERSION, "selection_ref": selected["selection"]["selection_ref"]}, headers=headers)
+    assert response.status_code == 403
+    assert response.json()["effect"] == "NOT_CREATED"
+    with SessionLocal() as db:
+        assert db.query(WorkoutSession).count() == 0

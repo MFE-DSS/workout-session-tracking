@@ -1,6 +1,6 @@
 # Build scope — MOB-06
 
-BUILD_AUTHORIZED / G1_ACCEPTED / PIXELS_PENDING. Décision reçue le12novembre :
+BUILD_AUTHORIZED / G1_ACCEPTED / PIXELS_ACCEPTED_FOR_CONTROLLED_PILOT_WITH_ARTISTIC_RESERVATIONS. Décision reçue le12novembre :
 « Autoriser MOB-06 et valider G1 », call_4321044cec284c79898cb7d2dd483990,
 conservée dans AUTHORIZATION.json. Aucun pixel final, traitement réel ou
 déploiement accepté par ce GO. Maltin n'est plus une dépendance.
@@ -35,3 +35,5 @@ revue indépendante, vrais rendus iOS/Android acceptés avant commit UI, CI HEAD
 exact et GOV-MERGE-01. Pas de question de merge routinière ; déploiement séparé.
 Le retour utilisateur n'a pas choisi « consultation seule » : lancement prévu
 quand son domaine le permet, sans contourner ses préconditions ou le profil SCI.
+
+15novembre : pixels du board8274 acceptés pour le pilote avec réserves artistiques ; reçu NATIVE_PIXEL_ACCEPTANCE.json. Ce reçu plus récent ne transforme pas les limites natives/physiques en PASS ni le GO initial en autorisation de déploiement.

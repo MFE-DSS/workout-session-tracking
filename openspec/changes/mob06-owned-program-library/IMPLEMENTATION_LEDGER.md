@@ -137,3 +137,13 @@ schéma, composition, baseline ou autorisation de release. Les suites ci-dessus
 sont celles du worktree, avec ses consommateurs non publiés ; la CI du HEAD
 publié sera observée séparément. Draft conservée, scope produit incomplet,
 parents canoniques et validations artistiques pendants.
+
+### Reprise canonique réelle —15novembre
+Parent runtime BODY/NUTc9ce3713 fusionné normalement dans le même worktree, branche conservée ; source NUT identique au HEADfc45ef7 dont la CI est verte. CI canonique NUT en cours, pas encore revendiquée. Neuf fichiers uniques sauvegardés avant opération.
+Brainstorming / Options / Risques / Choix retenu : appliquer aveuglément le patch ancien échoue sur cinq chemins et perdrait les ports BODY/NUT. Choix : préflight13chemins contre leurs empreintes base166d7b0, puis résolution additive trois voies des cinq conflits, tests consommateurs avant raccordement. Aucun nouveau scope, modèle ou baseline. Reprise de l’intégration déjà autorisée, suivie de la reconstruction du masterC/familleDA08 et d’un seul gate pixels Programmes. Les fichiers produit NUT sont figés, son closeout ne possède plus ces ports partagés.
+
+### Intégration/revue/native15novembre — état courant
+Parent réel NUTcloseout47c7411 intégré normalement (HEADf6d9b1d), sans fichier app/mobile ajouté par ce merge documentaire ; diff UI conservé noncommitté. Ports BODY/NUT, routes/inventaire et queue SQLite raccordés. Revue entière2Important+1Minor corrigés en une passe RED→GREEN, puis cycle de vie ExpoRoot corrigé sur preuve native.126backend broad final,1377mobile+TS ; détails, échecs initiaux et limites dans docs/pilot/mob06-library/REAL_PARENT_INTEGRATION_20261115.md. Board8274 soumis : pixels en attente. Aucun résultat CI du nouveau candidat ni recette physique prétendus.
+
+### Gate humain final15novembre
+« Accepter pour le pilote, avec réserves artistiques », call_b56c9db4e9754b4fb7435df10a6fda49, reçu avant commit UI. Les30chemins soumis ont leurs empreintes identiques au retour ; aucun nouveau pixel après exposition. Relecture décision par décision consignée dans REAL_PARENT_INTEGRATION_20261115.md. Suite commit/push/CI/merge sous GOV-MERGE-01 ; physique/Android complet/release non acquis.

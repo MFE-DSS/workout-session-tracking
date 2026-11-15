@@ -31,6 +31,11 @@ import {PlanV3Host} from './src/ui/plan/PlanV3Host';
 import {MissionActionClient,createMissionActionTransport,type MissionAction} from './src/api/missionAction';
 import {MissionActionResource} from './src/api/missionActionResource';
 import {localOpeningState,missionActionCurrent,hasLegacyStart,legacyStartMarker,markLegacyStart,clearLegacyStart,restoreExistingV3,blockLegacyResume,legacyResumeBlocked,clearLegacyResumeBlock} from './src/api/missionOpening';
+import {LibraryClient,createLibraryPorts} from './src/api/library';
+import {LibraryHost} from './src/ui/library/LibraryHost';
+import type {LibraryOpeningPorts} from './src/sync/libraryOpening';
+import type {LibraryPendingOpenings,LibrarySessionIdentity} from './src/storage/libraryPendingOpenings';
+import {Text} from 'react-native';
 import {MissionActionHost} from './src/ui/mission/MissionActionHost';
 import { FirstPlanClient } from './src/api/firstPlan';
 import { FirstUseController } from './src/api/firstUse';
@@ -63,6 +68,11 @@ import {BodyMeasurementsClient,createBodyTransport} from './src/api/bodyMeasurem
 import {BodyMeasurementsSurface} from './src/ui/body/BodyMeasurementsSurface';
 import {BodyTabConsumer} from './src/ui/body/BodyTabConsumer';
 import { shellRoutes } from './src/shell/routeContext';
+
+// Expo Router SDK58 memoizes the route tree by linking identity.
+// Parent paints for a durable intent must preserve the mounted controller.
+const SHELL_LINKING = {};
+
 import { openJournal } from './src/storage/journal';
 import { resolveJournal } from './src/storage/ownership';
 import { openOwnershipBook } from './src/storage/ownershipStore';
@@ -146,6 +156,9 @@ export default function ConnectedApp() {
   planV3Ref.current=planV3;
   const legacyStartUnknownRef=useRef(false),closePendingRef=useRef(false);
   const [,paintMission]=useState(0);
+  const libraryBlocked=useRef(false),libraryAttachment=useRef<object|null>(null);
+  const [libraryPorts,setLibraryPorts]=useState<LibraryOpeningPorts|null>(null);
+  const [libraryAtToday,setLibraryAtToday]=useState(false);
   const [missionMenu,setMissionMenu]=useState(false);
   const [missionRefusal,setMissionRefusal]=useState<string|null>(null);
   const [,setPlanV3Revision] = useState(0);
@@ -215,7 +228,7 @@ export default function ConnectedApp() {
 
   const missionResource=useMemo(()=>new MissionActionResource(auth,new MissionActionClient(auth,transport,createMissionActionTransport(API_URL))),[auth]);
   const historicalSessions=useMemo(()=>new FirstSessionV3Client(new RuntimeV3Client(auth,transport,createV3Transport(API_URL,fetch,{calibrationInventory:'plan-calibration-inventory/2.0.0'}))),[auth]);
-  const currentOpening=()=>localOpeningState({legacyStartUnknown:legacyStartUnknownRef.current,closePending:closePendingRef.current,v3:planV3Ref.current?.state??null});
+  const currentOpening=()=>libraryBlocked.current?{kind:'START' as const}:localOpeningState({legacyStartUnknown:legacyStartUnknownRef.current,closePending:closePendingRef.current,v3:planV3Ref.current?.state??null});
 
   const apply = useCallback((event: Event): WorkoutState => {
     const n = reduce(stateRef.current, event);
@@ -400,7 +413,10 @@ export default function ConnectedApp() {
     if (owned.state !== 'ready') { setScreen('OWNERSHIP'); return false; }
     const bodyTransport=API_URL?createBodyTransport(API_URL):null;
     const nutritionTransport=API_URL?createNutritionTransport(API_URL):null;
-    const j = await openJournal(owned.name, {...(PLAN_V3_CONTROLLED_TEST ? {planV3OwnerId:owned.userId} : {}),...(bodyTransport?{bodyOwner:{userId:owned.userId,backendScope:bodyTransport.scope}}:{}),...(nutritionTransport?{nutritionOwner:{userId:owned.userId,backendScope:nutritionTransport.scope}}:{})});
+    const libraryTransport=API_URL?createLibraryPorts(API_URL,fetch,value=>Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256,value)):null;
+    const attachment={};libraryAttachment.current=attachment;libraryBlocked.current=Boolean(libraryTransport);setLibraryPorts(null);
+    const attachmentCurrent=()=>current()&&libraryAttachment.current===attachment;
+    const j = await openJournal(owned.name, {...(PLAN_V3_CONTROLLED_TEST ? {planV3OwnerId:owned.userId} : {}),...(bodyTransport?{bodyOwner:{userId:owned.userId,backendScope:bodyTransport.scope}}:{}),...(nutritionTransport?{nutritionOwner:{userId:owned.userId,backendScope:nutritionTransport.scope}}:{}),...(libraryTransport?{libraryOwner:{ownerId:owned.userId,backendScope:libraryTransport.backendScope,sha256:libraryTransport.sha256,current:attachmentCurrent}}:{})});
     if (!appAlive.current || revision !== auth.revision) return false;
     engineRef.current?.stop();
     journalRef.current = j;
@@ -417,6 +433,46 @@ export default function ConnectedApp() {
       await restoreExistingV3(controller,j.planV3);if(!active())return false;
       planV3Ref.current=controller;setPlanV3(controller);setPlanV3Open(false);if(controller.state)void controller.load().catch(()=>undefined);
     }else {planV3Ref.current=null;setPlanV3(null);}
+    if(libraryTransport&&j.library){
+      const client=new LibraryClient(auth,libraryTransport),raw=j.library;
+      const changed=async()=>{if(!active())throw Error('stale_identity');try{const pending=await raw.unresolved(active);if(active()){libraryBlocked.current=Boolean(pending);paintMission(n=>n+1);}}catch(e){if(active()){libraryBlocked.current=true;paintMission(n=>n+1);}throw e;}};
+      const pending:LibraryPendingOpenings={...raw,
+        prepare:async(...args)=>{const outbox=await j.outboxRows();if(!active()||outbox.length)throw Error('pending_journal_conflict');const r=await raw.prepare(...args);await changed();return r;},
+        resolve:async(...args)=>{await raw.resolve(...args);await changed();}};
+      let adopted:WorkoutState|null=null,typedResume=false;
+      const ownedClient=new MissionActionClient(auth,transport,createMissionActionTransport(API_URL));
+      const readOwned:LibraryOpeningPorts['readOwned']=async current=>{
+        const r=await ownedClient.read('FIRST_USE',Boolean(planV3Ref.current?.active),()=>active()&&current());
+        if(!active()||!current()||r.state!=='confirmed'||r.value.owner_id!==owned.userId)return{state:'unknown'};
+        const action=r.value;
+        // Only these projections follow the server's completed open-session read.
+        // Unavailable guidance does not erase that fact or grant SCI execution.
+        if(action.state!=='RESUME'&&action.source!=='OWNED_FIRST_USE'&&action.state!=='NO_MISSION')return{state:'unknown'};
+        return{state:'confirmed',owner_id:owned.userId,backend_scope:client.backendScope,session:action.state==='RESUME'?{session_id:action.primary_action.session_id,session_profile:action.primary_action.kind==='RESUME_V3'?'PLAN_V3':'LEGACY'}:null};
+      };
+      const adoptLegacy:LibraryOpeningPorts['adoptLegacy']=async(plan,current)=>{
+        const valid=()=>active()&&current();if(!valid()||!j.beginLegacy||plan.status!=='in_progress'||plan.template_slug==='science:v3:first-session')throw Error('library_adoption_unavailable');
+        const r=await j.restore();if(!valid())throw Error('stale_identity');
+        if(r.outbox.some(row=>!['acked','resolved'].includes(row.state))&&r.snapshot?.plan?.session_id!==plan.session_id)throw Error('pending_journal_conflict');
+        const next=reconcileSubstitutions(stateFromServer(plan,r.snapshot?.plan?.session_id===plan.session_id?r.snapshot:null,r.sets,Date.now()),r.outbox);
+        await j.beginLegacy(next,valid);if(!valid())throw Error('stale_identity');adopted=next;typedResume=false;
+      };
+      const resumeOwned:LibraryOpeningPorts['resumeOwned']=async(session,current)=>{
+        const valid=()=>active()&&current();const r=await readOwned(valid);
+        if(r.state!=='confirmed'||r.session?.session_id!==session.session_id||r.session.session_profile!==session.session_profile)throw Error('owned_session_changed');
+        if(session.session_profile==='LEGACY'){
+          const plan=await ownedApi<ExecutionPlan>(`/sessions/${session.session_id}/execution`);if(plan.session_id!==session.session_id)throw Error('owned_session_changed');await adoptLegacy(plan,valid);
+        }else{
+          const controller=planV3Ref.current;if(!controller?.active)throw Error('typed_journal_unavailable');
+          await controller.restore();await controller.load();
+          if(!valid()||!controller.active||controller.state?.execution?.session_id!==session.session_id)throw Error('typed_journal_unavailable');typedResume=true;adopted=null;
+        }
+      };
+      await changed();if(!active())return false;
+      setLibraryPorts({client,pending,uuid:()=>Crypto.randomUUID(),now:()=>Date.now(),readOwned,adoptLegacy,resumeOwned,
+        otherActionPending:()=>!active()||sessionActionInFlight.current||legacyStartUnknownRef.current||closePendingRef.current||Boolean(localOpeningState({legacyStartUnknown:false,closePending:false,v3:planV3Ref.current?.state??null}))||['SET','REST'].includes(stateRef.current.phase),
+        onOpened:()=>{if(!active())return;setLibraryAtToday(true);if(adopted){apply({type:'RESTORE',state:adopted});setPaused(false);setPlanV3Open(false);}else if(typedResume)setPlanV3Open(true);missionResource.invalidate();void loadMission();}});
+    }else libraryBlocked.current=false;
     engineRef.current = new SyncEngine(j, (row) => {
       if (!active()) return Promise.reject(new ApiFailure('http', 401, 'auth'));
       if(row.kind === 'PLAN_V3_SET'){
@@ -445,7 +501,7 @@ export default function ConnectedApp() {
     setScreen('APP');
     setOffline(!online);
     return true;
-  }, [api, apply, auth, onAck, onStatus]);
+  }, [api, apply, auth, onAck, onStatus,loadMission,missionResource]);
 
   const verifyOwnership = useCallback(() => {
     if (ownershipFlight.current) return ownershipFlight.current;
@@ -921,7 +977,7 @@ export default function ConnectedApp() {
       const restored=target?await target.restore():{sets:[],outbox:[]};if(!current())return;
       const local=stateRef.current,next=reconcileSubstitutions(stateFromServer(plan,local.phase==='MISSION'?null:local,restored.sets,Date.now()),restored.outbox);
       await target?.beginLegacy?.(next,current);if(!current())return;
-      setPlanV3Open(false);apply({type:'RESTORE',state:next});setPaused(false);setOffline(false);
+      setLibraryAtToday(false);setPlanV3Open(false);apply({type:'RESTORE',state:next});setPaused(false);setOffline(false);
     }catch(error){
       if(!current())return;
       if(error instanceof ApiFailure&&error.kind==='network')setOffline(true);
@@ -933,6 +989,7 @@ export default function ConnectedApp() {
     if(sessionActionInFlight.current)return;
     const revision=auth.revision,target=journalRef.current;
     const current=()=>appAlive.current&&revision===auth.revision&&target===journalRef.current;
+    if(libraryBlocked.current){setMissionRefusal('Départ Programmes à vérifier dans la bibliothèque.');return;}
     setMissionRefusal(null);await engineRef.current?.kick();if(!current())return;
     const controller=planV3Ref.current;
     if(controller?.active)await controller.load();if(!current())return;
@@ -991,6 +1048,7 @@ export default function ConnectedApp() {
     cancelRestNotification();
     if (undoTimer.current) clearTimeout(undoTimer.current); undoTimer.current = null; setUndo(null);
     engineRef.current?.stop(); engineRef.current = null;
+    libraryAttachment.current=null;libraryBlocked.current=false;setLibraryPorts(null);setLibraryAtToday(false);
     journalRef.current = null; setJournal(null); setNutritionRuntime(null);
     apply({ type: 'RESET' }); setServerSets({}); setSubstitutions({}); setBilanContext(null); setNext(null);
     const signingOut = auth.logout();
@@ -1037,7 +1095,7 @@ export default function ConnectedApp() {
     onWebProfile={API_URL ? () => openWeb('/profile') : undefined} onSignOut={() => void signOut()} />;
   const continueAfterCreated = () => {
     const resume = state.phase === 'SET' || state.phase === 'REST' || mission?.state === 'RESUME';
-    if (!accountFlight.current) setAccountView(screen === 'APP' && !resume ? 'first-use' : null);
+    if (!accountFlight.current) setAccountView(screen === 'APP' && !resume && !libraryBlocked.current ? 'first-use' : null);
   };
   const bodyInShell=screen==='APP'&&accountView==='body'&&state.phase!=='SET'&&state.phase!=='REST';
   const nutritionInShell=screen==='APP'&&accountView==='nutrition'&&state.phase!=='SET'&&state.phase!=='REST';
@@ -1071,7 +1129,7 @@ export default function ConnectedApp() {
   } else if (screen === 'APP' && planV3?.active && planV3Open && !accountView && state.phase!=='SET' && state.phase!=='REST') {
     body = <PlanV3Host controller={planV3} onExit={()=>setPlanV3Open(false)} onPreferences={()=>setAccountView('preferences')} onSync={async()=>{await engineRef.current?.kick();}}/>;
   } else if (screen === 'APP') {
-    const inWorkout = state.phase === 'SET' || state.phase === 'REST';
+    const inWorkout = !libraryAtToday && (state.phase === 'SET' || state.phase === 'REST');
     if (inWorkout && paused && state.plan) {
       const remote=missionResource.state,other=remote.state==='confirmed'&&remote.value.state==='RESUME'&&remote.value.payload.session.id!==state.plan.session_id?remote.value.payload.session:null;
       const [name, subtitle] = (other?other.name:state.plan.template_name).split(' — ');
@@ -1134,12 +1192,12 @@ export default function ConnectedApp() {
       // MOB-01 — outside a workout the native shell is on screen; AUJOURD'HUI holds the MISSION or its quiet states
       const historical=isStartable(mission)?<View style={{flex:1}}><MissionScreen mission={mission as unknown as Mission} busy={busy}
         onStart={slug=>void start(slug)} onOpenLab={()=>setMissionMenu(true)} onSecondaryOpened={()=>metric('SECONDARY-OPENED')}/></View>:null;
-      const today=<MissionActionHost read={missionResource.state} path={missionResource.path} local={currentOpening()} checking={busy} refusal={missionRefusal} offline={offline} onReadOwned={planV3?.state?.execution?readCapturedV3:undefined}
+      const today=<View style={{flex:1}}>{libraryBlocked.current?<Text testID="library-pending-today" style={{color:color.ink,padding:20}}>Départ Programmes à vérifier · ouvre la bibliothèque.</Text>:null}<MissionActionHost read={missionResource.state} path={missionResource.path} local={currentOpening()} checking={busy} refusal={missionRefusal} offline={offline} onReadOwned={planV3?.state?.execution?readCapturedV3:undefined}
         onAction={openMissionAction} onVerify={verifyMission} onSelectPath={path=>{setMissionRefusal(null);missionResource.selectPath(path);setMission(null);void loadMission();}}
-        onOpenJournal={openJournalSheet} historical={historical}/>;
+        onOpenJournal={openJournalSheet} historical={historical}/></View>;
       body = (
-        <ShellProvider value={{ today, openJournal: openJournalSheet, siteUrl: API_URL, account: bodyInShell&&bodyOrigin==='profile'?bodySurface:accountSettings, progress:nutritionInShell?nutritionSurface:bodyInShell&&bodyOrigin==='progress'?bodySurface:<TrainingHistoryHost auth={auth} call={transport} typed={historicalSessions} bodyClient={bodyRuntime?.client} onBody={bodyRuntime?()=>{setBodyOrigin('progress');setAccountView('body');}:undefined} onNutrition={nutritionRuntime?()=>setAccountView('nutrition'):undefined}/> }}>
-          <ExpoRoot context={shellRoutes} />
+        <ShellProvider value={{ today, openJournal: openJournalSheet, siteUrl: API_URL, account: bodyInShell&&bodyOrigin==='profile'?bodySurface:accountSettings, programmes:libraryPorts?onOpened=><LibraryHost ports={libraryPorts} onOpened={onOpened} onResumeExisting={()=>{void resume();}} existingSession={missionResource.state.state==='confirmed'&&missionResource.state.value.state==='RESUME'?{session_id:missionResource.state.value.primary_action.session_id,session_profile:missionResource.state.value.primary_action.kind==='RESUME_V3'?'PLAN_V3':'LEGACY'}:null}/>:undefined, progress:nutritionInShell?nutritionSurface:bodyInShell&&bodyOrigin==='progress'?bodySurface:<TrainingHistoryHost auth={auth} call={transport} typed={historicalSessions} bodyClient={bodyRuntime?.client} onBody={bodyRuntime?()=>{setBodyOrigin('progress');setAccountView('body');}:undefined} onNutrition={nutritionRuntime?()=>setAccountView('nutrition'):undefined}/> }}>
+          <ExpoRoot context={shellRoutes} linking={SHELL_LINKING} />
         </ShellProvider>
       );
     }

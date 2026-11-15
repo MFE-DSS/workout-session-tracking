@@ -23,7 +23,7 @@ async function setup(){
 }
 const choice={source_ref:witness.created.source_ref,selection_ref:witness.request.selection_ref,read_revision:witness.detail.read_revision};
 test('prepare/readback/sent precede single creation and persistence precedes exact resolution',async()=>{
- const s=await setup();await s.controller.hydrate();await s.controller.submit(choice,()=>true);
+ const s=await setup();s.setOwned({state:'confirmed',owner_id:owner,backend_scope:backend,session:null});await s.controller.hydrate();await s.controller.submit(choice,()=>true);
  expect(s.sends).toBe(1);expect(s.adopted).toBe(1);expect(s.controller.state.phase).toBe('created');
  expect(await s.pending.unresolved(()=>true)).toBeNull();expect((await s.pending.get(localId,()=>true))?.creation_outcome).toBe('CONFIRMED');
 });
@@ -103,4 +103,13 @@ test('review I1 rejected-read follow-through: thrown owned read cannot erase def
  await s.controller.submit(choice,()=>true);expect(s.controller.state).toMatchObject({phase:'refused',code:'session_open'});
  s.setOwned({state:'confirmed',owner_id:owner,backend_scope:backend,session:{session_id:42,session_profile:'LEGACY'}});
  await s.controller.verify();expect(s.controller.state.phase).toBe('owned_found');expect(s.sends).toBe(1);
+});
+
+
+test('whole review I1: refusal guard survives hydrate and a new controller until an owner read succeeds',async()=>{
+ const s=await setup();s.refused();s.setOwned({state:'unknown'});await s.controller.submit(choice,()=>true);
+ expect(s.controller.state.code).toBe('session_open');expect(s.sends).toBe(1);
+ await s.controller.hydrate();await s.controller.submit(choice,()=>true);expect(s.sends).toBe(1);
+ const restored=s.make();await restored.hydrate();await restored.submit(choice,()=>true);expect(s.sends).toBe(1);
+ s.setOwned({state:'confirmed',owner_id:owner,backend_scope:backend,session:null});await restored.verify();expect(restored.state.phase).toBe('idle');
 });
