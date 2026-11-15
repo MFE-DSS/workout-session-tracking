@@ -15,6 +15,14 @@
 
 ---
 
+
+### NUT-01 — journal manuel et cibles, technique autorisée
+
+Change : `openspec/changes/nut-01-manual-daily-ledger/`. GO technique reçu
+(call_c1496d1a84e04b1a8dd61ad04f063aa6). Checkpoint de ports natifs sans
+consumer visible ni activation de schéma/API. Parent migration BODY requis pour
+la phase serveur ; G1 et pixels NUT restent ouverts.
+
 ## 1. Cycle Sx_26 — Engineering Control Plane & Anti-Drift Hardening (actif)
 
 **Spec :** `docs/strategy/Sx_26_ENGINEERING_CONTROL_PLANE_AND_ANTI_DRIFT_HARDENING_SPEC.md`

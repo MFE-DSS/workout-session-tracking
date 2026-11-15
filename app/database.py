@@ -113,7 +113,7 @@ def init_db() -> None:
     # Clone instead of mutating mapper metadata used by Alembic and services.
     startup_metadata = MetaData()
     for table in Base.metadata.sorted_tables:
-        if not table.info.get("plan_v3") and not table.info.get("body_01"):
+        if not any(table.info.get(scope) for scope in ("plan_v3", "body_01", "nutrition_manual")):
             clone = table.to_metadata(startup_metadata)
             for index in list(clone.indexes):
                 if any(original.name == index.name and original.info.get("plan_v3")

@@ -9,6 +9,7 @@
 import * as SQLite from 'expo-sqlite';
 import {attachPlanV3Journal,type PlanSQL} from './planV3Journal';
 import {attachBodyPending} from './bodyPendingCommands';
+import {attachNutritionPending} from './nutritionPendingCommands';
 import * as Crypto from 'expo-crypto';
 
 import type { WorkoutState } from '../domain/workout';
@@ -63,7 +64,7 @@ const UPSERT_SNAPSHOT =
  * `name`: the lab keeps its own file; the connected app (D9) uses another, so a
  * lab command aimed at a fixture session can never reach the real server.
  */
-export async function openJournal(name = 'auren-n0-lab.db', options: {planV3OwnerId?:number;bodyOwner?:{userId:number;backendScope:string}} = {}): Promise<Journal> {
+export async function openJournal(name = 'auren-n0-lab.db', options: {planV3OwnerId?:number;bodyOwner?:{userId:number;backendScope:string};nutritionOwner?:{userId:number;backendScope:string}} = {}): Promise<Journal> {
   const db = await SQLite.openDatabaseAsync(name);
   await db.execAsync(SCHEMA);
   // a command caught in flight by a force-kill has an unknown outcome: send it
@@ -74,6 +75,7 @@ export async function openJournal(name = 'auren-n0-lab.db', options: {planV3Owne
 
   const planV3 = options.planV3OwnerId === undefined ? undefined : await attachPlanV3Journal(db as unknown as PlanSQL, serial, options.planV3OwnerId);
   const bodyPending=options.bodyOwner===undefined?undefined:await attachBodyPending(db as unknown as PlanSQL,serial,options.bodyOwner.userId,options.bodyOwner.backendScope,s=>Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256,s));
+  const nutritionPending=options.nutritionOwner===undefined?undefined:await attachNutritionPending(db as unknown as PlanSQL,serial,options.nutritionOwner.userId,options.nutritionOwner.backendScope,s=>Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256,s));
   const saveLegacySnapshot = async (txn: Pick<SQLite.SQLiteDatabase,'getFirstAsync'|'runAsync'>, snapshot: WorkoutState, at: number) => {
     const row = await txn.getFirstAsync<{snapshot:string}>('SELECT snapshot FROM active_session WHERE id=1');
     if (row && JSON.parse(row.snapshot)?.profile === 'PLAN_V3') return;
@@ -83,6 +85,7 @@ export async function openJournal(name = 'auren-n0-lab.db', options: {planV3Owne
   return {
     planV3,
     bodyPending,
+    nutritionPending,
     beginLegacy: (snapshot,current) => serial(async()=>{
       if(!current())throw Error('stale_identity');
       await db.withExclusiveTransactionAsync(async tx=>{

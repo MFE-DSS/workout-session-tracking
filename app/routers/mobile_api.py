@@ -42,6 +42,7 @@ from app.routers import sessions as web_sessions
 from app.routers.mobile_body import router as body_router
 from app.routers.mobile_body_measurements import router as body_measurements_router
 from app.routers.mobile_mission import router as mission_action_router
+from app.routers.mobile_nutrition import router as nutrition_router
 from app.routers.mobile_training_history import router as training_history_router
 from app.routers.mobile_training_preferences import read_declarations, replace_declarations
 from app.services import device_auth
@@ -582,3 +583,4 @@ router.include_router(mission_action_router)
 
 # MOB-05A owned history reads; no writer or historical inference.
 router.include_router(training_history_router)
+router.include_router(nutrition_router)

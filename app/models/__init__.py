@@ -16,6 +16,7 @@ from app.models import (  # noqa: F401
     first_plan_runtime,
     measurement,
     muscle,
+    nutrition,
     plan_adaptation_dismissal,
     readiness,
     recommendation_episode,

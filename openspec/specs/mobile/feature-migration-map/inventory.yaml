@@ -24,6 +24,34 @@ excluded_routes:  # montés par FastAPI, pas des fonctions utilisateur (désacti
 
 features:
 
+  - id: manual-nutrition-core
+    feature: Journal nutritionnel manuel et cibles déclarées
+    family: progres
+    routes:
+      - GET /api/mobile/v1/me/nutrition/capabilities
+      - GET /api/mobile/v1/me/nutrition/consent
+      - POST /api/mobile/v1/me/nutrition/consent
+      - GET /api/mobile/v1/me/nutrition/days
+      - GET /api/mobile/v1/me/nutrition/days/{day}
+      - POST /api/mobile/v1/me/nutrition/days/{day}/revisions
+      - GET /api/mobile/v1/me/nutrition/days/{day}/revisions
+      - GET /api/mobile/v1/me/nutrition/targets/head
+      - GET /api/mobile/v1/me/nutrition/targets
+      - POST /api/mobile/v1/me/nutrition/targets/revisions
+      - GET /api/mobile/v1/me/nutrition/targets/{target_ref}/revisions
+      - GET /api/mobile/v1/me/nutrition/export
+      - GET /api/mobile/v1/me/nutrition/operations/{namespace}/{request_id}
+    legacy_location: "Nouveau domaine NUT-01 ; aucun writer web nutrition antérieur réutilisé"
+    domain_owner: [nutrition_commands, nutrition_reads, nutrition_consent]
+    api: "nutrition-manual/1.0.0 ; X-Auren-Nutrition-Contract explicite, Bearer et no-store"
+    data: [nutrition_day_revisions_v1, nutrition_target_revisions_v1, body_consents]
+    user_actions: [déclarer un jour, corriger, déclarer la complétude, définir ses cibles, lire les sources et versions]
+    native_destination: "PROGRÈS — ConnectedApp iOS contrôlé, entrée Journal Nutrition ; Host Android de production distinct, app Android complète non recettée"
+    status: REWRITE_NATIVE
+    dependencies: [NUT-01, parent BODY canonique, DATA pour activation réelle, recette physique et release distinctes]
+    visual_assets: []
+    migration_risk: "Nouveau schéma additif ; correction append-only, aucun objectif ou apport inféré ; aucune parité native déclarée depuis les routes"
+
   # ── Séance (déjà native) ────────────────────────────────────────────────────
   - id: mission-today
     feature: MISSION — la séance du jour et sa raison
