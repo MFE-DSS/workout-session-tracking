@@ -17,6 +17,7 @@ from sqlalchemy import select, func
 from sqlalchemy.orm import Session, selectinload
 
 from app.models.measurement import BodyMeasurement
+from app.services.body_measurement_reads import current_measurement_predicate
 from app.models.session import SessionExercise, SetLog, WorkoutSession
 from app.services.body_zone_source import ZoneResolution, resolve_exercise_zones
 from app.services.muscle_mapping import (
@@ -225,7 +226,7 @@ def _score_anthropo(
     # Get all measurements in window
     rows = db.execute(
         select(BodyMeasurement)
-        .where(BodyMeasurement.user_id == user_id)
+        .where(BodyMeasurement.user_id == user_id, current_measurement_predicate())
         .where(BodyMeasurement.measured_at >= window_start)
         .order_by(BodyMeasurement.measured_at.asc())
     ).scalars().all()
@@ -312,12 +313,12 @@ def compute_physique_dashboard(
     # Check for body measurement data availability
     weight_count = db.execute(
         select(func.count(BodyMeasurement.id))
-        .where(BodyMeasurement.user_id == user_id)
+        .where(BodyMeasurement.user_id == user_id, current_measurement_predicate())
         .where(BodyMeasurement.weight_kg.is_not(None))
     ).scalar_one() or 0
     waist_count = db.execute(
         select(func.count(BodyMeasurement.id))
-        .where(BodyMeasurement.user_id == user_id)
+        .where(BodyMeasurement.user_id == user_id, current_measurement_predicate())
         .where(BodyMeasurement.waist_cm.is_not(None))
     ).scalar_one() or 0
 

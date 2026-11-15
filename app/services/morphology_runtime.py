@@ -36,6 +36,7 @@ from sqlalchemy.orm import Session
 
 from app.models.measurement import BodyMeasurement
 from app.models.user import User
+from app.services.body_measurement_reads import current_measurement_predicate
 from app.services.morphology_profile import MorphologyFacts
 
 # Version de la convention d'agrégation latérale. Toute évolution de la règle
@@ -114,7 +115,7 @@ def _measurements(
     Scopé par `user_id` : une mesure d'un autre utilisateur n'est pas
     « refusée », elle est **introuvable** (spec §7).
     """
-    stmt = select(BodyMeasurement).where(BodyMeasurement.user_id == user_id)
+    stmt = select(BodyMeasurement).where(BodyMeasurement.user_id == user_id, current_measurement_predicate())
     if as_of is not None:
         stmt = stmt.where(BodyMeasurement.measured_at <= as_of)
     return list(

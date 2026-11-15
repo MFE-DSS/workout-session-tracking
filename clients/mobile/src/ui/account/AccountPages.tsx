@@ -12,8 +12,9 @@ export function AccountResultScreen(p: { kind: 'created' | 'password'; onContinu
     <Text style={type.eyebrow}>{p.kind === 'created' ? 'Comprendre · Planifier · Exécuter' : 'Compte sécurisé'}</Text>
   </AccountFrame>;
 }
-export function AccountSettingsScreen(p: { username: string | null; onPassword: () => void; onExport?: () => void; onPrivacy?: () => void; onPreferences?: () => void; onWebProfile?: () => void; onSignOut: () => void }) {
+export function AccountSettingsScreen(p: { username: string | null; onPassword: () => void; onExport?: () => void; onPrivacy?: () => void; onPreferences?: () => void; onBody?:()=>void; onWebProfile?: () => void; onSignOut: () => void }) {
   return <AccountFrame title="Ton compte" lead={p.username ?? 'Compte lié à cet appareil'} footer={<AccountLink label="Se déconnecter" onPress={p.onSignOut} testID="settings-signout" />}>
+    {p.onBody?<SheetRow title="Mesures corporelles" onPress={p.onBody}/>:null}
     <SheetRow title="Changer le mot de passe" onPress={p.onPassword} />
     {p.onExport ? <SheetRow title="Exporter mes données" detail="Sur le site · une connexion web peut être nécessaire" onPress={p.onExport} /> : null}
     {p.onPrivacy ? <SheetRow title="Confidentialité" onPress={p.onPrivacy} /> : null}

@@ -59,6 +59,11 @@ def _make_client(
     # Enter the TestClient context so lifespan (init_db + seed) runs
     # BEFORE we create the test user.
     with TestClient(main_mod.app) as c:
+        # This fixture models a migrated deployment; application startup
+        # deliberately never installs the BODY-01 lineage sidecar.
+        from tests.helpers import install_body_schema
+
+        install_body_schema()
         if login:
             from app.database import SessionLocal
             from app.models.user import User

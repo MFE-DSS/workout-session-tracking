@@ -267,3 +267,36 @@ donnée historique touchée.
 La limite la plus honnête de ce document : sans `observations`, le runtime produira des
 descripteurs à **confiance structurellement réduite**. C'est correct — mais il faut le
 savoir avant de brancher un planificateur dessus, pas après.
+
+
+## BODY-01 — amendement normatif du 11 novembre 2026
+
+Décision opérateur : « Autoriser BODY-01, son amendement et G1 », référence
+call_106057b169a74bc9887b1fea9f527f5d ; scope OpenSpec body-01-owned-measurements.
+Cette règle prospective précise/remplace les mentions antérieures d'édition
+en place, sans modifier les données historiques ni les preuves d'anciens scopes.
+
+Une observation nouvelle est un INSERT BodyMeasurement, sans upsert par jour.
+Corriger un relevé ajoute une version dans la même table, liée à la tête sous
+garde propriétaire/concurrence : original conservé, champs hérités et leur
+provenance conservés, corrections tracées. Une correction n'est pas une nouvelle
+observation indépendante. Les lecteurs courants utilisent les têtes non
+effacées ; les versions remplacées relèvent de l'audit/export et ne peuvent
+revenir comme repli d'un champ explicitement vidé. Aucune migration/backfill,
+fusion, requalification ou suppression des anciennes observations.
+
+L'effacement volontaire individuel est distinct : confirmation du relevé et de
+toutes ses versions, suppression réelle des nombres correspondants, reçu
+minimal/réservations identitaires identifiés comme copies personnelles DATA.
+Ce scope contrôlé sur synthétique ne ferme ni suppression tout profil, ni
+fermeture/export globaux, ni politique des copies locales/backups/rétention.
+Ces limites restent des gates avant activation, pas conformité générale acquise.
+
+Le poids mobile v1 conserve forme/décodeur et son profil de provenance limité,
+en excluant les versions remplacées ; le nouveau DTO BODY fournit les sources
+complètes au consommateur Progrès. Formules/règles et registres scientifiques,
+calibrage, snapshots et journaux des séances historiques restent inchangés.
+
+GO contrôlé d'ingénierie seulement : pixels réels avant commit UI ; DATA réelle,
+recette physique, intégration RC et autorisation de release distincts. Aucun
+APK/OTA ou déploiement automatique à partir d'un merge.

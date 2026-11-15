@@ -16,6 +16,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.models.measurement import BodyMeasurement
+from app.services.body_measurement_reads import current_measurement_predicate
 
 
 MEASUREMENT_MUSCLE_MAP: dict[str, list[str]] = {
@@ -128,7 +129,7 @@ def get_latest_measurement(
     """Return the most recent measurement for a user."""
     return db.execute(
         select(BodyMeasurement)
-        .where(BodyMeasurement.user_id == user_id)
+        .where(BodyMeasurement.user_id == user_id, current_measurement_predicate())
         .order_by(BodyMeasurement.measured_at.desc())
         .limit(1)
     ).scalar_one_or_none()
@@ -155,7 +156,7 @@ def get_measurement_series(
 
     measurement_rows = db.execute(
         select(BodyMeasurement.measured_at, col)
-        .where(BodyMeasurement.user_id == user_id)
+        .where(BodyMeasurement.user_id == user_id, current_measurement_predicate())
         .where(col.is_not(None))
     ).all()
     rows.extend((r[0], float(r[1])) for r in measurement_rows)

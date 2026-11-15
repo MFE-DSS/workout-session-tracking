@@ -10,6 +10,7 @@ export type Restored = {
 };
 
 export interface Journal {
+  readonly bodyPending?: import('./bodyPendingCommands').BodyPendingCommands;
   beginLegacy?(snapshot:WorkoutState,current:()=>boolean):Promise<void>;
   readonly planV3?: import('./planV3Journal').PlanV3Journal;
   readonly kind: 'sqlite' | 'memory';

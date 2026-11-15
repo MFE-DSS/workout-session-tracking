@@ -1,5 +1,6 @@
 import type {HistoryWindow} from '../../api/trainingHistory';
-import type {WeightEntry} from '../../api/weightHistory';
+import type {WeightPoint as WeightEntry} from '../../api/trainingHistoryResource';
+export function weightDateLabel(e:WeightEntry,zone='UTC'){return dateLabel(e.measured_at,e.bodySource?.date_precision==='DAY_UTC_CONVENTION'?'UTC':zone);}
 export const numeric=(n:number)=>String(n).replace('.',',');
 export function dateLabel(instant:string,timeZone='UTC'){
  try{return new Intl.DateTimeFormat('fr-FR',{day:'numeric',month:'short',year:'numeric',timeZone}).format(new Date(instant));}catch{return instant;}

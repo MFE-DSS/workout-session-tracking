@@ -122,10 +122,11 @@ def test_the_route_writes_through_the_canonical_service(client, monkeypatch):
     seen: dict = {}
     real = bp.create_measurement
 
-    def _spy(db, user_id, cleaned, *, measured_at=None):
+    def _spy(db, user_id, cleaned, *, measured_at=None, date_precision=None):
         seen["cleaned"] = dict(cleaned)
         seen["measured_at"] = measured_at
-        return real(db, user_id, cleaned, measured_at=measured_at)
+        seen["date_precision"] = date_precision
+        return real(db, user_id, cleaned, measured_at=measured_at, date_precision=date_precision)
 
     monkeypatch.setattr(bp, "create_measurement", _spy)
 
@@ -136,6 +137,7 @@ def test_the_route_writes_through_the_canonical_service(client, monkeypatch):
     assert seen["cleaned"] == {"chest_cm": 100.0}
     # The user-supplied date survived the delegation.
     assert seen["measured_at"].date() == datetime(2026, 4, 12).date()
+    assert seen["date_precision"] == "DAY_UTC_CONVENTION"
 
 
 def test_the_route_no_longer_writes_the_legacy_calf_column(client):

@@ -252,10 +252,19 @@ features:
       - POST /body/measurements/{measurement_id}/delete
       - GET /body/export.json
       - GET /api/mobile/v1/me/body/weight-history
+      - GET /api/mobile/v1/me/body/measurements
+      - POST /api/mobile/v1/me/body/measurements
+      - GET /api/mobile/v1/me/body/measurements/{root_ref}
+      - GET /api/mobile/v1/me/body/measurements/{root_ref}/versions
+      - POST /api/mobile/v1/me/body/measurements/{root_ref}/corrections
+      - POST /api/mobile/v1/me/body/measurements/{root_ref}/erase
+      - GET /api/mobile/v1/me/body/measurements/export
+      - GET /api/mobile/v1/me/body/measurements/weight-history
+      - GET /api/mobile/v1/me/body/operations/{request_id}
     legacy_location: "body.* → body_assessment/body_overview.html, measurement_form.html"
     domain_owner: [measurements, body_ledger, body_profile]
-    api: "GET /api/mobile/v1/me/body/weight-history (poids seul, consentement/flag) ; écriture JSON non livrée"
-    data: ["body_measurements (measured_at, weight_kg, tours)"]
+    api: "weight-history/1.0.0 préservé ; body-measurements/1.0.0 : lectures source-aware, projection minimale purpose=erasure sans grant, correction/effacement et reçus propriétaires ; engineering contrôlé BODY-01, pas activation réelle"
+    data: ["body_measurements (measured_at, weight_kg, tours)", body_measurement_operations_v1]
     user_actions: [saisir son poids, saisir des mesures, corriger, supprimer, exporter]
     native_destination: PROFIL (BODY_LEDGER) ; PROGRÈS (lecture du poids daté MOB-05A)
     status: REWRITE_NATIVE
@@ -266,10 +275,10 @@ features:
   - id: body-consent
     feature: Consentement à l'enregistrement des mesures corporelles
     family: profil
-    routes: [POST /profile/consent, POST /body/consent]
+    routes: [POST /profile/consent, POST /body/consent, GET /api/mobile/v1/me/body/consent, POST /api/mobile/v1/me/body/consent]
     legacy_location: "auth_routes.profile_consent, body.consent"
     domain_owner: [body_profile]
-    api: "à créer"
+    api: "GET/POST /api/mobile/v1/me/body/consent ; body-measurements/1.0.0, CAS et état courant, contrôlé BODY-01"
     data: [body_consents]
     user_actions: [accorder, retirer]
     native_destination: PROFIL / onboarding

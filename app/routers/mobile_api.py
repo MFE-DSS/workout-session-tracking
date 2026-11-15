@@ -40,6 +40,7 @@ from app.models.session import WorkoutSession
 from app.models.user import User
 from app.routers import sessions as web_sessions
 from app.routers.mobile_body import router as body_router
+from app.routers.mobile_body_measurements import router as body_measurements_router
 from app.routers.mobile_mission import router as mission_action_router
 from app.routers.mobile_training_history import router as training_history_router
 from app.routers.mobile_training_preferences import read_declarations, replace_declarations
@@ -576,6 +577,7 @@ def abandon(session_id: int, body: CloseBody, user: ApiUser, db: DbSession) -> d
 
 # MOB-03 read-only body history; no new measurement writer or deletion route.
 router.include_router(body_router)
+router.include_router(body_measurements_router)
 router.include_router(mission_action_router)
 
 # MOB-05A owned history reads; no writer or historical inference.

@@ -998,3 +998,11 @@ mesure, cible ou score, pas de writer corporel/nutrition. Revue complète unique
 
 
 **Closeout MOB-05A —11novembre :** [PR403](https://github.com/MFE-DSS/workout-session-tracking/pull/403), HEAD0343ecf289d278ae60636978df3c8f21aad4fe5c, merge18e04bd25ae424e97ac9f810321972e1b101dcae. CI PR42983311724 et canonique42986290983 completed/success11jobs :8476backend/3ignorés,88suites/1122mobiles+TS,77visuels réellement rejoués. Pixels finaux acceptés « Valider le delta final MOB-05A » avant commitUI,22frames/15sources et anciennes références intactes. [Clôture contrôlée](../pilot/mob05a-progress/CLOSEOUT.md), [passation](../pilot/mob05a-progress/AGENT_HANDOFF.md), [spec canonique](../../openspec/specs/mobile/training-history/spec.md). Archive15/16tasks : seul suivi publication/CI/merge canonique final/nettoyage demeure ouvert à l'instant de publication et sera résolu par reçu vivant. Deux mineurs/physique/RELEASE/DATA restent explicites ; aucun APK/OTA/déploiement ou writer BODY/NUT implicite.
+
+
+### BODY-01 — acquisition propriétaire versionnée
+
+Change : `openspec/changes/body-01-owned-measurements/`. GO BODY/amendement/G1
+reçu (call_106057b169a74bc9887b1fea9f527f5d). Première étape : fondation
+transactionnelle additive sans nouvelle acquisition montée ni livraison UI.
+Le change reste ouvert jusqu’aux consommateurs, pixels, CI et merge applicables.
