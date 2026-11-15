@@ -1,9 +1,9 @@
 {
   "feature": "MOB-07",
-  "status": "IMPLEMENTED_NOT_DELIVERED",
+  "status": "ENGINEERING_DELIVERED_CLOSEOUT_PUBLICATION_PENDING",
   "canonical_parent": "f31b6e7b8411bf9668906a3a5dc38b22fef8ae55",
-  "feature_commit": null,
-  "pull_request": null,
+  "feature_commit": "c614241123eae018df4b7c4d3a176bdc9091c38e",
+  "pull_request": 414,
   "schema": "program_builder_operations_01",
   "schema_parent": "nutrition_manual_01",
   "api": "program-builder/1.0.0",
@@ -23,7 +23,7 @@
   },
   "Android_physical": "UNAVAILABLE",
   "release_candidate": "NOT_READY",
-  "REL03_compatibility": "Snapshot-coupled schema pins and active default PREPARE template aligned with program_builder_operations_01. Prior f31 template bytes and actual PREPARE/binary receipts preserved. Actual-default positive RED→GREEN then270QA tests PASS. Exact remote CI/merge not yet performed; no deployment/release.",
+  "REL03_compatibility": "Snapshot-coupled schema pins and active default PREPARE template aligned with program_builder_operations_01. Actual-default RED→GREEN and270QA PASS; PR CI and guarded merge verified. Actual PREPARE_ONLY on the merge succeeded, with release skipped and non-distributable artifact verified. Historical f31 template and past receipts preserved. Canonical CI11jobs success and genuine advisory Sonar recorded. No deployment/release.",
   "update_classification": {
     "native_modules_and_dependencies": "UNCHANGED_BY_MOB07_DIFF",
     "application": "JS/TS logic and additive owner-bound SQLite command table",
@@ -33,5 +33,36 @@
     "future_OTA": "Only after actual installed runtime/channel compatibility and controlled release approval",
     "rollback": "Must preserve new pending builder intents and server receipts; an older JS bundle cannot be presumed able to reconcile that table. Candidate-specific rollback/readback remains UNVERIFIED.",
     "storage_source_boundary": "Existing guard hashes every production src/storage/*.ts file, including new builder store. No OTA across changed storage bytes is presumed compatible with an old native receipt."
+  },
+  "code_merge": "dbad35d4634442e985b2964ff85fad6254efae74",
+  "PR_CI": {
+    "run": 43750397616,
+    "status": "completed/success",
+    "backend_passed": 8755,
+    "backend_skipped": 3,
+    "mobile_suites": 127,
+    "mobile_tests": 1448,
+    "typescript": "PASS",
+    "visual_tests": 77
+  },
+  "PREPARE_ONLY": {
+    "run": 43753502730,
+    "source_sha": "dbad35d4634442e985b2964ff85fad6254efae74",
+    "candidate_sha256": "a5e06ba5633f8c01c329b2620d66b869edcee7f07f12294aa310d3426831955a",
+    "artifact_id": 14177018006,
+    "artifact_zip_sha256": "c961b55fff5c61949959fadc1ea5e79921a95e61e0e3a03428d70bf1139418ee",
+    "storage_source_sha256": "691c7acd7cfb3b7d8e6700c3c00aab85ac97ed32cecb127b7c9976194ee9ea29",
+    "release_job": "skipped",
+    "distributable": false
+  },
+  "canonical_CI": {
+    "run": 43753463939,
+    "status": "completed/success",
+    "jobs": 11,
+    "backend_passed": 8755,
+    "backend_skipped": 3,
+    "mobile_tests": 1448,
+    "typescript": "PASS",
+    "visual_tests": 77
   }
 }
