@@ -316,7 +316,16 @@ def test_collector_refuses_private_or_extra_mounts_and_changed_loaded_generation
             "StartedAt": "2026-11-15T12:00:00Z",
         },
         "HostConfig": host,
-        "Config": {"User": "10001"},
+        "Config": {
+            "User": "10001",
+            "Entrypoint": ["python", "-m", "tools.qa_delivery.bootstrap"],
+            "Cmd": [
+                "--config",
+                "/etc/secrets/qa-config.json",
+                "--activation",
+                "/var/lib/qa/activation.json",
+            ],
+        },
         "NetworkSettings": {"Ports": {"8080/tcp": []}},
         "Mounts": [
             {"Type": x["type"], "Name": x["source"], "Destination": x["destination"], "RW": x["rw"]}
@@ -333,6 +342,11 @@ def test_collector_refuses_private_or_extra_mounts_and_changed_loaded_generation
         project_runtime(policy, activation, container, [record["container_id"][:12]])["image_id"]
         == record["image_id"]
     )
+    wrong_command = deepcopy(container)
+    wrong_command["Config"]["Entrypoint"] = ["python", "-m", "tools.qa_delivery.server"]
+    wrong_command["Config"]["Cmd"] = ["--facade-only"]
+    with pytest.raises(ValueError, match="qa_ovh_collector"):
+        project_runtime(policy, activation, wrong_command, [record["container_id"][:12]])
     container["Mounts"].append({"Type": "bind", "Destination": "/var/run/docker.sock", "RW": True})
     with pytest.raises(ValueError):
         project_runtime(policy, activation, container, [record["container_id"][:12]])

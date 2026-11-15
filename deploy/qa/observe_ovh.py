@@ -117,6 +117,16 @@ def project_runtime(policy, activation, container, writers):
     require(container["Name"] == "/" + RESOURCE and state["Running"] is True)
     require(state["Health"]["Status"] == "healthy")
     require(container["Config"]["User"] == "10001" and not host["Privileged"])
+    require(container["Config"]["Entrypoint"] == ["python", "-m", "tools.qa_delivery.bootstrap"])
+    require(
+        container["Config"]["Cmd"]
+        == [
+            "--config",
+            "/etc/secrets/qa-config.json",
+            "--activation",
+            "/var/lib/qa/activation.json",
+        ]
+    )
     require(
         host["ReadonlyRootfs"] is True
         and host["CapAdd"] in (None, [])
@@ -217,7 +227,7 @@ def collect(request):
     projection = (
         '{"Id":{{json .Id}},"Name":{{json .Name}},"Image":{{json .Image}},"State":{"Running":{{json .State.Running}},"StartedAt":{{json .State.StartedAt}},"Health":{"Status":{{json .State.Health.Status}}}},"HostConfig":{'
         + host
-        + '},"Mounts":{{json .Mounts}},"Config":{"User":{{json .Config.User}}},"NetworkSettings":{"Ports":{{json .NetworkSettings.Ports}}}}'
+        + '},"Mounts":{{json .Mounts}},"Config":{"User":{{json .Config.User}},"Entrypoint":{{json .Config.Entrypoint}},"Cmd":{{json .Config.Cmd}}},"NetworkSettings":{"Ports":{{json .NetworkSettings.Ports}}}}'
     )
     container = json.loads(
         fixed_read(["/usr/bin/docker", "inspect", "--format", projection, RESOURCE])
