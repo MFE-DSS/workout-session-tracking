@@ -13,9 +13,9 @@
 - [x] Contrats/leases/migration fixés, plan borné, tests RED puis domaine/readmodel/API/SQLite et local owner-bound.
 - [x] Vrai consommateur natif jour/cibles/historique factuel sans provider ; tests A/B/offline/reprise/complétude/concurrence. ConnectedApp iOS et présentateurs Host Android distingués dans le reçu du15novembre.
 - [x] Board natif réel familial comparé références ; accord pixels avant commit UI, avec réserves artistiques non bloquantes pour le pilote.
-- [ ] check_scope/checks exigés/sécurité/revue indépendante/CI HEAD exact ; corrections autonomes dans scope.
+- [x] check_scope/checks exigés/sécurité/revue indépendante/CI HEAD exact ; corrections autonomes dans scope. Reçu15novembre : CI43705775645 et canonique43707036706 completed/success,11jobs chacune.
 - [ ] Commit/push/PR/guarded merge GOV-MERGE-01, canonique CI/Sonar réel, manifeste intégration/smoke, archive/closeout/cleanup possédés.
-- [ ] DATA/physique/RC/release séparés ; aucun EAS Build/OTA routinier. Futur provider ne bloque pas COMPLETE manuel.
+- [x] Documenter les gates DATA/physique/RC/release restant OUVERTES hors closeout engineering ; aucun EAS Build/OTA. Provider futur distinct du manuel.
 
 ## Avancement technique contrôlé — 12novembre
 - [x] Modèles deux tables, canonicalisation milli-entière, commandes/CAS/reçus et accord distinct implémentés.
@@ -25,8 +25,8 @@
 - [x] Client typé, stockage exact/reprise explicite et lecteur multi-pages implémentés sans composition UI.
 - [x] Revue native/corrections et suite mobile ; preuve iOS technique de reprise réelle sans nouvelle UI.
 - [x] Campagne globale locale du15novembre sur sources BODY5b19+NUT :447fichiers,8668PASS/1ignoré, composée après arrêt mémoire ; ancien échec232/440 conservé. Aucune CI finale déduite.
-- [ ] Intégrer la migration dans le vrai graphe après parent BODY et obtenir drift/snapshot/CI verts à cette révision. L'échec de drift de la branche NUT isolée est conservé, pas contourné.
-- [ ] Montage journal/ConnectedApp et vrai consommateur visuel : non réalisés sous ce GO technique ; gates artistiques applicables à conserver.
+- [x] Réalisé15novembre : migration dans le vrai graphe après BODY5b19 ; drift/snapshot/CI verts sur sourcefc45ef7 puis canonique c9ce371. Ancien échec isolé conservé.
+- [x] Réalisé15novembre après G1/master/famille et gate natif propres : journal/ConnectedApp/consommateur contrôlé, pixels acceptés pour le pilote avec réserves ; limites Android/physique conservées.
 
 
 ### État courant vérifié —15 novembre
@@ -39,3 +39,6 @@ Board natif unique http://127.0.0.1:8264/ :17captures, ConnectedApp iOS et Host 
 
 ### Décision native finale reçue —15novembre
 **« Accepter les pixels NUT pour le pilote, avec réserves artistiques »**, questioncall_ac972e9af5dd4c2698c6f2c131cce4eb. Le refus précédent est levé pour ce périmètre contrôlé. Reçu exactNATIVE_PIXEL_ACCEPTANCE.json ; aucun nouveau GO technique/G1/famille demandé. Les réserves artistiques, limites Android/physique et gates de CI/merge/release restent conservées.
+
+### Clôture engineering —15novembre
+Code406fusionné c9ce3713c43261f896e1e552c09243837ff535da, HEADfc45ef769ef76c0a4b1bef9b8836967f9d2fefb5 ; CI PR43705775645 et canonique43707036706 completed/success11jobs. Sonar consultatifERROR, détails docs/pilot/nut-01/CLOSEOUT.md. Seul le suivi de publication du closeout/CI/nettoyage reste ouvert à l’instant d’archive ; le reçu vivant final406 le résoudra. Aucun faux traitement réel ou recette physique fermé.
