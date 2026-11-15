@@ -50,7 +50,7 @@ Généré depuis `inventory.yaml` (base `36b971a`) — ne pas éditer à la main
 
 | Fonction | Statut | Destination native | Routes | Propriétaire du domaine | Dépendances | Risque |
 |---|---|---|---|---|---|---|
-| Journal nutritionnel manuel et cibles déclarées | REWRITE_NATIVE | PROGRÈS — consommateur à raccorder après G1/pixels, domaine technique seulement à ce stade | 13 | nutrition_commands · nutrition_reads · nutrition_consent | NUT-01 · migration parent BODY · G1 et pixels NUT · DATA pour activation réelle | Nouveau schéma additif ; correction append-only, aucun objectif ou apport inféré ; aucune parité native déclarée depuis les routes |
+| Journal nutritionnel manuel et cibles déclarées | REWRITE_NATIVE | PROGRÈS — ConnectedApp iOS contrôlé, entrée Journal Nutrition ; Host Android distinct, app Android complète non recettée | 13 | nutrition_commands · nutrition_reads · nutrition_consent | NUT-01 · parent BODY canonique · DATA pour activation réelle · physique et release distincts | Nouveau schéma additif ; correction append-only, aucun objectif ou apport inféré ; aucune parité native déclarée depuis les routes |
 | Rapport de coach (synthèse en 10 blocs) | BLOCKED | PROGRÈS | 1 | coach_report · coach_inference · body_intelligence · narrative | UX-LAB PROFILE / PROGRÈS · moteur scientifique V2 (couches E0–E8) | élevé — prose dense héritée, revendications à revoir |
 | Historique des séances (journal) | REWRITE_NATIVE | PROGRÈS | 3 | flight_recorder · session_state · training_history_reads | MOB-05 | moyen |
 | Historique d'un exercice | REWRITE_NATIVE | PROGRÈS (et depuis la séance) | 4 | exercise_history · training_history_reads | MOB-05 | faible |

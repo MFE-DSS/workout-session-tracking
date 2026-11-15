@@ -16,12 +16,9 @@
 ---
 
 
-### NUT-01 — journal manuel et cibles, technique autorisée
+### NUT-01 — journal natif manuel et cibles : ENGINEERING MERGE
 
-Change : `openspec/changes/nut-01-manual-daily-ledger/`. GO technique reçu
-(call_c1496d1a84e04b1a8dd61ad04f063aa6). Checkpoint de ports natifs sans
-consumer visible ni activation de schéma/API. Parent migration BODY requis pour
-la phase serveur ; G1 et pixels NUT restent ouverts.
+Code [#406](https://github.com/MFE-DSS/workout-session-tracking/pull/406) fusionné en `c9ce3713c43261f896e1e552c09243837ff535da`, après BODY canonique `5b19dc7`. GO technique, G1, master B, famille DA08 et pixels pilote avec réserves acquis. CI PR43705775645 et canonique43707036706 completed/success, onze jobs. Archive : `openspec/changes/archive/2026-11-15-nut-01-manual-daily-ledger/` ; sept exigences canoniques `mobile/manual-nutrition-ledger`. Voir `docs/pilot/nut-01/CLOSEOUT.md` pour revues, Sonar consultatif, limites et suivi du closeout. DATA, Android complet, physique et release restent ouverts.
 
 ## 1. Cycle Sx_26 — Engineering Control Plane & Anti-Drift Hardening (actif)
 

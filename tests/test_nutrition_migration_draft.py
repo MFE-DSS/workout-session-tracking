@@ -12,7 +12,7 @@ from test_nutrition_models import day, target
 
 def test_frozen_migration_accepts_both_revision_types_and_records_server_time(tmp_path):
     source = (Path(__file__).parents[1] / "openspec/changes/"
-              "nut-01-manual-daily-ledger/migration-draft/nutrition_manual_01.py")
+              "archive/2026-11-15-nut-01-manual-daily-ledger/migration-draft/nutrition_manual_01.py")
     spec = importlib.util.spec_from_file_location("nutrition_draft_test", source)
     migration = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(migration)
