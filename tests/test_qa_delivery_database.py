@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import sqlite3
 import subprocess
@@ -95,6 +96,71 @@ def qa_database(tmp_path, migrated_canonical_schema):
             "INSERT INTO nutrition_day_revisions_v1 (user_id,local_day,timezone,state,declared_complete,target_ref,revision,kcal_milli,provenance,request_id,command_digest,receipt) VALUES (42,'2026-11-15','Europe/Paris','ACTIVE',1,1,1,1900000,'{}','day-preserved',?,'{}')",
             ("e" * 64,),
         )
+        # An actual owned programme and its editable tree coexist with the
+        # historical technical CREATE receipt. Later web edits do not rewrite it.
+        title = "Owned programme preserved"
+        slug = "owned-programme-preserved"
+        command_body = {
+            "contract_version": "program-builder/1.0.0",
+            "command_id": "builder-preserved",
+            "operation": "CREATE",
+            "program_id": None,
+            "expected_source_digest": None,
+            "payload": {"title": title},
+        }
+        source_after_create = {
+            "id": 17,
+            "title": title,
+            "slug_base": slug,
+            "status": "draft",
+            "version": 1,
+            "archived_at": None,
+            "wizard_answers": None,
+            "sessions": [],
+        }
+
+        def digest(value):
+            return hashlib.sha256(
+                json.dumps(
+                    value, sort_keys=True, separators=(",", ":"), ensure_ascii=False
+                ).encode()
+            ).hexdigest()
+
+        request_sha256, source_digest = digest(command_body), digest(source_after_create)
+        builder_receipt = {
+            "contract_version": "program-builder/1.0.0",
+            "owner_id": 42,
+            "command_id": "builder-preserved",
+            "request_sha256": request_sha256,
+            "operation": "CREATE",
+            "program_id": 17,
+            "resulting_source_digest": source_digest,
+            "resulting_version": 1,
+            "publication_ids": [],
+            "selections": [],
+            "recorded_at": "2026-11-15T00:00:00Z",
+        }
+        db.execute(
+            "INSERT INTO user_programs (id,user_id,title,slug_base,status,current_version) VALUES (17,42,?,?, 'draft',1)",
+            (title, slug),
+        )
+        db.execute(
+            "INSERT INTO user_program_sessions (id,user_program_id,position,name,kind,focus) VALUES (18,17,1,'Owned session preserved','strength','')"
+        )
+        db.execute(
+            "INSERT INTO user_program_exercises (id,user_program_session_id,position,exercise_name,set_scheme,source_reason) VALUES (19,18,1,'Manual exercise preserved','1x 8-12','manual')"
+        )
+        db.execute(
+            "INSERT INTO user_program_rep_targets (id,user_program_exercise_id,set_index,min_reps,max_reps,is_warmup) VALUES (20,19,1,8,12,0)"
+        )
+        db.execute(
+            "INSERT INTO program_builder_operations_v1 (user_id,command_id,operation,request_sha256,program_id,source_digest_after,result_version,result_json,created_at) VALUES (42,'builder-preserved','CREATE',?,17,?,1,?,'2026-11-15T00:00:00Z')",
+            (
+                request_sha256,
+                source_digest,
+                json.dumps(builder_receipt, sort_keys=True, separators=(",", ":")),
+            ),
+        )
     return path
 
 
@@ -110,8 +176,8 @@ def rows(path):
 def test_real_canonical_migration_is_verified_without_revision_stamping(qa_database):
     from tools.qa_delivery.database import verify_database
 
-    assert rows(qa_database)["alembic_version"] == [("nutrition_manual_01",)]
-    assert verify_database(qa_database)["server_schema"] == "nutrition_manual_01"
+    assert rows(qa_database)["alembic_version"] == [("program_builder_operations_01",)]
+    assert verify_database(qa_database)["server_schema"] == "program_builder_operations_01"
 
 
 def test_backup_restore_copies_all_tables_ids_and_refresh_without_source_mutation(
@@ -119,9 +185,12 @@ def test_backup_restore_copies_all_tables_ids_and_refresh_without_source_mutatio
 ):
     from tools.qa_delivery.database import backup_database, verify_database
 
+    assert rows(qa_database)["alembic_version"] == [("program_builder_operations_01",)]
     original = qa_database.read_bytes()
     snapshot, exported, restored = (
-        tmp_path / "backup.db", tmp_path / "export.db", tmp_path / "restored.db"
+        tmp_path / "backup.db",
+        tmp_path / "export.db",
+        tmp_path / "restored.db",
     )
     receipt = backup_database(qa_database, snapshot)
     exported.write_bytes(snapshot.read_bytes())
@@ -135,8 +204,8 @@ def test_backup_restore_copies_all_tables_ids_and_refresh_without_source_mutatio
     backup_database(exported, restored, expected_backup=_verify_backup(exported))
     assert rows(qa_database) == rows(snapshot) == rows(exported) == rows(restored)
     assert qa_database.read_bytes() == original
-    assert rows(qa_database)["alembic_version"] == [("nutrition_manual_01",)]
-    assert receipt["server_schema"] == "nutrition_manual_01"
+    assert rows(qa_database)["alembic_version"] == [("program_builder_operations_01",)]
+    assert receipt["server_schema"] == "program_builder_operations_01"
     assert receipt["tables"]["users"]["rows"] == 1
     assert receipt["tables"]["device_sessions"]["rows"] == 1
     assert receipt["tables"]["blueprint_source_events"]["rows"] == 1
@@ -150,14 +219,45 @@ def test_backup_restore_copies_all_tables_ids_and_refresh_without_source_mutatio
         "body_measurement_operations_v1",
         "nutrition_target_revisions_v1",
         "nutrition_day_revisions_v1",
+        "user_programs",
+        "user_program_sessions",
+        "user_program_exercises",
+        "user_program_rep_targets",
+        "program_builder_operations_v1",
     ):
         assert receipt["tables"][table]["rows"] == 1
+    restored_rows = rows(restored)
+    with closing(sqlite3.connect(restored)) as db:
+        operation_columns = [
+            c[1] for c in db.execute("PRAGMA table_info(program_builder_operations_v1)")
+        ]
+    operation = dict(
+        zip(operation_columns, restored_rows["program_builder_operations_v1"][0], strict=True)
+    )
+    historical = json.loads(operation["result_json"])
+    assert historical["owner_id"] == 42 and historical["program_id"] == 17
+    assert historical["command_id"] == "builder-preserved" and historical["operation"] == "CREATE"
+    assert historical["request_sha256"] == operation["request_sha256"]
+    assert historical["resulting_source_digest"] == operation["source_digest_after"]
+    assert "rep_targets" not in historical and "sessions" not in historical
     assert receipt["continuity_digest"] == verify_database(restored)["continuity_digest"]
     assert "private-" not in json.dumps(receipt) and str(tmp_path) not in json.dumps(receipt)
     assert snapshot.stat().st_mode & 0o777 == 0o600
 
 
-@pytest.mark.parametrize("damage", ["unknown_head", "old_head", "fk", "corrupt", "missing", "schema"])
+@pytest.mark.parametrize(
+    "damage",
+    [
+        "unknown_head",
+        "old_head",
+        "parent_head",
+        "fk",
+        "corrupt",
+        "missing",
+        "schema",
+        "builder_schema",
+    ],
+)
 def test_invalid_database_refused_before_copy(qa_database, tmp_path, damage):
     from tools.qa_delivery.database import backup_database
 
@@ -171,8 +271,10 @@ def test_invalid_database_refused_before_copy(qa_database, tmp_path, damage):
                 {
                     "unknown_head": "UPDATE alembic_version SET version_num='future'",
                     "old_head": "UPDATE alembic_version SET version_num='plan_v3_20261107_01'",
+                    "parent_head": "UPDATE alembic_version SET version_num='nutrition_manual_01'",
                     "fk": "UPDATE device_sessions SET user_id=999",
                     "schema": "DROP TABLE first_plan_set_observations",
+                    "builder_schema": "DROP TABLE program_builder_operations_v1",
                 }[damage]
             )
     target = tmp_path / "new.db"
@@ -182,15 +284,18 @@ def test_invalid_database_refused_before_copy(qa_database, tmp_path, damage):
     assert not target.with_suffix(".db.manifest.json").exists()
 
 
+@pytest.mark.parametrize("old_schema", ["plan_v3_20261107_01", "nutrition_manual_01"])
 @pytest.mark.parametrize("forged_head", [False, True])
-def test_genuine_older_schema_is_refused_even_with_forged_current_head(tmp_path, forged_head):
+def test_genuine_older_schema_is_refused_even_with_forged_current_head(
+    tmp_path, forged_head, old_schema
+):
     from tools.qa_delivery.database import backup_database
 
     source, target = tmp_path / "older.db", tmp_path / "must-not-publish.db"
-    migrate_database(source, "plan_v3_20261107_01")
+    migrate_database(source, old_schema)
     if forged_head:
         with sqlite3.connect(source) as db:
-            db.execute("UPDATE alembic_version SET version_num='nutrition_manual_01'")
+            db.execute("UPDATE alembic_version SET version_num='program_builder_operations_01'")
     original = source.read_bytes()
     with pytest.raises(ValueError, match="qa_database_invalid"):
         backup_database(source, target)
@@ -244,7 +349,7 @@ def test_database_cli_restore_new_copy_has_redacted_manifest(qa_database, tmp_pa
     assert result.returncode == 0, result.stderr
     assert rows(target) == rows(qa_database)
     assert "private-" not in result.stdout and str(tmp_path) not in result.stdout
-    assert json.loads(result.stdout)["server_schema"] == "nutrition_manual_01"
+    assert json.loads(result.stdout)["server_schema"] == "program_builder_operations_01"
 
 
 def test_source_refresh_rotation_during_capture_refuses_publication(

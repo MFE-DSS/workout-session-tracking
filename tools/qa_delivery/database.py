@@ -12,7 +12,7 @@ import time
 from contextlib import closing
 from pathlib import Path
 
-SCHEMA = "nutrition_manual_01"
+SCHEMA = "program_builder_operations_01"
 ROOT = Path(__file__).resolve().parents[2]
 
 

@@ -32,6 +32,8 @@ import {MissionActionClient,createMissionActionTransport,type MissionAction} fro
 import {MissionActionResource} from './src/api/missionActionResource';
 import {localOpeningState,missionActionCurrent,hasLegacyStart,legacyStartMarker,markLegacyStart,clearLegacyStart,restoreExistingV3,blockLegacyResume,legacyResumeBlocked,clearLegacyResumeBlock} from './src/api/missionOpening';
 import {LibraryClient,createLibraryPorts} from './src/api/library';
+import {ProgramBuilderClient,createProgramBuilderTransport} from './src/api/programBuilder';
+import type {ProgramBuilderPorts} from './src/ui/programs/ProgramBuilderController';
 import {LibraryHost} from './src/ui/library/LibraryHost';
 import type {LibraryOpeningPorts} from './src/sync/libraryOpening';
 import type {LibraryPendingOpenings,LibrarySessionIdentity} from './src/storage/libraryPendingOpenings';
@@ -168,6 +170,7 @@ export default function ConnectedApp() {
   const [journal, setJournal] = useState<Journal | null>(null);
   const [bodyRuntime,setBodyRuntime]=useState<{client:BodyMeasurementsClient;current:()=>boolean}|null>(null);
   const [nutritionRuntime,setNutritionRuntime]=useState<{client:NutritionClient;current:()=>boolean}|null>(null);
+  const [builderPorts,setBuilderPorts]=useState<ProgramBuilderPorts|null>(null);
   const nutritionExit=useRef<(()=>boolean)|null>(null);
   const registerNutritionExit=useCallback((exit:(()=>boolean)|null)=>{nutritionExit.current=exit;},[]);
   const [bodyOrigin,setBodyOrigin]=useState<'profile'|'progress'>('profile');
@@ -413,10 +416,11 @@ export default function ConnectedApp() {
     if (owned.state !== 'ready') { setScreen('OWNERSHIP'); return false; }
     const bodyTransport=API_URL?createBodyTransport(API_URL):null;
     const nutritionTransport=API_URL?createNutritionTransport(API_URL):null;
+    const builderTransport=API_URL?createProgramBuilderTransport(API_URL):null;
     const libraryTransport=API_URL?createLibraryPorts(API_URL,fetch,value=>Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256,value)):null;
-    const attachment={};libraryAttachment.current=attachment;libraryBlocked.current=Boolean(libraryTransport);setLibraryPorts(null);
+    const attachment={};libraryAttachment.current=attachment;libraryBlocked.current=Boolean(libraryTransport);setLibraryPorts(null);setBuilderPorts(null);
     const attachmentCurrent=()=>current()&&libraryAttachment.current===attachment;
-    const j = await openJournal(owned.name, {...(PLAN_V3_CONTROLLED_TEST ? {planV3OwnerId:owned.userId} : {}),...(bodyTransport?{bodyOwner:{userId:owned.userId,backendScope:bodyTransport.scope}}:{}),...(nutritionTransport?{nutritionOwner:{userId:owned.userId,backendScope:nutritionTransport.scope}}:{}),...(libraryTransport?{libraryOwner:{ownerId:owned.userId,backendScope:libraryTransport.backendScope,sha256:libraryTransport.sha256,current:attachmentCurrent}}:{})});
+    const j = await openJournal(owned.name, {...(PLAN_V3_CONTROLLED_TEST ? {planV3OwnerId:owned.userId} : {}),...(bodyTransport?{bodyOwner:{userId:owned.userId,backendScope:bodyTransport.scope}}:{}),...(nutritionTransport?{nutritionOwner:{userId:owned.userId,backendScope:nutritionTransport.scope}}:{}),...(builderTransport?{builderOwner:{ownerId:owned.userId,backendScope:builderTransport.scope,sha256:value=>Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256,value),current:attachmentCurrent}}:{}),...(libraryTransport?{libraryOwner:{ownerId:owned.userId,backendScope:libraryTransport.backendScope,sha256:libraryTransport.sha256,current:attachmentCurrent}}:{})});
     if (!appAlive.current || revision !== auth.revision) return false;
     engineRef.current?.stop();
     journalRef.current = j;
@@ -424,6 +428,7 @@ export default function ConnectedApp() {
     const active = () => appAlive.current && revision === auth.revision && journalRef.current === j;
     setBodyRuntime(bodyTransport?{client:new BodyMeasurementsClient(auth,transport,bodyTransport,owned.userId),current:active}:null);
     setNutritionRuntime(nutritionTransport?{client:new NutritionClient(auth,{scope:nutritionTransport.scope,call:transport},nutritionTransport,owned.userId),current:active}:null);
+    setBuilderPorts(builderTransport&&j.builderPending?{client:new ProgramBuilderClient(auth,{scope:builderTransport.scope,call:transport},builderTransport,owned.userId),store:j.builderPending,current:active,newId:()=>Crypto.randomUUID()}:null);
     const v3Runtime = new RuntimeV3Client(auth,transport,createV3Transport(API_URL,fetch,{calibrationInventory:"plan-calibration-inventory/2.0.0"}));
     const v3Sessions = new FirstSessionV3Client(v3Runtime);
     if(PLAN_V3_CONTROLLED_TEST && j.planV3){
@@ -639,7 +644,7 @@ export default function ConnectedApp() {
     accountFlight.current = true;
     ownershipFlight.current = null; setOwnershipChecking(false);
     if (undoTimer.current) clearTimeout(undoTimer.current); undoTimer.current = null; setUndo(null);
-    engineRef.current?.stop(); engineRef.current = null; journalRef.current = null; setJournal(null); setNutritionRuntime(null);
+    engineRef.current?.stop(); engineRef.current = null; journalRef.current = null; setJournal(null); setNutritionRuntime(null); setBuilderPorts(null);
     apply({ type: 'RESET' }); setServerSets({}); setMission(null); setNext(null); setBilanContext(null);
     setBusy(true); setLoginError(null);
     const pending = auth.login(username, password, deviceLabel(deviceIdentity()));
@@ -1049,7 +1054,7 @@ export default function ConnectedApp() {
     if (undoTimer.current) clearTimeout(undoTimer.current); undoTimer.current = null; setUndo(null);
     engineRef.current?.stop(); engineRef.current = null;
     libraryAttachment.current=null;libraryBlocked.current=false;setLibraryPorts(null);setLibraryAtToday(false);
-    journalRef.current = null; setJournal(null); setNutritionRuntime(null);
+    journalRef.current = null; setJournal(null); setNutritionRuntime(null); setBuilderPorts(null);
     apply({ type: 'RESET' }); setServerSets({}); setSubstitutions({}); setBilanContext(null); setNext(null);
     const signingOut = auth.logout();
     const logoutRevision = auth.revision;
@@ -1084,7 +1089,7 @@ export default function ConnectedApp() {
   const reconnectAccount = () => {
     if (accountFlight.current) return;
     // Keep owned pending workout facts in their partition during reauthentication.
-    engineRef.current?.stop(); engineRef.current = null; journalRef.current = null; setJournal(null); setNutritionRuntime(null);
+    engineRef.current?.stop(); engineRef.current = null; journalRef.current = null; setJournal(null); setNutritionRuntime(null); setBuilderPorts(null);
     apply({ type: 'RESET' }); setAccount(null); setMission(null); setNext(null); setBilanContext(null); setServerSets({});
     setAccountView(null); setAccountOutcome(null); setScreen('LOGIN');
   };
@@ -1196,7 +1201,7 @@ export default function ConnectedApp() {
         onAction={openMissionAction} onVerify={verifyMission} onSelectPath={path=>{setMissionRefusal(null);missionResource.selectPath(path);setMission(null);void loadMission();}}
         onOpenJournal={openJournalSheet} historical={historical}/></View>;
       body = (
-        <ShellProvider value={{ today, openJournal: openJournalSheet, siteUrl: API_URL, account: bodyInShell&&bodyOrigin==='profile'?bodySurface:accountSettings, programmes:libraryPorts?onOpened=><LibraryHost ports={libraryPorts} onOpened={onOpened} onResumeExisting={()=>{void resume();}} existingSession={missionResource.state.state==='confirmed'&&missionResource.state.value.state==='RESUME'?{session_id:missionResource.state.value.primary_action.session_id,session_profile:missionResource.state.value.primary_action.kind==='RESUME_V3'?'PLAN_V3':'LEGACY'}:null}/>:undefined, progress:nutritionInShell?nutritionSurface:bodyInShell&&bodyOrigin==='progress'?bodySurface:<TrainingHistoryHost auth={auth} call={transport} typed={historicalSessions} bodyClient={bodyRuntime?.client} onBody={bodyRuntime?()=>{setBodyOrigin('progress');setAccountView('body');}:undefined} onNutrition={nutritionRuntime?()=>setAccountView('nutrition'):undefined}/> }}>
+        <ShellProvider value={{ today, openJournal: openJournalSheet, siteUrl: API_URL, account: bodyInShell&&bodyOrigin==='profile'?bodySurface:accountSettings, programmes:libraryPorts?(onOpened,active)=><LibraryHost active={active} ports={libraryPorts} builderPorts={builderPorts??undefined} onOpened={onOpened} onResumeExisting={()=>{void resume();}} existingSession={missionResource.state.state==='confirmed'&&missionResource.state.value.state==='RESUME'?{session_id:missionResource.state.value.primary_action.session_id,session_profile:missionResource.state.value.primary_action.kind==='RESUME_V3'?'PLAN_V3':'LEGACY'}:null}/>:undefined, progress:nutritionInShell?nutritionSurface:bodyInShell&&bodyOrigin==='progress'?bodySurface:<TrainingHistoryHost auth={auth} call={transport} typed={historicalSessions} bodyClient={bodyRuntime?.client} onBody={bodyRuntime?()=>{setBodyOrigin('progress');setAccountView('body');}:undefined} onNutrition={nutritionRuntime?()=>setAccountView('nutrition'):undefined}/> }}>
           <ExpoRoot context={shellRoutes} linking={SHELL_LINKING} />
         </ShellProvider>
       );

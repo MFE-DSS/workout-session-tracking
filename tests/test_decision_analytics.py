@@ -10,6 +10,7 @@ from __future__ import annotations
 import json
 
 import pytest
+from program_builder_web_helpers import post_program
 
 # Comme les tranches morpho : la fixture `client` purge `sys.modules`, donc
 # aucun import `app.*` au niveau module.
@@ -522,7 +523,7 @@ def test_a_collector_failure_does_not_break_materialization(client, monkeypatch)
         _save_prefs(db, _uid())
 
     # The route must still create the draft even if observation explodes.
-    r = client.post(MATERIALIZE_URL, follow_redirects=False)
+    r = post_program(client, MATERIALIZE_URL, follow_redirects=False)
     assert r.status_code in (303, 200)
 
 

@@ -36,6 +36,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
 
 from app.models.user_program import UserProgram
+from app.services.program_builder_transactions import program_writer
 
 
 class VersioningError(Exception):
@@ -79,8 +80,9 @@ def _load_owned(db: Session, user_id: int, program_id: int) -> UserProgram:
     return program
 
 
+@program_writer
 def start_new_edit_cycle(
-    db: Session, user_id: int, program_id: int
+    db: Session, user_id: int, program_id: int, *, commit: bool = True
 ) -> NewCycleResult:
     """Return a published program to `draft` at `current_version + 1` (same row).
 
@@ -105,6 +107,6 @@ def start_new_edit_cycle(
     for session in program.sessions:
         session.published_template_id = None
         session.template_slug_snapshot = None
-    db.commit()
+    db.flush()
     db.refresh(program)
     return NewCycleResult(program=program, incremented=True)

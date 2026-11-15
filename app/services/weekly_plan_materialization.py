@@ -46,6 +46,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from enum import StrEnum
 
+from app.services.program_builder_transactions import program_writer
 from app.services.user_program_exercise_catalog import enrich
 from app.services.weekly_planner import WeeklyPlan
 
@@ -267,7 +268,8 @@ def plan_to_draft_tree(plan: WeeklyPlan) -> list[dict]:
     return tree
 
 
-def materialize_weekly_plan(db, user_id: int, plan: WeeklyPlan, *, title: str, slug_base: str):
+@program_writer
+def materialize_weekly_plan(db, user_id: int, plan: WeeklyPlan, *, title: str, slug_base: str, commit: bool = True):
     """Crée un brouillon Custom Program à partir du plan. **Rien de publié.**
 
     Renvoie `(programme, verdict)`. Le programme sort en statut `draft` par le
@@ -294,8 +296,8 @@ def materialize_weekly_plan(db, user_id: int, plan: WeeklyPlan, *, title: str, s
             + ", ".join(readiness.blocked_reasons)
         )
 
-    program = create_draft(db, user_id, title, slug_base)
-    replace_draft_tree(db, user_id, program.id, plan_to_draft_tree(plan))
+    program = create_draft(db, user_id, title, slug_base, commit=False)
+    replace_draft_tree(db, user_id, program.id, plan_to_draft_tree(plan), commit=False)
     return program, readiness
 
 

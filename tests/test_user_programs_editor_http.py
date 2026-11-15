@@ -13,6 +13,7 @@ to a stale, pre-reset class.
 from __future__ import annotations
 
 import pytest
+from program_builder_web_helpers import post_program
 from sqlalchemy import func, select
 
 # ─────────────────────────── helpers ───────────────────────────
@@ -97,7 +98,7 @@ def _status(pid: int) -> str:
 def test_add_session_unauthenticated_redirects(client):
     pid = _make_program("Auth", "auth-s")
     client.cookies.clear()
-    r = client.post(f"/programs/{pid}/sessions", data={"name": "X"}, follow_redirects=False)
+    r = post_program(client, f"/programs/{pid}/sessions", data={"name": "X"}, follow_redirects=False)
     assert r.status_code == 303
     assert r.headers["location"] == "/login"
 
@@ -105,7 +106,7 @@ def test_add_session_unauthenticated_redirects(client):
 def test_add_exercise_unauthenticated_redirects(client):
     pid = _make_program("Auth", "auth-e")
     client.cookies.clear()
-    r = client.post(
+    r = post_program(client,
         f"/programs/{pid}/sessions/1/exercises",
         data={"exercise_name": "X", "sets": 3, "min_reps": 8, "max_reps": 12},
         follow_redirects=False,
@@ -117,7 +118,7 @@ def test_add_exercise_unauthenticated_redirects(client):
 def test_validate_unauthenticated_redirects(client):
     pid = _make_program("Auth", "auth-v")
     client.cookies.clear()
-    r = client.post(f"/programs/{pid}/validate", follow_redirects=False)
+    r = post_program(client, f"/programs/{pid}/validate", follow_redirects=False)
     assert r.status_code == 303
     assert r.headers["location"] == "/login"
 
@@ -140,7 +141,7 @@ def test_add_session_creates_position_1(client):
     from app.models.user_program import UserProgramSession
 
     pid = _make_program("Edit", "edit-1")
-    r = client.post(f"/programs/{pid}/sessions", data={"name": "Push A"}, follow_redirects=False)
+    r = post_program(client, f"/programs/{pid}/sessions", data={"name": "Push A"}, follow_redirects=False)
     assert r.status_code == 303
     with _session() as db:
         sessions = (
@@ -161,7 +162,7 @@ def test_add_session_trims_name(client):
     from app.models.user_program import UserProgramSession
 
     pid = _make_program("Trim", "trim-s")
-    client.post(f"/programs/{pid}/sessions", data={"name": "  Push A  "}, follow_redirects=False)
+    post_program(client, f"/programs/{pid}/sessions", data={"name": "  Push A  "}, follow_redirects=False)
     with _session() as db:
         s = db.execute(select(UserProgramSession)).scalar_one()
         assert s.name == "Push A"
@@ -171,7 +172,7 @@ def test_add_session_empty_name_rerenders_no_row(client):
     from app.models.user_program import UserProgramSession
 
     pid = _make_program("EmptyN", "empty-n")
-    r = client.post(f"/programs/{pid}/sessions", data={"name": "   "}, follow_redirects=False)
+    r = post_program(client, f"/programs/{pid}/sessions", data={"name": "   "}, follow_redirects=False)
     assert r.status_code == 200
     assert "séance" in r.text.lower()
     assert _count(UserProgramSession) == 0
@@ -182,7 +183,7 @@ def test_quota_seven_sessions_blocks_eighth(client):
 
     pid = _make_program("Quota", "quota-s")
     _seed_tree(pid, [_session_payload(i) for i in range(1, 8)])
-    r = client.post(f"/programs/{pid}/sessions", data={"name": "8e"}, follow_redirects=False)
+    r = post_program(client, f"/programs/{pid}/sessions", data={"name": "8e"}, follow_redirects=False)
     assert r.status_code == 200
     assert "7" in r.text  # gentle quota message names the cap
     assert _count(UserProgramSession) == 7
@@ -193,7 +194,7 @@ def test_delete_session_resequences(client):
 
     pid = _make_program("Del", "del-s")
     _seed_tree(pid, [_session_payload(1), _session_payload(2), _session_payload(3)])
-    r = client.post(f"/programs/{pid}/sessions/2/delete", follow_redirects=False)
+    r = post_program(client, f"/programs/{pid}/sessions/2/delete", follow_redirects=False)
     assert r.status_code == 303
     with _session() as db:
         positions = [
@@ -214,8 +215,8 @@ def test_add_exercise_creates_rep_targets(client):
     from app.models.user_program import UserProgramExercise, UserProgramRepTarget
 
     pid = _make_program("Ex", "ex-1")
-    client.post(f"/programs/{pid}/sessions", data={"name": "S1"}, follow_redirects=False)
-    r = client.post(
+    post_program(client, f"/programs/{pid}/sessions", data={"name": "S1"}, follow_redirects=False)
+    r = post_program(client,
         f"/programs/{pid}/sessions/1/exercises",
         data={"exercise_name": "Squat", "sets": 3, "min_reps": 8, "max_reps": 12},
         follow_redirects=False,
@@ -245,8 +246,8 @@ def test_invalid_exercise_form_rerenders_no_row(client, data):
     from app.models.user_program import UserProgramExercise
 
     pid = _make_program("Inv", "inv-ex")
-    client.post(f"/programs/{pid}/sessions", data={"name": "S1"}, follow_redirects=False)
-    r = client.post(
+    post_program(client, f"/programs/{pid}/sessions", data={"name": "S1"}, follow_redirects=False)
+    r = post_program(client,
         f"/programs/{pid}/sessions/1/exercises", data=data, follow_redirects=False
     )
     assert r.status_code == 200
@@ -258,7 +259,7 @@ def test_quota_ten_exercises_blocks_eleventh(client):
 
     pid = _make_program("QuotaE", "quota-e")
     _seed_tree(pid, [_session_payload(1, n_exercises=10)])
-    r = client.post(
+    r = post_program(client,
         f"/programs/{pid}/sessions/1/exercises",
         data={"exercise_name": "11e", "sets": 3, "min_reps": 8, "max_reps": 12},
         follow_redirects=False,
@@ -273,7 +274,7 @@ def test_delete_exercise_resequences(client):
 
     pid = _make_program("DelE", "del-e")
     _seed_tree(pid, [_session_payload(1, n_exercises=3)])
-    r = client.post(
+    r = post_program(client,
         f"/programs/{pid}/sessions/1/exercises/2/delete", follow_redirects=False
     )
     assert r.status_code == 303
@@ -294,12 +295,12 @@ def test_delete_exercise_resequences(client):
 
 def test_mutation_on_foreign_program_is_404(client):
     _other_id, pid = _make_other_program("Foreign", "foreign-1")
-    r = client.post(f"/programs/{pid}/sessions", data={"name": "X"}, follow_redirects=False)
+    r = post_program(client, f"/programs/{pid}/sessions", data={"name": "X"}, follow_redirects=False)
     assert r.status_code == 404
 
 
 def test_mutation_on_absent_program_is_same_404(client):
-    r = client.post("/programs/999999/sessions", data={"name": "X"}, follow_redirects=False)
+    r = post_program(client, "/programs/999999/sessions", data={"name": "X"}, follow_redirects=False)
     assert r.status_code == 404
 
 
@@ -313,7 +314,7 @@ def test_published_program_editing_refused(client):
     with _session() as db:
         db.get(UserProgram, pid).status = "published"
         db.commit()
-    r = client.post(f"/programs/{pid}/sessions", data={"name": "X"}, follow_redirects=False)
+    r = post_program(client, f"/programs/{pid}/sessions", data={"name": "X"}, follow_redirects=False)
     assert r.status_code == 200
     assert "publiée" in r.text.lower()
     assert _count(UserProgramSession) == 0
@@ -326,7 +327,7 @@ def test_archived_program_editing_refused(client):
     pid = _make_program("Arch", "arch-lock")
     with _session() as db:
         archive_draft(db, _uid(), pid)
-    r = client.post(f"/programs/{pid}/sessions", data={"name": "X"}, follow_redirects=False)
+    r = post_program(client, f"/programs/{pid}/sessions", data={"name": "X"}, follow_redirects=False)
     assert r.status_code == 200
     assert "archiv" in r.text.lower()
     assert _count(UserProgramSession) == 0
@@ -335,23 +336,23 @@ def test_archived_program_editing_refused(client):
 def test_editing_validated_program_flips_back_to_draft(client):
     pid = _make_program("Val", "val-flip")
     _seed_tree(pid, [_session_payload(1, n_exercises=1)])
-    client.post(f"/programs/{pid}/validate", follow_redirects=False)
+    post_program(client, f"/programs/{pid}/validate", follow_redirects=False)
     assert _status(pid) == "validated"
-    client.post(f"/programs/{pid}/sessions", data={"name": "S2"}, follow_redirects=False)
+    post_program(client, f"/programs/{pid}/sessions", data={"name": "S2"}, follow_redirects=False)
     assert _status(pid) == "draft"
 
 
 def test_validate_complete_draft_becomes_validated(client):
     pid = _make_program("VOk", "v-ok")
     _seed_tree(pid, [_session_payload(1, n_exercises=1)])
-    r = client.post(f"/programs/{pid}/validate", follow_redirects=False)
+    r = post_program(client, f"/programs/{pid}/validate", follow_redirects=False)
     assert r.status_code == 303
     assert _status(pid) == "validated"
 
 
 def test_validate_empty_draft_soft_error(client):
     pid = _make_program("VEmpty", "v-empty")
-    r = client.post(f"/programs/{pid}/validate", follow_redirects=False)
+    r = post_program(client, f"/programs/{pid}/validate", follow_redirects=False)
     assert r.status_code == 200
     assert "séance" in r.text.lower()
     assert _status(pid) == "draft"
@@ -364,13 +365,13 @@ def test_no_quality_review_written(client):
     from app.models.user_program import UserProgramQualityReview
 
     pid = _make_program("NoRev", "no-rev")
-    client.post(f"/programs/{pid}/sessions", data={"name": "S1"}, follow_redirects=False)
-    client.post(
+    post_program(client, f"/programs/{pid}/sessions", data={"name": "S1"}, follow_redirects=False)
+    post_program(client,
         f"/programs/{pid}/sessions/1/exercises",
         data={"exercise_name": "Squat", "sets": 3, "min_reps": 8, "max_reps": 12},
         follow_redirects=False,
     )
-    client.post(f"/programs/{pid}/validate", follow_redirects=False)
+    post_program(client, f"/programs/{pid}/validate", follow_redirects=False)
     assert _count(UserProgramQualityReview) == 0
 
 
@@ -379,8 +380,8 @@ def test_no_workout_template_created(client):
 
     before = _count(WorkoutTemplate)
     pid = _make_program("NoTpl", "no-tpl")
-    client.post(f"/programs/{pid}/sessions", data={"name": "S1"}, follow_redirects=False)
-    client.post(
+    post_program(client, f"/programs/{pid}/sessions", data={"name": "S1"}, follow_redirects=False)
+    post_program(client,
         f"/programs/{pid}/sessions/1/exercises",
         data={"exercise_name": "Squat", "sets": 3, "min_reps": 8, "max_reps": 12},
         follow_redirects=False,
@@ -391,7 +392,7 @@ def test_no_workout_template_created(client):
 def test_editor_shows_no_scoring(client):
     pid = _make_program("NoScore", "no-score")
     _seed_tree(pid, [_session_payload(1, n_exercises=1)])
-    client.post(f"/programs/{pid}/validate", follow_redirects=False)
+    post_program(client, f"/programs/{pid}/validate", follow_redirects=False)
     body = client.get(f"/programs/{pid}").text.lower()
     assert "grade" not in body
     assert "/100" not in body
@@ -400,7 +401,7 @@ def test_editor_shows_no_scoring(client):
 def test_wizard01_routes_still_green(client):
     assert client.get("/programs").status_code == 200
     assert client.get("/programs/new").status_code == 200
-    r = client.post("/programs", data={"title": "Non-regression"}, follow_redirects=False)
+    r = post_program(client, "/programs", data={"title": "Non-regression"}, follow_redirects=False)
     assert r.status_code == 303
 
 
@@ -459,7 +460,7 @@ def test_editor_datalist_label_has_no_literal_none(client):
 
 def test_add_exercise_ekb_name_persists_enrichment(client):
     pid = _editor_with_one_session("Enrich", "w05-enrich")
-    r = client.post(
+    r = post_program(client,
         f"/programs/{pid}/sessions/1/exercises",
         data={"exercise_name": _EKB_NAME, "sets": 3, "min_reps": 8, "max_reps": 12},
         follow_redirects=False,
@@ -478,7 +479,7 @@ def test_add_exercise_ekb_name_persists_enrichment(client):
 
 def test_add_exercise_free_text_leaves_enrichment_null(client):
     pid = _editor_with_one_session("Free", "w05-free")
-    r = client.post(
+    r = post_program(client,
         f"/programs/{pid}/sessions/1/exercises",
         data={
             "exercise_name": "Mon Exercice Perso XYZ",
@@ -500,7 +501,7 @@ def test_add_exercise_free_text_leaves_enrichment_null(client):
 
 def test_add_exercise_owner_scope_404_unchanged(client):
     _other_id, pid = _make_other_program("Foreign", "w05-foreign")
-    r = client.post(
+    r = post_program(client,
         f"/programs/{pid}/sessions/1/exercises",
         data={"exercise_name": _EKB_NAME, "sets": 3, "min_reps": 8, "max_reps": 12},
         follow_redirects=False,
@@ -513,7 +514,7 @@ def test_add_exercise_quota_unchanged_with_picker(client):
 
     pid = _make_program("QuotaW05", "w05-quota")
     _seed_tree(pid, [_session_payload(1, n_exercises=10)])
-    r = client.post(
+    r = post_program(client,
         f"/programs/{pid}/sessions/1/exercises",
         data={"exercise_name": _EKB_NAME, "sets": 3, "min_reps": 8, "max_reps": 12},
         follow_redirects=False,
@@ -530,7 +531,7 @@ def test_add_exercise_archived_refused_unchanged(client):
     _seed_tree(pid, [_session_payload(1)])
     with _session() as db:
         archive_draft(db, _uid(), pid)
-    r = client.post(
+    r = post_program(client,
         f"/programs/{pid}/sessions/1/exercises",
         data={"exercise_name": _EKB_NAME, "sets": 3, "min_reps": 8, "max_reps": 12},
         follow_redirects=False,
@@ -544,7 +545,7 @@ def test_wizard04_recognizes_manually_added_ekb_exercise(client):
     from app.services.user_program_quality_preview import compute_quality_preview
 
     pid = _editor_with_one_session("Reco", "w05-reco")
-    client.post(
+    post_program(client,
         f"/programs/{pid}/sessions/1/exercises",
         data={"exercise_name": _EKB_NAME, "sets": 3, "min_reps": 8, "max_reps": 12},
         follow_redirects=False,
@@ -561,7 +562,7 @@ def test_wizard04_free_text_stays_outside_aggregates(client):
     from app.services.user_program_quality_preview import compute_quality_preview
 
     pid = _editor_with_one_session("Outside", "w05-outside")
-    client.post(
+    post_program(client,
         f"/programs/{pid}/sessions/1/exercises",
         data={"exercise_name": "Zzz Inconnu Perso", "sets": 3, "min_reps": 8, "max_reps": 12},
         follow_redirects=False,
@@ -576,7 +577,7 @@ def test_picker_flow_persists_no_quality_review(client):
     from app.models.user_program import UserProgramQualityReview
 
     pid = _editor_with_one_session("NoRev05", "w05-norev")
-    client.post(
+    post_program(client,
         f"/programs/{pid}/sessions/1/exercises",
         data={"exercise_name": _EKB_NAME, "sets": 3, "min_reps": 8, "max_reps": 12},
         follow_redirects=False,

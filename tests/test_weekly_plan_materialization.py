@@ -14,6 +14,7 @@ Ce que ces tests protègent :
 from __future__ import annotations
 
 import pytest
+from program_builder_web_helpers import post_program
 
 from app.services.training_preferences import TrainingPreferencesData
 from app.services.weekly_plan_materialization import (
@@ -399,7 +400,7 @@ class TestUserSurface:
         with SessionLocal() as db:
             save_training_preferences(db, uid, sessions_per_week=4)
 
-        response = client.post("/programs/from-weekly-plan")
+        response = post_program(client, "/programs/from-weekly-plan")
         assert response.status_code == 200
 
         with SessionLocal() as db:
@@ -418,7 +419,7 @@ class TestUserSurface:
         uid = get_test_user_id()
         with SessionLocal() as db:
             save_training_preferences(db, uid, sessions_per_week=4)
-        client.post("/programs/from-weekly-plan")
+        post_program(client, "/programs/from-weekly-plan")
 
         with SessionLocal() as db:
             statuses = {

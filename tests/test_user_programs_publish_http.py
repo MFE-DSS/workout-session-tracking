@@ -9,6 +9,7 @@ module tree per test).
 """
 from __future__ import annotations
 
+from program_builder_web_helpers import post_program
 from sqlalchemy import func, select
 
 # ─────────────────────────── helpers ───────────────────────────
@@ -150,7 +151,7 @@ def test_get_publish_unauthenticated_redirects(client):
 def test_post_publish_unauthenticated_redirects(client):
     pid = _make_validated("pub-auth-p")
     client.cookies.clear()
-    r = client.post(f"/programs/{pid}/publish", follow_redirects=False)
+    r = post_program(client, f"/programs/{pid}/publish", follow_redirects=False)
     assert r.headers["location"] == "/login"
 
 
@@ -180,7 +181,7 @@ def test_get_publish_foreign_and_missing_are_404(client):
 def test_post_publish_validated_creates_templates(client):
     pid = _make_validated("pub-go", n_sessions=3)
     assert _user_template_count() == 0
-    r = client.post(f"/programs/{pid}/publish")
+    r = post_program(client, f"/programs/{pid}/publish")
     assert r.status_code == 200
     assert "publié" in r.text
     assert _user_template_count() == 3
@@ -189,7 +190,7 @@ def test_post_publish_validated_creates_templates(client):
 
 def test_post_publish_draft_is_soft_refusal_no_template(client):
     pid = _make_draft("pub-draft")
-    r = client.post(f"/programs/{pid}/publish")
+    r = post_program(client, f"/programs/{pid}/publish")
     assert r.status_code == 200
     assert "Validez" in r.text or "validé" in r.text
     assert _user_template_count() == 0
@@ -199,7 +200,7 @@ def test_post_publish_draft_is_soft_refusal_no_template(client):
 def test_post_publish_archived_is_soft_refusal_no_template(client):
     pid = _make_validated("pub-arch")
     _archive(pid)
-    r = client.post(f"/programs/{pid}/publish")
+    r = post_program(client, f"/programs/{pid}/publish")
     assert r.status_code == 200
     assert "archiv" in r.text
     assert _user_template_count() == 0
@@ -207,9 +208,9 @@ def test_post_publish_archived_is_soft_refusal_no_template(client):
 
 def test_post_publish_is_idempotent_no_duplicate(client):
     pid = _make_validated("pub-idem", n_sessions=2)
-    client.post(f"/programs/{pid}/publish")
+    post_program(client, f"/programs/{pid}/publish")
     assert _user_template_count() == 2
-    r2 = client.post(f"/programs/{pid}/publish")
+    r2 = post_program(client, f"/programs/{pid}/publish")
     assert r2.status_code == 200
     assert _user_template_count() == 2  # no duplicate on re-submit
     assert "déjà publié" in r2.text
@@ -217,7 +218,7 @@ def test_post_publish_is_idempotent_no_duplicate(client):
 
 def test_post_publish_foreign_is_404(client):
     foreign = _make_other_validated("pub-foreign-post")
-    r = client.post(f"/programs/{foreign}/publish")
+    r = post_program(client, f"/programs/{foreign}/publish")
     assert r.status_code == 404
     assert _user_template_count() == 0
 
@@ -236,7 +237,7 @@ def test_detail_shows_publish_cta_for_validated(client):
 def test_library_excludes_published_user_templates(client):
     uid = _uid()
     pid = _make_validated("pub-libx", n_sessions=2)
-    client.post(f"/programs/{pid}/publish")
+    post_program(client, f"/programs/{pid}/publish")
     assert _user_template_count() == 2
 
     r = client.get("/library")
@@ -250,6 +251,6 @@ def test_library_excludes_published_user_templates(client):
 def test_library_slug_detail_404_for_user_template(client):
     uid = _uid()
     pid = _make_validated("pub-libd", n_sessions=1)
-    client.post(f"/programs/{pid}/publish")
+    post_program(client, f"/programs/{pid}/publish")
     r = client.get(f"/library/up{uid}-pub-libd-v1-s1")
     assert r.status_code == 404

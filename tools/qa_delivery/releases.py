@@ -17,7 +17,7 @@ CERTIFICATE = "12b13109a2a41e2e2c0e97578364793e659a7548da4ce210d0dbd2f912f4bc75"
 COMPATIBILITY = {
     "api": "first-session-runtime/3.0.0",
     "inventory": "plan-calibration-inventory/2.0.0",
-    "server_schema": "nutrition_manual_01",
+    "server_schema": "program_builder_operations_01",
     "local_schema": "first-session-local/3.0.0",
 }
 

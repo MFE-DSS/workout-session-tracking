@@ -17,7 +17,7 @@ export type Shell = {
   account?: React.ReactNode;
   /** MOB-05A owned read-only history, mounted only by the focused Progress route. */
   progress?: React.ReactNode;
-  programmes?: (onOpened:()=>void)=>React.ReactNode;
+  programmes?: (onOpened:()=>void,active?:boolean)=>React.ReactNode;
 };
 
 const ShellContext = createContext<Shell | null>(null);

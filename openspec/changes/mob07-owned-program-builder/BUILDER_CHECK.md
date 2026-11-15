@@ -1,0 +1,23 @@
+# MOB-07 — builder check indépendant du paquet préparatoire
+
+15 novembre2026. Lecture seule, aucune modification du dépôt ni test exécuté. Paquet examiné : proposal/design/BUILD_SCOPE/UX_BOARD/specs. Référence services : worktreeMOB06 HEAD7a578b2, produit110f0a1. Deux Important de préparation à fermer avant de présenter le scope comme exécutable ; aucun nouveau choix scientifique requis.
+
+## I1 — Le CAS natif seul ne protège pas les writers web existants
+
+**Constat.** design.md promet que les changements web sont détectés par digest « dans la même transaction » et propose surtout des hooks commit=False. Pourtant `app/routers/user_programs.py::_tree_to_payload` construit l’arbre depuis une lecture hors de l’orchestration proposée ; les routes759/784/821/849/940 transmettent ensuite cet arbre entier à `replace_draft_tree`. Ce service remplace tous les enfants et commite (`app/services/user_program_drafts.py:164–235`), sans CAS/lock de racine partagé. Un verrou pris seulement par le writer mobile ou seulement au moment du commit laisse une requête web ayant lu l’ancien arbre réécrire cet arbre après le commit mobile. Les créations concurrentes doivent également préserver le quota par propriétaire, avant qu’une racine n’existe.
+
+**Correction minimale du paquet.** Borner explicitement un kernel commun read→vérification→mutation, adopté par *tous* les writers web et natifs de la composition. Énoncer la stratégie de sérialisation de création sous propriétaire, et de mutation sous racine/owner, avec relecture fraîche excluant les objets ORM cachés. Pour les formulaires web de remplacement d’arbre, passer un digest de révision de la vue rendue et refuser409 une soumission périmée, plutôt que d’accepter une copie ancienne comme édition fraîche. Ajouter les leases `app/routers/user_programs.py` et templates d’éditeur nécessaires au jeton invisible (deltaSSR propre), ainsi que les témoins weblectureA→mobilecommitB→websubmitA, publication contre modification, et deux créations au bord du quota. Option plus restrictive possible : rendre les programmes gérés par ce writer exclusifs au natif, mais ce serait une nouvelle restriction produit et ne doit pas être choisie silencieusement.
+
+## I2 — La sélection stricte ne doit pas effacer ou verrouiller les slots historiques manuels
+
+**Constat.** Le paquet propose intersection stricte Exercise/EKB et « serveur résout à nouveau la sélection avant écriture ». Le domaine historique accepte des noms manuels horsEKB : `user_program_exercise_catalog.enrich` retourne{} sans bloquer, `UserProgramExercise.exercise_name` est figé sans FK ; les arbres existants peuvent donc contenir des slots non résolus. Le parcours annoncé « créer/éditer/ordonner un programme personnel » n’explique pas si modifier son titre/ordre oblige à remplacer ces slots, refuse toute sauvegarde ou les conserve. Un implementer raisonnable pourrait valider l’arbre complet via le nouveau picker et casser la réédition des sources existantes.
+
+**Correction minimale du paquet.** Exiger l’identité canonique résolue pour un *nouveau slot ou un remplacement explicitement choisi*. Conserver sans remapping les slots historiques inchangés, sous référence propriétaire/révision et contenu exact relu côté serveur ; rendre leur statut inconnu visible. Renommer un programme, changer l’ordre ou corriger un autre slot ne doit ni les supprimer ni leur inventer une identité. Une modification du mouvement de ce slot exige une sélection explicite. Prévoir un témoin avec ancien nom horsEKB et un avec alias/nom canonique différent ; conserver prescriptions et templates antérieurs. Si le choix produit est plutôt « seulement les nouveaux programmes créés nativement sont éditables », le scope doit le dire et le PO doit approuver cette restriction.
+
+## Point de préparation non bloquant à ce stade
+
+Avant apply, figer la forme complète du protocole : routes/DTO/métadonnées bornées, digest canonique, création sans racine/If-None-Match, contenu du reçu et ordre exact replay→CAS courant. Les hooks transactionnels exacts doivent inclure `compute_and_store_quality_review` : son commit actuel précède la matérialisation dans `publish_user_program`. Le design a déjà identifié cette atomicité et conserve correctement mono-row new-cycle, templates immuables, validation de structure distincte et ZERO FK ; aucun conflit supplémentaire constaté sur ces points.
+
+## Verdict
+
+**PREPARATION_REQUIRES_I1_I2_RULING.** Ces deux lacunes sont réparables dans les documents sans code ni GO supplémentaire de BODY/NUT/MOB06. Après leur fermeture et la finalisation du wire/scope, le nouveau GO BUILD/G1 MOB07 pourra porter sur un paquet concret. Ce check ne vaut ni revue d’implémentation, ni validation visuelle, ni test des services.

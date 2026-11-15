@@ -47,6 +47,7 @@ from app.models.user_program import (
     UserProgramExercise,
     UserProgramSession,
 )
+from app.services.program_builder_transactions import program_writer
 from app.services.program_quality_reviews import (
     QualityReviewError,
     compute_and_store_quality_review,
@@ -195,8 +196,9 @@ def _materialize_session(
     return template
 
 
+@program_writer
 def publish_user_program(
-    db: Session, user_id: int, program_id: int
+    db: Session, user_id: int, program_id: int, *, commit: bool = True
 ) -> PublishResult:
     """Publish a validated custom program into N user-owned templates.
 
@@ -224,10 +226,10 @@ def publish_user_program(
         )
 
     # status == "validated": freeze quality FIRST, while still scorable. The
-    # writer commits its own transaction and expires the session, so the tree is
-    # re-loaded fresh before materialization.
+    # writer stages its trace in the same owner transaction as materialization;
+    # the refreshed tree and the receipt share the outer commit.
     try:
-        compute_and_store_quality_review(db, user_id, program_id)
+        compute_and_store_quality_review(db, user_id, program_id, commit=False)
     except QualityReviewError as exc:
         db.rollback()
         raise PublishRefused(str(exc)) from exc
@@ -247,7 +249,7 @@ def publish_user_program(
 
     program.status = "published"
     try:
-        db.commit()
+        db.flush()
     except IntegrityError as exc:
         db.rollback()
         raise PublishRefused(

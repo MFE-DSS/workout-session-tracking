@@ -42,7 +42,7 @@ def candidate():
         "compatibility": {
             "api": "first-session-runtime/3.0.0",
             "inventory": "plan-calibration-inventory/2.0.0",
-            "server_schema": "nutrition_manual_01",
+            "server_schema": "program_builder_operations_01",
             "local_schema": "first-session-local/3.0.0",
         },
     }
@@ -141,7 +141,7 @@ def test_release_gate_accepts_actual_migrated_canonical_server_schema(tmp_path):
     migrate_database(path)
     with sqlite3.connect(path) as db:
         head = db.execute("SELECT version_num FROM alembic_version").fetchone()[0]
-    assert head == "nutrition_manual_01"
+    assert head == "program_builder_operations_01"
     c, e = approved()
     c["compatibility"]["server_schema"] = head
     c["target"]["compatibility"]["server_schema"] = head
@@ -149,7 +149,7 @@ def test_release_gate_accepts_actual_migrated_canonical_server_schema(tmp_path):
     assert validate_candidate(c, e)["pending"] == ["build_artifact"]
 
 
-@pytest.mark.parametrize("schema", ["plan_v3_20261107_01", "future", None])
+@pytest.mark.parametrize("schema", ["plan_v3_20261107_01", "nutrition_manual_01", "future", None])
 def test_release_gate_refuses_old_or_unknown_server_schema_even_when_evidence_matches(schema):
     c, e = approved()
     c["compatibility"]["server_schema"] = schema

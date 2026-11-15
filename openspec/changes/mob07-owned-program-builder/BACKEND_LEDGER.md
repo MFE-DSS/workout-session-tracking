@@ -1,0 +1,266 @@
+# MOB07 backend execution ledger — Tasks 1/2
+
+Worktree/branch: existing mob06-library-20261112 / spec/mob07-owned-program-builder.
+Parent dc970d4d1b0352614cbdbbf1b694ff764f290829. GO is BUILD_AUTHORIZATION.json.
+Backend lease only; no commits/push/PR/native commands. No product completion claimed.
+The parent owns implementation planning, native client, pixels and final delivery.
+
+## Interfaces implemented
+
+`ProgramBuilderError(code,status=422)`, `canonical_command(body)`, `command_digest(body)`,
+`program_source_digest(program)`, `read_program(db,owner,id)`,
+`apply_command(db,owner,body,*,auth_proof,controlled)`,
+`web_mutation(db,owner,*,program_id,expected_source_digest,callback)`.
+All root domain writers use the same SQLite reservation, refresh ORM collections after
+reservation, and expose keyword `commit=True` (decorator); nested publication quality
+freeze and weekly materialization flush inside the single owner transaction.
+
+Command exact keys remain IMPLEMENTATION_PLAN Task1, version `program-builder/1.0.0`.
+New native technique max8 (existing column). Native target set_index is server assigned;
+historical keep preserves stored set_index, out-of-new-bounds targets, text and metadata.
+No fuzzy identity mapping. Selected receipt provenance is attached only to new selections.
+
+Receipt exact keys: contract_version, owner_id, command_id, request_sha256, operation,
+program_id, resulting_source_digest, resulting_version, publication_ids, selections,
+recorded_at. Selection receipt item `{slot_id,slug,name,ekb_version}`. Bare receipt from
+both POST and GET operation, no transport wrapper, replay historical and byte-equivalent
+as JSON facts. Recorded_at UTC ISO8601 Z; digests lowerhex64; IDs safe positive integer.
+
+GET detail envelope `{contract_version,owner_id,program}`. Program exact keys:
+`id,title,slug_base,status,version,source_digest,sessions,publication_ids`.
+Session exact keys: `position,name,kind,focus,duration_target_minutes,notes,exercises`.
+Exercise exact keys: `slot_id,slot_digest,position,exercise_name,set_scheme,variant_key,
+variant_group,equipment_family,movement_pattern,notes,source_reason,rep_targets,identity`.
+Rep target exact keys: `set_index,min_reps,max_reps,technique,is_warmup`.
+Identity exact keys: `state,slug,name,ekb_version`, unresolved fields null and state
+UNRESOLVED; otherwise RESOLVED_CURRENT_NAME. This is current name resolution, not
+historical original selection provenance. Archived read status is `archived` when the
+canonical soft archive timestamp is set.
+
+GET list `{contract_version,owner_id,items,next_cursor}`; program item
+`{id,title,status,version,source_digest}`, exercise item
+`{slug,name,ekb_version,equipment_family,movement_pattern}`. Limit25/max50.
+Signed cursor binds owner/backend/scope plus content watermark; source change409,
+foreign/invalid cursor422. Row/text source count is bounded before tree materialization,
+response bytes131072. Root scans are bounded to1000 roots, with1000 source rows and131072 source text bytes per root;
+historical numeric values are not subjected to new input bounds.
+
+Runtime `ProgramBuilderRuntime(backend_identity,signing_key,controlled_test_enabled=False,
+app_env='')` from explicit `program_builder_*` settings. No production .env reads added.
+Fresh controlled acquisition requires enabled and app_env=test; exact replay precedes this
+and HTTP fresh preconditions. API rechecks auth under SQLite lock. Bearer401 challenge,
+version header and no-store survive exceptions. Storage/commit errors503 have no definitive
+no-effect assertion. Five routes mounted directly in app/main.py and canonical inventory.
+
+## Verification so far
+
+Scaffolding RED: missing module2 tests; **not** a behavior regression proof.
+Real behavior RED then GREEN: historical set_index4 became1; missing WWW-Authenticate
+on401; isolated surrogate encoding exception; stale pagination200; oversized tree200.
+Command/HTTP targeted11 passed (5.35s), standalone actual two-connection quota race1 passed
+(0.61s). Publication failure injected after quality freeze leaves validated source, no
+quality review, template or receipt. Broader serial campaign running; full migration sweep
+explicitly deferred for parent's resource lease/source freeze.
+
+Evidence directory: /Users/martinfeldmann/auren-review/mob07-implementation-20261115/backend/.
+Schema snapshot regenerated with canonical generate_schema_snapshot.py. The initial ruling
+deferred REL03 schema pins; that ruling is superseded by the mandatory migration-consumer
+repair below. Historical release receipts remain unchanged.
+
+Ruling: root explicitly approved minimal app/database.py startup table-info exclusion
+for program_builder after behavioral RED. This adds no DDL/startup migration or database
+refactor. Root adds the necessary lease path to FILE_OWNERSHIP.
+
+## Concrete DTO and final bounded evidence
+
+`backend/concrete-http-dto.json` in the external evidence directory is generated by
+`backend/capture_dto.py` against a fresh synthetic SQLite + actual mounted Bearer API.
+It contains create/save commands, exact receipts, complete detail and paged reads, with no
+credential/token. It is a concrete client fixture/reference, not a production data export.
+
+Canonical parent advanced by root to f31b6e7b8411bf9668906a3a5dc38b22fef8ae55 (REL03 docs-only
+closeout). No backend product parent bytes changed. Unsafe command keys are refused using
+exact client regex `[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}` so every key is recoverable in its route.
+Exact unambiguous EKB aliases are honored; unknown/fuzzy/multiple identities are refused.
+
+Broad-01: 10 failed / 220 passed in137.51s. Nine failures were lifecycle pages with no
+mutation form/token; invisible rendered source-digest metadata now supports actual GET token
+submission for published/archived/draft refusal cases. The tenth was a test-helper tuple
+collapse; preserving actual duplicate URL-encoded fields exposed genuine303 vs422, followed
+by explicit duplicate-field422 rejection. All original10 failures subsequently PASS in5.25s.
+No original success/domain assertion was removed or lowered.
+
+The 230-test process completed its report but remained in Python3.14 finalizer GC. macOS
+sample showed physical footprint5.4GB/peak5.5GB (RSS2.7GB). Only that completed test process
+was terminated (exit143); tests/report retained and not called a successful process exit.
+Subsequent checks use fresh small processes. Memory sample is retained as
+`backend/broad-01-finalizer-sample.txt`. No full sweep has been started by this worker.
+
+Targeted-03:16PASS in7.15s. Targeted-final:34PASS in9.84s including actual route inventory;
+then exact EKB alias behavioral RED0matches vs1, followed by2PASS in1.07s including stale
+identity/foreign keep. Hardening/launch consumers28PASS in14.65s. Actual final HTTP flow
+includes create/save/validate/publish/library/start/execution/MISSION/history and NEW_CYCLE;
+only volatile server_now is excluded from immutable execution fact comparison. Exact old
+publication receipt remains readable and POST-replayable after source cycle/flag withdrawal.
+
+Migration guards: snapshot, patterns and empty roundtrip PASS; ruff new files and budget PASS
+(305≤548 at capture), spec protocol PASS. Initial direct-file invocation of drift imported
+the separately installed editable app package before migrations/env inserted this worktree,
+yielding spurious old-schema differences. The documented canonical command
+`python -m scripts.check_alembic_drift` PASS (no diff); no script/schema gate was changed.
+
+REMAINING: root-coordinated required bounded full migration sweep, final branch review,
+applicable SSR/native pixels, final CI and integration. No delivery/feature-complete claim.
+
+Backend source freeze milestone: final bounded target+actual inventory35PASS in11.28s,
+new-file ruff clean, diff-check clean after whitespace-only helper-call trim.
+Additional existing library/quality-preview consumers22PASS in10.68s.
+Affected file list is `backend/affected-files.txt` (37 files including this ledger).
+No active backend test process at freeze. Full sweep lease remains with parent.
+
+## Updated frozen handoff (supersedes the earlier freeze above)
+
+Final callback/wire audit found and repaired three issues with real RED→GREEN:
+
+- Signed safe integer/null duration metadata had incorrectly acquired1..1440 limits;
+  duration0/-10/1441 yielded422 in3tests. Bounds are now only signed safe integer/null,
+  aligned with the client and canonical field; no recommendation is added.
+- Existing draft PUBLISH and archived NEW_CYCLE refusals were falling through to503;
+ 2realHTTP tests observed503 vs409. Existing draft/publish/versioning domain refusals
+  now map to `domain_refused`409, without a receipt or uncertain storage claim.
+- Existing weekly decision analytics owns commits/rollbacks. Calling it inside the
+  new outer source boundary could commit or roll back the source. Independent-reader
+  RED saw0committed programmes during observer call. The router now attaches a confined
+  callback to its response; the wrapper invokes it AFTER source commit. The observer's
+  code/formulas are untouched and failures still leave the created programme intact.
+
+Final targeted+mounted inventory:41PASS in12.92s (`targeted-final-handoff.txt`).
+Weekly materialization consumer file24PASS in5.44s. Cross-repo writer scan found three
+additional existing test consumers of materialization (decision_analytics,
+orchestrator_explainer, ux4_02c_coherence); they now obtain the real rendered form token
+through the same helper, preserving all assertions. Additional consumer proof44PASS
+in27.91s (`additional-consumers-green.txt`), after observed428 in the old collector test.
+New-file ruff and diff-check PASS at handoff. Final ruff budget capture260≤548.
+
+Affected backend files:40 in external `affected-files.txt`; hashes in
+`source-freeze.sha256`. Source/model/migration/SSR/read/API implementation is frozen;
+all owned test processes exited normally after the final small batches. Root retains
+full-sweep scheduling, UI/ConnectedApp source, SSR/native exposure, whole-branch review,
+final CI, publication/merge and closeout. No full sweep, commit, push or PR was performed.
+
+## Fresh-review I3 — collection budget correction
+
+Review found an Important regression: check_source_budget(owner,None) aggregated all
+programme descendants under one1000-row budget. Three legal7sessions×10exercises×6targets
+programmes contain1494 source rows combined, while each root has498. Native index413 and
+SSR failure were observed in2RED tests (`collection-per-root-red.txt`,1.42s).
+
+The repair scans at most1000 root IDs (existing bounded collection scan), validates the
+1000-row/source-text limits independently for each root, computes its exact full-source
+digest and then releases its loaded relationship collections before reading the next tree.
+Only scalar summaries/digests are retained for the index watermark and SSR collection token.
+No shared descendant quota or new training quota remains. Existing10active-program quota,
+per-root source cap and131072-byte transport cap are unchanged. Current source digest and
+collection-token encoding are unchanged; off-page numeric tree changes still invalidate
+both cursor and old SSR creation token.
+
+Narrow RED→GREEN4PASS in2.68s covers three legal full roots, paged index/detail, SSR pages,
+fourth-root creation, off-page tree cursor409, stale collection token409 and the existing
+oversized-single-root413 guard. Final targeted+mounted inventory43PASS in15.97s.
+Fresh-process scoped SSR consumers137PASS: programmes19(11.33s), editor38(21.92s),
+generator44(25.40s), publication12(6.81s), weekly24(6.49s). New/changed-file ruff and
+diff-check PASS. Logs are `collection-*` in the external backend evidence directory.
+
+Correction touches only program_builder_bounds.py, program_builder_commands.py,
+mobile_program_builder.py, test_mobile_program_builder_http.py and this ledger. The
+40-file source-freeze hash manifest is refreshed. No migration, wire, SDK, commit or
+full sweep was changed/run by this correction. Parent retains the stopped full campaign
+and final source/visual/CI coordination; no global-sweep PASS is claimed.
+
+
+## Mandatory migration consumers — QA schema pins (supersedes initial deferral)
+
+Ruling: tools/qa_delivery/database.py SCHEMA and releases.py COMPATIBILITY.server_schema
+are mandatory consumers of the already-authorized additive MOB07 migration. The verifier
+compares current data/schema_snapshot.sql DDL; keeping nutrition_manual_01 made the genuine
+MOB07 head fail its revision check and made an older nutrition database fail its DDL check.
+Deferring these pins was therefore incorrect. Both pins now equal
+program_builder_operations_01. This is migration compatibility, not a hosting, provider,
+DNS, workflow, EAS, APK, OTA or deployment authorization; none of those operations occurred.
+All other compatibility fields, gates, private paths, ownership, full-DDL/FK/integrity,
+no-overwrite and rollback/publication guards remain unchanged.
+
+Actual RED on existing canonical-backup positive after asserting genuine migrated MOB07
+head and adding owned programme data: qa_database_invalid,1FAIL in0.43s
+(qa-schema-consumer-red.txt). Actual release-gate migrated-head positive RED:
+qa_release_refused,1FAIL in0.45s (qa-release-pin-red.txt). Minimal production diff is exactly
+two schema-pin lines. Core canonical verify/backup/release GREEN3PASS in0.59s.
+
+The real on-disk backup/export/restore fixture now includes an owned UserProgram, its
+session/exercise/rep-target tree and its exact historical technical CREATE receipt. All
+rows/IDs/hashes/result JSON remain identical through source→backup→export→restore, source
+bytes stay unchanged, the manifest retains only counts/digests and private file mode0600.
+Negative tests now explicitly reject nutrition parent or earlier V3 schemas, with or without
+a forged current-head stamp, stale version headers, missing builder DDL, FK corruption and
+existing restore tampering/race cases. No revision stamping or schema-check weakening.
+
+The initial repair classified docs/release/rel-03/candidate.json as immutable and tested
+its refusal. That classification and those intentional-default-failure expectations are
+superseded by the active PREPARE template correction below: the workflow uses this tracked
+file as its default input. The prior f31 template remains preserved in Git and external
+evidence, explicitly not release approval. The earlier pipeline failure (1FAIL/130PASS
+in22.35s) is retained as evidence of the genuine default PREPARE regression.
+
+Final isolated serial service checks: database24PASS(1.48s), releases82PASS(0.69s),
+server32PASS(23.92s), pipeline132PASS(23.26s):270PASS. The initial four-file campaign's
+observed maximum child RSS was138.6MiB; no application-heavy fixture was used. Logs are
+qa-schema-* in the external backend evidence directory. Ruff on all six leased files PASS;
+diff/scope guards recorded. Production lease: tools/qa_delivery/{database.py,releases.py};
+consumer tests: test_qa_delivery_{database,releases,server,pipeline}.py only.
+
+Source is frozen again: seven-file correction hashes in qa-schema-consumer.sha256 and
+qa-schema-consumer-files.txt; full backend manifest refreshed to46 files. No full sweep,
+commit, push, PR, actual backup of user data or external/provider operation was performed
+by this worker. Root retains global sweep, review, visual, CI and delivery coordination.
+
+
+## Active PREPARE template — final bounded correction
+
+Root ruling: .github/workflows/qa-release.yml:84 invokes PREPARE with the active tracked
+`docs/release/rel-03/candidate.json`. It is a PREPARED input with unprovisioned/null facts,
+not an immutable approved release receipt. The prior classification and refusal-as-success
+test therefore masked a workflow regression and are superseded. The active template now
+advances only server_schema to program_builder_operations_01; every other byte/field is
+unchanged. Production Python, workflow/provider, credentials, native identity and all
+publication gates remain untouched by this correction.
+
+The old f31 template bytes remain in Git history and externally as
+active-prepare-template-pending/prior-f31-active-prepare-template-NOT-release-approval.json.
+Origin f31b6e7b8411bf9668906a3a5dc38b22fef8ae55, Git blob
+a18817d52be6aa06d2fe31c64f24126c5c6e55c2, SHA256
+56cd6184113732ecd229c71e98fbc4b3d63aaa09a33553a09afc3e947d932f92.
+This retained artifact does not authorize release or represent provisioning/approval.
+
+After the full runner finished and root granted the technical lease, before hashes were
+verified; the tests-only patch was applied first. The restored positive CLI exercised the
+actual unchanged default file and observed qa_release_refused:1FAIL/1warning in0.50s
+(actual-default-template-RED.txt). Only then was the one-line candidate JSON patch applied.
+The positive now uses the real tracked template; an old nutrition copy is explicitly
+refused without credentials or output. Private0600, proof/canonical/target null and
+non-distributable assertions remain. In-memory preparation also proves current-template
+success and stale-copy refusal; the CLI does not mutate its template.
+
+Final four QA files were run as fresh serial processes with the requested pinned overlay:
+PYTHONPATH=/Users/martinfeldmann/auren-review/mob06-canonical-integration-20261115/locked-fastapi:/Users/martinfeldmann/auren-review/mob06-library-20261112
+and /Users/martinfeldmann/workout-session-tracking/.venv/bin/python. Verified versions:
+FastAPI0.141.1 and Starlette1.6.0. Logs are active-prepare-template-pending/final-*-GREEN.txt.
+Final results: database24PASS(1.54s), releases82PASS(0.71s), server32PASS(26.25s),
+pipeline132PASS(25.65s):270PASS, with one existing framework warning per process.
+Observed maximum child RSS153.2MiB; all processes exited0. No full sweep was rerun by this
+worker. Root's separate454-file canonical sweep remains its own evidence; this doc/test-only
+consumer delta is covered by the final four-file rerun.
+
+Final correction scope is candidate.json, test_qa_delivery_pipeline.py and this ledger.
+Full backend owned manifest includes candidate.json (47files); fresh correction hashes and
+application metadata are in active-prepare-template-pending/. No commit/push/PR, actual
+workflow dispatch, backup of user data, build, provider or remote operation occurred.

@@ -35,6 +35,7 @@ from app.models.user_program import (
     UserProgramRepTarget,
     UserProgramSession,
 )
+from app.services.program_builder_transactions import program_writer
 
 _EDITABLE_STATUSES = ("draft", "validated")
 
@@ -87,8 +88,9 @@ def list_drafts(
 # ─────────────────────────── mutations ───────────────────────────
 
 
+@program_writer
 def create_draft(
-    db: Session, user_id: int, title: str, slug_base: str
+    db: Session, user_id: int, title: str, slug_base: str, *, commit: bool = True
 ) -> UserProgram:
     title = (title or "").strip()
     slug_base = (slug_base or "").strip()
@@ -111,7 +113,7 @@ def create_draft(
     program = UserProgram(user_id=user_id, title=title, slug_base=slug_base)
     db.add(program)
     try:
-        db.commit()
+        db.flush()
     except IntegrityError as exc:
         db.rollback()
         raise UserProgramDraftError(
@@ -141,15 +143,16 @@ def _owned_editable(db: Session, user_id: int, program_id: int) -> UserProgram:
     return program
 
 
+@program_writer
 def rename_draft(
-    db: Session, user_id: int, program_id: int, title: str
+    db: Session, user_id: int, program_id: int, title: str, *, commit: bool = True
 ) -> UserProgram:
     title = (title or "").strip()
     if not title:
         raise UserProgramDraftError("Le titre ne peut pas être vide")
     program = _owned_editable(db, user_id, program_id)
     program.title = title
-    db.commit()
+    db.flush()
     db.refresh(program)
     return program
 
@@ -161,8 +164,9 @@ def _validate_positions(values: list[int], label: str) -> None:
         )
 
 
+@program_writer
 def replace_draft_tree(
-    db: Session, user_id: int, program_id: int, sessions_payload: list[dict]
+    db: Session, user_id: int, program_id: int, sessions_payload: list[dict], *, commit: bool = True
 ) -> UserProgram:
     """Replace the WHOLE child tree of a draft (the V1 editing gesture:
     wizard and card editing rebuild server-side). Old children are purged
@@ -213,7 +217,7 @@ def replace_draft_tree(
             for i, rt in enumerate(e.get("rep_targets", []), start=1):
                 exercise.rep_targets.append(
                     UserProgramRepTarget(
-                        set_index=i,
+                        set_index=rt.get("set_index", i),
                         min_reps=rt["min_reps"],
                         max_reps=rt["max_reps"],
                         technique=rt.get("technique"),
@@ -230,12 +234,13 @@ def replace_draft_tree(
     program.sessions.clear()
     db.flush()
     program.sessions.extend(new_sessions)
-    db.commit()
+    db.flush()
     db.refresh(program)
     return program
 
 
-def validate_draft(db: Session, user_id: int, program_id: int) -> UserProgram:
+@program_writer
+def validate_draft(db: Session, user_id: int, program_id: int, *, commit: bool = True) -> UserProgram:
     """Transition draft → validated (spec 04 §6) with a MINIMAL completeness
     check: at least one session, every session has at least one exercise,
     every exercise has at least one rep target. Publication stays a later,
@@ -274,12 +279,13 @@ def validate_draft(db: Session, user_id: int, program_id: int) -> UserProgram:
                 )
 
     program.status = "validated"
-    db.commit()
+    db.flush()
     db.refresh(program)
     return program
 
 
-def archive_draft(db: Session, user_id: int, program_id: int) -> UserProgram:
+@program_writer
+def archive_draft(db: Session, user_id: int, program_id: int, *, commit: bool = True) -> UserProgram:
     """Soft delete (spec 04 §8): the program leaves the library, the data
     stays. Archiving an already-archived program is an explicit error."""
     program = db.execute(
@@ -290,6 +296,6 @@ def archive_draft(db: Session, user_id: int, program_id: int) -> UserProgram:
     if program.archived_at is not None:
         raise UserProgramDraftError("Programme déjà archivé")
     program.archived_at = datetime.now(UTC)
-    db.commit()
+    db.flush()
     db.refresh(program)
     return program

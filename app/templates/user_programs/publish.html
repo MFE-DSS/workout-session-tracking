@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% from "user_programs/_status.html" import status_label %}
 {% block content %}
+<div hidden data-source-digest="{{ source_digest }}"></div>
 <h1 class="page-title">Publier — {{ program.title }}</h1>
 
 {% if success %}
@@ -89,6 +90,7 @@
 
 {% if publishable %}
   <form class="pd-block" method="post" action="{{ url_for('user_program_publish', program_id=program.id) }}">
+    <input type="hidden" name="source_digest" value="{{ source_digest }}">
     <button type="submit" class="btn btn--primary">Publier définitivement</button>
   </form>
 {% elif is_draft %}

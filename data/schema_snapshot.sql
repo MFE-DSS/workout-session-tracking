@@ -46,6 +46,9 @@ CREATE INDEX ix_nutrition_target_key ON nutrition_target_revisions_v1 (user_id, 
 -- index: ix_plan_adapt_dismissal_user
 CREATE INDEX ix_plan_adapt_dismissal_user ON plan_adaptation_dismissals (user_id);
 
+-- index: ix_program_builder_owner_program
+CREATE INDEX ix_program_builder_owner_program ON program_builder_operations_v1 (user_id, program_id, id);
+
 -- index: ix_reco_episode_user_context
 CREATE INDEX ix_reco_episode_user_context ON recommendation_episodes (user_id, context_fingerprint);
 
@@ -168,6 +171,9 @@ CREATE TABLE owned_blueprint_snapshots ( id VARCHAR(36) NOT NULL, owner_id INTEG
 
 -- table: plan_adaptation_dismissals
 CREATE TABLE plan_adaptation_dismissals ( id INTEGER NOT NULL, decision_id VARCHAR(64) NOT NULL, user_id INTEGER NOT NULL, dismissed_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, PRIMARY KEY (id), FOREIGN KEY(user_id) REFERENCES users (id) ON DELETE CASCADE, CONSTRAINT uq_plan_adapt_dismissal_decision_id UNIQUE (decision_id) );
+
+-- table: program_builder_operations_v1
+CREATE TABLE program_builder_operations_v1 ( id INTEGER NOT NULL, user_id INTEGER NOT NULL, command_id VARCHAR(128) NOT NULL, operation VARCHAR(24) NOT NULL, request_sha256 VARCHAR(64) NOT NULL, program_id INTEGER, source_digest_before VARCHAR(64), source_digest_after VARCHAR(64) NOT NULL, result_version INTEGER NOT NULL, result_json TEXT NOT NULL, created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, PRIMARY KEY (id), FOREIGN KEY(user_id) REFERENCES users (id) ON DELETE CASCADE, FOREIGN KEY(program_id) REFERENCES user_programs (id) ON DELETE SET NULL, CONSTRAINT uq_program_builder_owner_command UNIQUE (user_id, command_id) );
 
 -- table: readiness_entries
 CREATE TABLE readiness_entries ( id INTEGER NOT NULL, user_id INTEGER NOT NULL, recorded_on DATE NOT NULL, sleep_quality INTEGER NOT NULL, fatigue_level INTEGER NOT NULL, soreness_level INTEGER NOT NULL, stress_level INTEGER NOT NULL, motivation_level INTEGER NOT NULL, resting_hr INTEGER, note TEXT, created_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, PRIMARY KEY (id), FOREIGN KEY(user_id) REFERENCES users (id) ON DELETE CASCADE, CONSTRAINT uq_readiness_user_day UNIQUE (user_id, recorded_on) );

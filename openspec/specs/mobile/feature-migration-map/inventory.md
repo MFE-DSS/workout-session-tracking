@@ -96,3 +96,9 @@ Généré depuis `inventory.yaml` (base `36b971a`) — ne pas éditer à la main
 
 ### MOB-06 — consommateur en cours de finalisation (15 novembre)
 Les trois routes natives `/api/mobile/v1/me/library`, `/api/mobile/v1/me/library/items/{source_ref}` et `/api/mobile/v1/me/library/start` sont montées par le router canonique ; mapping exact dans inventory.yaml. Lecture et départ propriétaires via les vrais domaines. Consommateur ConnectedApp/journal intégré sur BODY/NUT47c7411 ; preuve iOS réelle et Hosts Android distincts. **PARTIAL : pixels/CI408/merge encore ouverts**, pas fonctionnalité livrée ni programme actif/agenda/constructeur natif présumés. Le catalogue est celui des modèles de séances, pas la bibliothèque d’exercices.
+
+MOB-07 monte les cinq routes de `owned-native-program-builder` dans l'application réelle :
+GET `/api/mobile/v1/me/program-builder/exercises`, GET `/programs`, GET `/programs/{program_id}`,
+POST `/commands` et GET `/operations/{command_id}`, ces quatre derniers sous le même préfixe.
+Le kernel CAS/reçu reste adossé à UserProgram ; le départ reste celui de MOB-06.
+L'acquisition synthétique est fermée par défaut ; pixels, CI et intégration restent des gates distinctes.

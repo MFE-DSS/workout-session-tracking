@@ -154,6 +154,7 @@
       </details>
     {% endif %}
     <form method="post" action="{{ url_for('user_program_from_weekly_plan') }}">
+    <input type="hidden" name="source_digest" value="{{ collection_digest }}">
       <button type="submit" class="btn btn--primary">Créer le programme proposé</button>
     </form>
     <p class="text-dim plan-sub">
@@ -286,6 +287,7 @@
   </summary>
   <form method="post" action="{{ url_for('profile_preferences_submit') }}"
         class="prefs-form" data-prefs-form>
+    <input type="hidden" name="source_digest" value="{{ collection_digest }}">
 
     {# ── Cadence : domaine fini de 7 valeurs, donc une grille de choix,
          pas un menu déroulant. Aucune valeur pré-sélectionnée si rien
@@ -412,6 +414,7 @@
     </summary>
     <form method="post" action="{{ url_for('user_plan_equipment_submit') }}"
           class="prefs-form">
+    <input type="hidden" name="source_digest" value="{{ collection_digest }}">
       {# Le marqueur distingue une soumission volontairement VIDE — « je
          m'entraîne sans matériel » — d'un formulaire jamais rendu. Sans
          lui, les deux arriveraient identiques. #}
@@ -440,6 +443,7 @@
        aller simple et l'état hérité deviendrait inatteignable. #}
     <form method="post" action="{{ url_for('user_plan_equipment_submit') }}"
           class="prefs-form">
+    <input type="hidden" name="source_digest" value="{{ collection_digest }}">
       <input type="hidden" name="raz" value="1">
       <button type="submit" class="btn btn--ghost prefs-form__submit">Effacer ma déclaration</button>
     </form>

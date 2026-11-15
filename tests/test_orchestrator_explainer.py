@@ -9,6 +9,7 @@ from __future__ import annotations
 import re
 
 import pytest
+from program_builder_web_helpers import post_program
 
 PROGRAMS_URL = "/programs"
 MATERIALIZE_URL = "/programs/from-weekly-plan"
@@ -181,7 +182,7 @@ def test_the_rendered_section_never_mentions_morphology(client):
         db.add(BodyMeasurement(
             user_id=uid, measured_at=datetime.now(UTC), wingspan_cm=190.0))
         db.commit()
-    client.post(MATERIALIZE_URL, follow_redirects=False)
+    post_program(client, MATERIALIZE_URL, follow_redirects=False)
 
     blob = _visible(client).lower()
     for banned in ("envergure", "ape index", "morpholog", "proportion"):
@@ -244,7 +245,7 @@ def test_the_morphology_guard_states_the_reason():
 def test_rejected_alternatives_are_never_user_facing(client):
     with _session() as db:
         _save_prefs(db, _uid())
-    client.post(MATERIALIZE_URL, follow_redirects=False)
+    post_program(client, MATERIALIZE_URL, follow_redirects=False)
     blob = _visible(client).lower()
     for banned in ("rejeté", "rejete", "écarté", "ecarte", "au lieu de",
                    "nous avons choisi plutôt"):
@@ -266,7 +267,7 @@ def test_no_confidence_is_invented_for_declared_or_policy_sources():
 def test_no_percentage_is_ever_rendered(client):
     with _session() as db:
         _save_prefs(db, _uid())
-    client.post(MATERIALIZE_URL, follow_redirects=False)
+    post_program(client, MATERIALIZE_URL, follow_redirects=False)
     assert not re.search(r"\d+\s*%", _visible(client))
 
 
@@ -326,7 +327,7 @@ def test_the_copy_is_a_closed_mapping_with_no_llm():
 def test_no_enum_token_is_ever_rendered(client):
     with _session() as db:
         _save_prefs(db, _uid())
-    client.post(MATERIALIZE_URL, follow_redirects=False)
+    post_program(client, MATERIALIZE_URL, follow_redirects=False)
     blob = _section(client)
     for token in ("USER_DECLARED", "PRODUCT_POLICY", "CATALOG_CONSTRAINT",
                   "RECOVERY_ESTIMATE", "MORPHOLOGY_INFERENCE", "VOLUME_BAND"):
@@ -336,7 +337,7 @@ def test_no_enum_token_is_ever_rendered(client):
 def test_the_surface_never_speaks_as_an_ai(client):
     with _session() as db:
         _save_prefs(db, _uid())
-    client.post(MATERIALIZE_URL, follow_redirects=False)
+    post_program(client, MATERIALIZE_URL, follow_redirects=False)
     blob = _visible(client).lower()
     for banned in ("l'ia", "l’ia", "intelligence artificielle", "l'algorithme pense",
                    "je pense que"):
@@ -409,6 +410,6 @@ def test_rendering_the_explanation_does_not_move_the_plan(client):
     before = build_weekly_plan(prefs)
     with _session() as db:
         _save_prefs(db, _uid())
-    client.post(MATERIALIZE_URL, follow_redirects=False)
+    post_program(client, MATERIALIZE_URL, follow_redirects=False)
     client.get(PROGRAMS_URL)
     assert build_weekly_plan(prefs).fingerprint == before.fingerprint

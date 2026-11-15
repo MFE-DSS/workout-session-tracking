@@ -15,6 +15,7 @@ from __future__ import annotations
 
 from urllib.parse import urlparse
 
+from program_builder_web_helpers import post_program
 from sqlalchemy import func, select
 
 # ─────────────────────────── helpers ───────────────────────────
@@ -83,7 +84,7 @@ def test_new_unauthenticated_redirects_to_login(client):
 
 def test_post_unauthenticated_redirects_to_login(client):
     client.cookies.clear()
-    r = client.post("/programs", data={"title": "X"}, follow_redirects=False)
+    r = post_program(client, "/programs", data={"title": "X"}, follow_redirects=False)
     assert r.status_code == 303
     assert r.headers["location"] == "/login"
 
@@ -109,7 +110,7 @@ def test_new_authenticated_shows_title_form(client):
 def test_post_valid_title_creates_owned_draft(client):
     from app.models.user_program import UserProgram
 
-    r = client.post("/programs", data={"title": "Mon programme"}, follow_redirects=False)
+    r = post_program(client, "/programs", data={"title": "Mon programme"}, follow_redirects=False)
     assert r.status_code == 303
     assert urlparse(r.headers["location"]).path.startswith("/programs/")
     with _session() as db:
@@ -121,7 +122,7 @@ def test_post_valid_title_creates_owned_draft(client):
 
 
 def test_redirect_target_shows_created_program(client):
-    r = client.post("/programs", data={"title": "Prog Detail"}, follow_redirects=False)
+    r = post_program(client, "/programs", data={"title": "Prog Detail"}, follow_redirects=False)
     path = urlparse(r.headers["location"]).path
     detail = client.get(path)
     assert detail.status_code == 200
@@ -133,7 +134,7 @@ def test_redirect_target_shows_created_program(client):
 def test_title_is_trimmed(client):
     from app.models.user_program import UserProgram
 
-    client.post("/programs", data={"title": "  Espaces  "}, follow_redirects=False)
+    post_program(client, "/programs", data={"title": "  Espaces  "}, follow_redirects=False)
     with _session() as db:
         program = db.execute(
             select(UserProgram).where(UserProgram.user_id == _uid())
@@ -145,7 +146,7 @@ def test_title_is_trimmed(client):
 
 
 def test_blank_title_rerenders_error_no_row(client):
-    r = client.post("/programs", data={"title": "   "}, follow_redirects=False)
+    r = post_program(client, "/programs", data={"title": "   "}, follow_redirects=False)
     assert r.status_code == 200
     assert "titre" in r.text.lower()
     assert _count_owned() == 0
@@ -154,7 +155,7 @@ def test_blank_title_rerenders_error_no_row(client):
 def test_slug_is_derived_from_title(client):
     from app.models.user_program import UserProgram
 
-    client.post(
+    post_program(client,
         "/programs", data={"title": "Mon Programme Hyper 2024 !"}, follow_redirects=False
     )
     with _session() as db:
@@ -167,9 +168,9 @@ def test_slug_is_derived_from_title(client):
 def test_slug_collision_same_user_rerenders_error_no_second_row(client):
     from app.models.user_program import UserProgram
 
-    first = client.post("/programs", data={"title": "Push A"}, follow_redirects=False)
+    first = post_program(client, "/programs", data={"title": "Push A"}, follow_redirects=False)
     assert first.status_code == 303
-    second = client.post("/programs", data={"title": "push a"}, follow_redirects=False)
+    second = post_program(client, "/programs", data={"title": "push a"}, follow_redirects=False)
     assert second.status_code == 200
     assert "existe" in second.text.lower() or "slug" in second.text.lower()
     with _session() as db:
@@ -191,7 +192,7 @@ def test_quota_blocks_eleventh_program(client):
     with _session() as db:
         for i in range(10):
             create_draft(db, uid, f"Programme {i}", f"programme-{i}")
-    r = client.post("/programs", data={"title": "Onzieme"}, follow_redirects=False)
+    r = post_program(client, "/programs", data={"title": "Onzieme"}, follow_redirects=False)
     assert r.status_code == 200
     assert "10" in r.text  # gentle quota message names the cap
     assert _count_owned() == 10
@@ -235,7 +236,7 @@ def test_archived_program_excluded_from_list(client):
 def test_no_quality_review_written(client):
     from app.models.user_program import UserProgramQualityReview
 
-    client.post("/programs", data={"title": "Sans review"}, follow_redirects=False)
+    post_program(client, "/programs", data={"title": "Sans review"}, follow_redirects=False)
     with _session() as db:
         count = db.execute(
             select(func.count()).select_from(UserProgramQualityReview)
@@ -250,7 +251,7 @@ def test_no_workout_template_created(client):
         before = db.execute(
             select(func.count()).select_from(WorkoutTemplate)
         ).scalar_one()
-    client.post("/programs", data={"title": "Sans template"}, follow_redirects=False)
+    post_program(client, "/programs", data={"title": "Sans template"}, follow_redirects=False)
     with _session() as db:
         after = db.execute(
             select(func.count()).select_from(WorkoutTemplate)

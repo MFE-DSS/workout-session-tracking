@@ -9,6 +9,7 @@ template immutability, owner-scope, lifecycle guards, and the published-only UI 
 from __future__ import annotations
 
 import pytest
+from program_builder_web_helpers import post_program
 from sqlalchemy import func, select
 
 from app.services.user_program_versioning import (
@@ -332,7 +333,7 @@ def test_cta_appears_only_for_published(client):
 
 def test_post_new_version_returns_editable_draft(client):
     pid = _make_published_http("http-cycle")
-    r = client.post(f"/programs/{pid}/new-version", follow_redirects=False)
+    r = post_program(client, f"/programs/{pid}/new-version", follow_redirects=False)
     assert r.status_code == 303
     assert r.headers["location"].endswith(f"/programs/{pid}")
 
@@ -360,11 +361,11 @@ def test_post_new_version_foreign_is_404(client):
             db.add(other)
             db.commit()
         foreign = _make_published(db, other.id, "http-foreign").id
-    assert client.post(f"/programs/{foreign}/new-version").status_code == 404
+    assert post_program(client, f"/programs/{foreign}/new-version").status_code == 404
 
 
 def test_post_new_version_unauthenticated_redirects(client):
     pid = _make_published_http("http-auth")
     client.cookies.clear()
-    r = client.post(f"/programs/{pid}/new-version", follow_redirects=False)
+    r = post_program(client, f"/programs/{pid}/new-version", follow_redirects=False)
     assert r.headers["location"] == "/login"

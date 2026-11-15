@@ -27,6 +27,8 @@ from __future__ import annotations
 import pathlib
 import re
 
+from program_builder_web_helpers import post_program
+
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 PLAN_TPL = ROOT / "app/templates/user_programs/plan.html"
 BASE_TPL = ROOT / "app/templates/base.html"
@@ -52,7 +54,7 @@ def _declare_and_materialise(client):
     with SessionLocal() as db:
         save_training_preferences(db, uid, sessions_per_week=4,
                                   focus_priorities=["back_width"])
-    client.post("/programs/from-weekly-plan", follow_redirects=True)
+    post_program(client, "/programs/from-weekly-plan", follow_redirects=True)
     return client.get(PLAN_URL).text
 
 

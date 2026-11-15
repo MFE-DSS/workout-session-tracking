@@ -41,14 +41,17 @@ An EKB-assisted exercise picker onto the flow is WIZARD_05+.
 """
 from __future__ import annotations
 
+import inspect
 import logging
 import re
 import unicodedata
 from datetime import UTC, datetime
+from functools import wraps
 from typing import Annotated
 
 from fastapi import APIRouter, Form, HTTPException, Path, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
+from starlette.concurrency import run_in_threadpool
 
 from app.deps import CurrentUser, DbSession
 from app.routers.sessions import _demarrage_bloque, _poser_adaptations
@@ -58,6 +61,12 @@ from app.services.environment_activation import (
     preparer_demarrage,
 )
 from app.services.equipment_model import equipment_groups
+from app.services.program_builder_commands import (
+    ProgramBuilderError,
+    collection_digest,
+    program_source_digest,
+)
+from app.services.program_builder_transactions import owner_transaction
 from app.services.program_quality_reviews import SCORABLE_STATUSES
 from app.services.session_builder import instantiate_session
 from app.services.session_state import latest_open_session
@@ -93,6 +102,39 @@ from app.services.user_program_versioning import (
     start_new_edit_cycle,
 )
 from app.templating import templates
+
+
+def owned_web_writer(function):
+    """Check rendered CAS under the owner reservation before ANY tree read."""
+    @wraps(function)
+    async def guarded(*args, **kwargs):
+        request, db, user = kwargs['request'], kwargs['db'], kwargs['user']
+        program_id = kwargs.get('program_id')
+        form = await request.form()
+        if any(len(form.getlist(key)) != 1 for key in form):
+            raise HTTPException(status_code=422, detail="Champs de formulaire dupliqués")
+        try:
+            with owner_transaction(db, user.id):
+                program = _owned_or_404(db, user, program_id) if program_id is not None else None
+                tokens = form.getlist('source_digest')
+                token = tokens[0] if len(tokens) == 1 else None
+                if not token:
+                    raise ProgramBuilderError('Relisez le programme avant de réessayer.', 428)
+                expected = program_source_digest(program) if program is not None else collection_digest(db, user.id)
+                if token != expected:
+                    raise ProgramBuilderError('Ce programme a changé. Relisez-le avant de réessayer.', 409)
+                response = await run_in_threadpool(function, *args, **kwargs)
+            after_commit = getattr(response, "_program_builder_after_commit", None)
+            if after_commit is not None:
+                await run_in_threadpool(after_commit)
+            return response
+        except ProgramBuilderError as error:
+            response = (_render_editor(request, db, user, _owned_or_404(db, user, program_id), error=error.code)
+                        if program_id is not None else _render_new(request, db, user, title='', error=error.code))
+            response.status_code = error.status
+            return response
+    guarded.__signature__ = inspect.signature(function, eval_str=True)
+    return guarded
 
 router = APIRouter(tags=["user_programs"])
 
@@ -136,6 +178,7 @@ def _render_new(
         request,
         "user_programs/new.html",
         {
+            "collection_digest": collection_digest(db, user.id),
             "page_title": "Créer un programme",
             "error": error,
             "title_value": title,
@@ -154,6 +197,8 @@ def _render_editor(
         request,
         "user_programs/detail.html",
         {
+            "collection_digest": collection_digest(db, user.id),
+            "source_digest": program_source_digest(program),
             "page_title": program.title,
             "program": program,
             "session_count": session_count,
@@ -206,6 +251,7 @@ def _tree_to_payload(program) -> list[dict]:
                     "source_reason": e.source_reason,
                     "rep_targets": [
                         {
+                            "set_index": rt.set_index,
                             "min_reps": rt.min_reps,
                             "max_reps": rt.max_reps,
                             "technique": rt.technique,
@@ -335,6 +381,8 @@ def _render_generate(
         request,
         "user_programs/generate.html",
         {
+            "collection_digest": collection_digest(db, user.id),
+            "source_digest": program_source_digest(program),
             "page_title": f"Générer — {program.title}",
             "program": program,
             "split_labels": SPLIT_LABELS,
@@ -448,6 +496,7 @@ def user_programs_list(request: Request, db: DbSession, user: CurrentUser):
         request,
         "user_programs/list.html",
         {
+            "collection_digest": collection_digest(db, user.id),
             "page_title": "Mes programmes",
             "programs": programs,
             "active_session": latest_open_session(db, user.id),
@@ -536,6 +585,7 @@ def user_plan(request: Request, db: DbSession, user: CurrentUser):
         request,
         "user_programs/plan.html",
         {
+            "collection_digest": collection_digest(db, user.id),
             "page_title": "Mon plan",
             "preferences": preferences or _NO_PREFERENCES,
             "priority_labels": labels,
@@ -613,6 +663,7 @@ def _plan_explanation(db, user_id: int):
     response_class=HTMLResponse,
     name="user_program_from_weekly_plan",
 )
+@owned_web_writer
 def user_program_from_weekly_plan(
     request: Request, db: DbSession, user: CurrentUser
 ):
@@ -659,18 +710,21 @@ def user_program_from_weekly_plan(
     # l'appelé n'est pas une garantie : le jour où quelqu'un modifie
     # l'observateur et le laisse lever, cette route rendrait 500 alors que le
     # brouillon est **déjà créé et valide**. Le brouillon prime sur sa trace.
-    try:
-        from app.services.decision_analytics import (
-            observe_plan_generation_for_user,
-        )
+    def observe_after_commit():
+        try:
+            from app.services.decision_analytics import (
+                observe_plan_generation_for_user,
+            )
 
-        observe_plan_generation_for_user(db, user.id, plan)
-    except Exception:  # noqa: BLE001
-        logger.exception(
-            "decision-trace observation failed; draft %s stays valid", program.id
-        )
+            observe_plan_generation_for_user(db, user.id, plan)
+        except Exception:  # noqa: BLE001
+            logger.exception(
+                "decision-trace observation failed; draft %s stays valid", program.id
+            )
 
-    return _redirect_to_editor(request, program.id)
+    response = _redirect_to_editor(request, program.id)
+    response._program_builder_after_commit = observe_after_commit
+    return response
 
 
 # Declared BEFORE `/programs/{program_id}`: even though `{program_id:int}`
@@ -681,6 +735,7 @@ def user_program_new(request: Request, db: DbSession, user: CurrentUser):
 
 
 @router.post("/programs", response_class=HTMLResponse, name="user_program_create")
+@owned_web_writer
 def user_program_create(
     request: Request,
     db: DbSession,
@@ -735,6 +790,7 @@ def user_program_detail(
     name="user_program_add_session",
     responses={404: {"description": _NOT_FOUND}},
 )
+@owned_web_writer
 def user_program_add_session(
     request: Request,
     db: DbSession,
@@ -771,6 +827,7 @@ def user_program_add_session(
     name="user_program_delete_session",
     responses={404: {"description": _NOT_FOUND}},
 )
+@owned_web_writer
 def user_program_delete_session(
     request: Request,
     db: DbSession,
@@ -796,6 +853,7 @@ def user_program_delete_session(
     name="user_program_add_exercise",
     responses={404: {"description": _NOT_FOUND}},
 )
+@owned_web_writer
 def user_program_add_exercise(
     request: Request,
     db: DbSession,
@@ -833,6 +891,7 @@ def user_program_add_exercise(
     name="user_program_delete_exercise",
     responses={404: {"description": _NOT_FOUND}},
 )
+@owned_web_writer
 def user_program_delete_exercise(
     request: Request,
     db: DbSession,
@@ -861,6 +920,7 @@ def user_program_delete_exercise(
     name="user_program_validate",
     responses={404: {"description": _NOT_FOUND}},
 )
+@owned_web_writer
 def user_program_validate(
     request: Request,
     db: DbSession,
@@ -903,6 +963,7 @@ def user_program_generate_form(
     name="user_program_generate",
     responses={404: {"description": _NOT_FOUND}},
 )
+@owned_web_writer
 def user_program_generate(
     request: Request,
     db: DbSession,
@@ -1025,6 +1086,8 @@ def _render_publish(
         request,
         "user_programs/publish.html",
         {
+            "collection_digest": collection_digest(db, user.id),
+            "source_digest": program_source_digest(program),
             "page_title": f"Publier — {program.title}",
             "program": program,
             "rows": _publish_rows(program, user),
@@ -1066,6 +1129,7 @@ def user_program_publish_form(
     name="user_program_publish",
     responses={404: {"description": _NOT_FOUND}},
 )
+@owned_web_writer
 def user_program_publish(
     request: Request,
     db: DbSession,
@@ -1106,6 +1170,7 @@ def user_program_publish(
     name="user_program_new_version",
     responses={404: {"description": _NOT_FOUND}},
 )
+@owned_web_writer
 def user_program_new_version(
     request: Request,
     db: DbSession,
@@ -1165,7 +1230,7 @@ def user_program_start_session(
     if preparation.etat == REFUSE:
         return _demarrage_bloque(template.slug)
 
-    from app.services.plan_v3.transactions import admit_legacy_start, RuntimeFailure
+    from app.services.plan_v3.transactions import RuntimeFailure, admit_legacy_start
     try:
         admit_legacy_start(db, user.id)
     except RuntimeFailure as error:
