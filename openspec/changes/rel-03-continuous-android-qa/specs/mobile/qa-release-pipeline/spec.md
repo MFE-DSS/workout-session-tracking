@@ -37,3 +37,19 @@ OTA support SHALL be claimed only after a real installed client downloads and ru
 - **WHEN** Expo Updates is disabled or the QA channel/runtime is absent in that binary
 - **THEN** it is not advertised as OTA-capable
 - **AND** a new native build and installed proof remain required
+
+### Requirement: Independent provider and image observation
+The OVH QA path SHALL bind a backend image receipt independently acquired from an allowlisted GitHub workflow/run/source to an authenticated fresh fixed-command host observation of the actual running image. Candidate documents, application version responses and OCI source labels MUST NOT alone establish image provenance. Existing Render verification SHALL remain strict.
+
+#### Scenario: Image or host observation cannot be independently acquired
+- **WHEN** the workflow/artifact/source/image binding, pinned host identity, nonce or bounded observation freshness cannot be verified
+- **THEN** publication is refused before an external build or update command
+- **AND** preparation remains non-distributable without weakening the existing database-proof limits
+
+### Requirement: Explicit synthetic feature configuration
+The QA supervisor SHALL supply only explicitly admitted synthetic feature settings through private references and separate backend/facade environments. Advertised BODY, Nutrition, Library and Builder contracts SHALL require their applicable configuration and retain independent data-consent and runtime authority gates.
+
+#### Scenario: Extended feature configuration is missing or contaminated
+- **WHEN** a candidate promises a feature without its private configuration, or ambient production/sensitive values contaminate either child environment
+- **THEN** extended service activation is refused without inheriting secrets or granting consent
+- **AND** legacy PLAN-only configuration and minimal post-withdrawal erasure semantics are preserved

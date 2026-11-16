@@ -21,6 +21,7 @@ def read_version(
     bundle_root: Path,
     ownership_anchor: dict,
     ownership_anchor_sha256: str,
+    feature_profiles: dict | None = None,
 ) -> dict:
     from app.services.plan_v3.packaging import bundle_manifest, execute_science
 
@@ -74,7 +75,7 @@ def read_version(
             or publication != {key: authorities["v3"][key] for key in publication}
         ):
             raise ValueError
-        return {
+        identity = {
             "schema_version": "qa-backend/1.0.0",
             "data_scope": "SYNTHETIC_ONLY",
             "environment_id": environment_id,
@@ -86,5 +87,8 @@ def read_version(
             "packaging_digest": digest,
             "authority": {"state": row[1], "generation": row[0], "publication": publication},
         }
+        if feature_profiles:
+            identity["feature_profiles"] = dict(feature_profiles)
+        return identity
     except Exception:
         raise ValueError("qa_identity_unavailable") from None

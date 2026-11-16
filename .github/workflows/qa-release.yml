@@ -6,7 +6,7 @@ on:
       operation:
         description: Prepare is non-distributable; other operations need qa-release review
         type: choice
-        options: [PREPARE, BUILD_APK, UPDATE, ROLLBACK]
+        options: [PREPARE, PREPARE_IMAGE, BUILD_APK, UPDATE, ROLLBACK]
         default: PREPARE
       source_sha:
         description: Exact approved merged Git SHA; dispatch ref must point to this SHA
@@ -48,7 +48,7 @@ jobs:
           CIPHER: ${{ inputs.proof_cipher_sha256 }}
         run: |
           [[ "$SOURCE" =~ ^[a-f0-9]{40}$ ]] && [[ "$SOURCE" == "$GITHUB_SHA" ]]
-          if [[ "$OPERATION" != PREPARE || -n "$EXPECTED$ASSET$CIPHER" ]]; then
+          if [[ "$OPERATION" != PREPARE && "$OPERATION" != PREPARE_IMAGE || -n "$EXPECTED$ASSET$CIPHER" ]]; then
             [[ "$EXPECTED" =~ ^[a-f0-9]{64}$ ]]
             [[ "$ASSET" =~ ^[1-9][0-9]*$ ]]
             [[ "$CIPHER" =~ ^[a-f0-9]{64}$ ]]
@@ -68,6 +68,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: python -c 'from tools.qa_delivery.pipeline import protected_environment; protected_environment()'
       - name: Prepare frozen non-distributable candidate without private credentials
+        if: inputs.operation != 'PREPARE_IMAGE'
         env:
           GH_TOKEN: ${{ github.token }}
           OPERATION: ${{ inputs.operation }}
@@ -83,6 +84,7 @@ jobs:
           fi
           python -m tools.qa_delivery.pipeline prepare --candidate docs/release/rel-03/candidate.json --operation "$operation" --output "$RUNNER_TEMP/qa-prepared.json" "${args[@]}"
       - uses: actions/upload-artifact@v6
+        if: inputs.operation != 'PREPARE_IMAGE'
         id: package
         with:
           name: qa-prepared-candidate
@@ -90,6 +92,7 @@ jobs:
           retention-days: 7
           if-no-files-found: error
       - name: Expose exact package for the single protected candidate review
+        if: inputs.operation != 'PREPARE_IMAGE'
         id: summary
         env:
           ARTIFACT_URL: ${{ steps.package.outputs.artifact-url }}
@@ -103,8 +106,39 @@ jobs:
           with open(os.environ['GITHUB_STEP_SUMMARY'],'a') as out:
               out.write(f"PREPARED / NON_DISTRIBUTABLE / DECLARED_NOT_VERIFIED\n\nReview {os.environ['ARTIFACT_URL']} including source, current canonical, target and expected proof hash against the local staging receipt. Private proof is verified only after approval.\n\nSingle qa-release approval comment (deployment authorization only): `APPROVE_QA {p['candidate_sha256']} {p['proof_sha256']}`\n")
           PY
+  prepare-qa-image:
+    if: inputs.operation == 'PREPARE_IMAGE'
+    needs: prepare
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment:
+      name: qa-release
+    permissions:
+      contents: read
+      actions: read
+      deployments: read
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.source_sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - run: pip install httpx==0.28.1
+      - name: Require distinct image-preparation approval; build local metadata only
+        env:
+          GH_TOKEN: ${{ secrets.QA_RELEASE_AUDIT_TOKEN || github.token }}
+        run: python -m tools.qa_delivery.image_receipts --output "$RUNNER_TEMP/qa-image-build.json"
+      - uses: actions/upload-artifact@v6
+        with:
+          name: qa-image-build
+          path: ${{ runner.temp }}/qa-image-build.json
+          retention-days: 7
+          if-no-files-found: error
   release:
-    if: inputs.operation != 'PREPARE'
+    if: inputs.operation != 'PREPARE' && inputs.operation != 'PREPARE_IMAGE'
     needs: prepare
     runs-on: ubuntu-latest
     timeout-minutes: 60
@@ -152,6 +186,27 @@ jobs:
           PY
           python -m tools.qa_delivery.proofs import --package "$RUNNER_TEMP/qa-package/qa-prepared.json" --key "$RUNNER_TEMP/qa-proof-private/key" --output "$RUNNER_TEMP/qa-proof-private/proof"
           rm -- "$RUNNER_TEMP/qa-proof-private/key"
+      - name: Materialize only the existing private OVH audit references when selected
+        env:
+          QA_OVH_AUDIT_KEY: ${{ secrets.QA_OVH_AUDIT_KEY }}
+          QA_OVH_KNOWN_HOSTS: ${{ secrets.QA_OVH_KNOWN_HOSTS }}
+        run: |
+          python - <<'PYCODE'
+          import json, os
+          from pathlib import Path
+          root=Path(os.environ['RUNNER_TEMP'])/'qa-proof-private'
+          proof=json.loads((root/'proof'/'cutover.json').read_text())
+          if proof.get('provider',{}).get('kind')=='OVH':
+              audit=root/'ssh'
+              audit.mkdir(mode=0o700)
+              for name,value in [('identity',os.environ['QA_OVH_AUDIT_KEY']),('known_hosts',os.environ['QA_OVH_KNOWN_HOSTS'])]:
+                  if not value or len(value)>16384:
+                      raise SystemExit('qa_ovh_private_audit_reference_missing')
+                  fd=os.open(audit/name,os.O_WRONLY|os.O_CREAT|os.O_EXCL,0o600)
+                  with os.fdopen(fd,'w') as out: out.write(value)
+              with open(os.environ['GITHUB_ENV'],'a') as out:
+                  out.write(f"AUREN_QA_OVH_IDENTITY_FILE={audit/'identity'}\nAUREN_QA_OVH_KNOWN_HOSTS_FILE={audit/'known_hosts'}\n")
+          PYCODE
       - run: npm ci
         working-directory: clients/mobile
       - run: npm install --global eas-cli@27.2.0

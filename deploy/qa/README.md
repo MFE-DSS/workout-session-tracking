@@ -185,3 +185,7 @@ external decision described in [the release package](../../docs/release/rel-03/R
 Base proposal is USD7.25/month before taxes/variable bandwidth/build minutes;
 there is no hard global invoice cap or automatic paid upgrade. The measured EAS
 Free snapshot10Android remaining at2026-11-10T12:23:46Z must be re-read before use.
+
+## OVH technical collector
+
+`observe_ovh.py` is a standalone, readonly, administrator-installed forced-command collector. It is not installed by the application or workflow. See [the technical and operational boundary](../../docs/release/rel-03/OVH_TECHNICAL_RUNBOOK.md). Do not run it as a generic remote shell or grant the audit client Docker access.
