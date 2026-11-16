@@ -1,5 +1,7 @@
 # REL03 — réemploi du VPS existant : prochaine opération
 
+**Actualisation après autorisations ultérieures :** la maintenance a été exécutée le 16 novembre. Voir le [reçu de maintenance, incidents et reprise réelle](EXISTING_HOST_MAINTENANCE_RECEIPT_20261116.md). Les constats et conditions de préparation ci-dessous conservent leur instant historique ; ils ne décrivent plus l'état système courant. Aucun déploiement QA n'en découle.
+
 16 novembre 2026 — Europe/Paris. Parent réconcilié `0347c11dde66d04862ba3ee2944456ae387f4086`. **Réemploi décidé ; préparation effectuée en lecture seule ; aucune maintenance distante appliquée.** Aucun nouvel achat, APK ou déploiement. Le compte, les services et les données du site sont conservés.
 
 ## Brainstorming / Options / Risques / Choix retenu
