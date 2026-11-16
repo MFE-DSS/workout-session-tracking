@@ -1,0 +1,72 @@
+{
+  "schema_version": "rel03-ops-qualification/1.0.0",
+  "observed_at_utc": "2026-11-16T09:14:43Z",
+  "canonical_parent": "c2f01b26823961a09cd5ce903dc76ea203d823e3",
+  "method": "EXISTING_AUTHENTICATED_SSH_READ_ONLY_STRICT_HOST_KEY",
+  "os": "Ubuntu 25.04",
+  "os_support": "END_OF_LIFE_2026-01-15",
+  "docker": "28.2.2",
+  "platform": "linux/amd64",
+  "cpu_count": 4,
+  "memory_total_mib": 7750,
+  "memory_available_mib": 5881,
+  "disk_available_mib": 45660,
+  "existing_container_count": 8,
+  "existing_docker_volume_count": 19,
+  "legacy_workout_and_nginx": "ACTIVE_UNMODIFIED",
+  "qa_audit_account": "ABSENT",
+  "qa_collector": "ABSENT",
+  "qa_activation_and_loaded_routing_receipts": "ABSENT",
+  "nginx_on_disk_contains_qa_host": false,
+  "qa_loaded_routing": "NOT_QUALIFIED",
+  "qa_dns": "UNRESOLVED_FROM_QUALIFICATION_HOST",
+  "qa_tls": "UNAVAILABLE_NO_QA_DNS",
+  "github_qa_release_environment": "ABSENT_404",
+  "private_proof_store": "UNPROVISIONED",
+  "local_qualification_tests": {
+    "passed": 112,
+    "files": 5,
+    "new_code": false,
+    "remote_acceptance": false
+  },
+  "fresh_backup_restore": {
+    "at": "2026-11-16T09:23:58.415821+00:00",
+    "source_sha": "c2f01b26823961a09cd5ce903dc76ea203d823e3",
+    "scope": "LOCAL_SYNTHETIC_MIGRATED_FIXTURE_NOT_DEPLOYABLE_NOT_REMOTE",
+    "head": [
+      [
+        "program_builder_operations_01"
+      ]
+    ],
+    "integrity": [
+      [
+        "ok"
+      ]
+    ],
+    "fk_violations": 0,
+    "tables": 46,
+    "table_digests_equal": true,
+    "continuity_equal": true,
+    "source_file_unchanged": true,
+    "manifest_verified": true,
+    "private_copies": true,
+    "deployed": false
+  },
+  "npm_audit": {
+    "total": 28,
+    "high": 3,
+    "moderate": 24,
+    "low": 1,
+    "applicability": "OPEN_REQUIRES_IMAGE_APK_TOOLCHAIN_TRIAGE",
+    "autofix_performed": false
+  },
+  "eas_android_quota": {
+    "used": 5,
+    "limit": 15,
+    "remaining_at_observation": 10,
+    "reserved": false
+  },
+  "remote_changes": false,
+  "build_performed": false,
+  "release": "NOT_READY"
+}
