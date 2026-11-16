@@ -2,6 +2,8 @@
 
 16 novembre 2026, Europe/Paris. **PROPOSITION, AUCUNE MUTATION DISTANTE AUTORISÉE OU EXÉCUTÉE.** Parent relu `c2f01b26823961a09cd5ce903dc76ea203d823e3`. Le mandat OPS autorise les lectures et la préparation indépendante ; il exige une décision distincte avant services, secrets, DNS/TLS, exposition ou distribution. Ce paquet ne rouvre aucun GO produit ni DA08.
 
+**Décision opérateur ultérieure du 16 novembre : réutiliser le VPS existant, sans nouvel achat.** « oui je veux réutiliser l'existant ». Le panier du nouvel hôte a été fermé sans acceptation contractuelle ni paiement ; cette décision remplace le chemin d'achat précédemment autorisé. Les options et commandes « nouvel hôte » ci-dessous conservent leur statut historique de proposition et ne doivent pas être exécutées sur l'hôte partagé. Le [paquet de maintenance de l'existant](EXISTING_HOST_MAINTENANCE.md) fixe la suite et ses autorisations encore nécessaires. Le choix du réemploi ne vaut pas autorisation de mise à niveau, reboot, modification des sauvegardes, déploiement QA ou changement de secrets/DNS/TLS.
+
 ## État réel et décision utile
 
 SSH authentifié, clé d’hôte existante vérifiée, lecture du 16 novembre à 09:14:43 UTC : Ubuntu25.04, noyau6.14.0-37, Docker28.2.2/linux-amd64,4CPU,7750Mio RAM dont5881 disponibles,45660Mio disque disponibles. Les huit conteneurs existants, dix-neuf volumes Docker et services workout/nginx sont préservés. L’insuffisance de capacité n’est pas le blocage constaté.
