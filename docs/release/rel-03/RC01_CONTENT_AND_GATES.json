@@ -1,0 +1,102 @@
+{
+  "schema_version": "mvp-rc01-content-proposal/1.0.0",
+  "status": "BLOCKED_NO_BUILD_NO_DEPLOYMENT",
+  "qualification_source_sha": "c2f01b26823961a09cd5ce903dc76ea203d823e3",
+  "features": [
+    {
+      "name": "MOB05A",
+      "code_merge": "18e04bd25ae424e97ac9f810321972e1b101dcae"
+    },
+    {
+      "name": "MOB04",
+      "code_merge": "205bf203596b0e6856335b7264624e3e27f74525"
+    },
+    {
+      "name": "BODY-01",
+      "code_pr": 407,
+      "closeout_pr": 409,
+      "code_merge": "045a3dbc35fdd0bb6ab49fe50a25ebddeb984af0",
+      "closeout_merge": "5b19dc77071a0bcab3d8048ed7a61e2e0b0e3084"
+    },
+    {
+      "name": "NUT-01",
+      "code_pr": 406,
+      "closeout_pr": 410,
+      "code_merge": "c9ce3713c43261f896e1e552c09243837ff535da",
+      "closeout_merge": "47c7411f084b779488cbbd13712aa816684228ac"
+    },
+    {
+      "name": "MOB-06",
+      "code_pr": 408,
+      "closeout_pr": 411,
+      "code_merge": "110f0a1961338f319d6deac258cd840b78c83ed5",
+      "closeout_merge": "59a28dc6db2554babc924701e11fe9f1a86bf613"
+    },
+    {
+      "name": "MOB-07",
+      "code_pr": 414,
+      "closeout_pr": 415,
+      "code_merge": "dbad35d4634442e985b2964ff85fad6254efae74",
+      "closeout_merge": "683e88313b0c2c5866f0594766213569628d1659",
+      "canonical_CI": {
+        "run": 43753463939,
+        "status": "completed/success"
+      }
+    }
+  ],
+  "legacy_v3": "PRESERVED_NOT_REIMPLEMENTED",
+  "account_onboarding": "EXISTING_CANONICAL_CONSUMER",
+  "feature_merges_verified_ancestors": true,
+  "compatibility": {
+    "api": "first-session-runtime/3.0.0",
+    "inventory": "plan-calibration-inventory/2.0.0",
+    "server_schema": "program_builder_operations_01",
+    "local_schema": "first-session-local/3.0.0"
+  },
+  "feature_profiles": {
+    "BODY": "body-measurements/1.0.0",
+    "NUT": "nutrition-manual/1.0.0",
+    "LIBRARY": "owned-library/1.0.0",
+    "BUILDER": "program-builder/1.0.0"
+  },
+  "proposed_android": {
+    "app_version": "0.0.2",
+    "version_code": 3,
+    "package": "dev.auren.releaseqa02",
+    "certificate_sha256": "12b13109a2a41e2e2c0e97578364793e659a7548da4ce210d0dbd2f912f4bc75",
+    "runtime_version": null,
+    "fingerprint": null,
+    "updates_enabled": true,
+    "storage_schema_sha256": null
+  },
+  "proposed_profile": "qa-continuous-android",
+  "qa_channel": "qa",
+  "qa_branch": "qa",
+  "backend_target": null,
+  "image_id": null,
+  "runtime_version": null,
+  "native_fingerprint": null,
+  "build_id": null,
+  "artifact_url": null,
+  "artifact_sha256": null,
+  "installed_connected_app": "NOT_RUN_NO_NEW_ARTIFACT_OR_QA_TARGET",
+  "physical_acceptance": "UNAVAILABLE",
+  "local_recovery_tables": [
+    "body_pending_commands_v1",
+    "nutrition_pending_commands_v1",
+    "library_pending_openings_v1",
+    "program_builder_pending_commands_v1"
+  ],
+  "excluded_not_served": [
+    "muscle-group availability",
+    "photo/OCR nutrition",
+    "new scientific prescriptions"
+  ],
+  "native_source_file_sha256": {
+    "clients/mobile/package-lock.json": "da02ce7478ab6a3332e4fd8a4b4c4d56013324440662e79f4bee742fe709a2a3",
+    "clients/mobile/qa-delivery.config.js": "8164a3668e9e83534a0a9b295a539a7cda28447e1ec4430ecb8c40e057d71121",
+    "clients/mobile/eas.json": "5873008311a157b6b702cf2d467031d8dcc2491b6c40cfeba66fea003c45a70e",
+    "deploy/qa/Dockerfile": "863d20c47cd3f08703cbb734340da31782cd1ba69a49575251587b728d851619",
+    "requirements-lock.txt": "563a6ec43cd63f44f70191cdcca9ba9673e04bbce27d8c0feebc43124c390b37"
+  }
+}
