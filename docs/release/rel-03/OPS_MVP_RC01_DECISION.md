@@ -1,5 +1,7 @@
 # REL03 OPS / MVP RC01 — décision opérationnelle bornée
 
+**Actualisation du 16 novembre après décisions opérateur :** le VPS existant a été maintenu vers Ubuntu 26.04.1 LTS, puis ses services vérifiés après deux boots. Le [reçu de maintenance](EXISTING_HOST_MAINTENANCE_RECEIPT_20261116.md) distingue opérations, incidents et limites. Ce document conserve ci-dessous sa proposition initiale ; aucun achat ni déploiement QA n'est réalisé ou autorisé par son actualisation.
+
 16 novembre 2026, Europe/Paris. **PROPOSITION, AUCUNE MUTATION DISTANTE AUTORISÉE OU EXÉCUTÉE.** Parent relu `c2f01b26823961a09cd5ce903dc76ea203d823e3`. Le mandat OPS autorise les lectures et la préparation indépendante ; il exige une décision distincte avant services, secrets, DNS/TLS, exposition ou distribution. Ce paquet ne rouvre aucun GO produit ni DA08.
 
 **Décision opérateur ultérieure du 16 novembre : réutiliser le VPS existant, sans nouvel achat.** « oui je veux réutiliser l'existant ». Le panier du nouvel hôte a été fermé sans acceptation contractuelle ni paiement ; cette décision remplace le chemin d'achat précédemment autorisé. Les options et commandes « nouvel hôte » ci-dessous conservent leur statut historique de proposition et ne doivent pas être exécutées sur l'hôte partagé. Le [paquet de maintenance de l'existant](EXISTING_HOST_MAINTENANCE.md) fixe la suite et ses autorisations encore nécessaires. Le choix du réemploi ne vaut pas autorisation de mise à niveau, reboot, modification des sauvegardes, déploiement QA ou changement de secrets/DNS/TLS.
