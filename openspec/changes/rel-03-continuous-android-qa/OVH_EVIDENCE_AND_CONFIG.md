@@ -52,3 +52,15 @@ Le superviseur exige que les fonctionnalités annoncées par le candidat soient 
 Tests de reçus GitHub forgés/stales/autre workflow/SHA/attempt/image et d’observation rejouée/mauvaise clé/double writer/mount inattendu ; guards Render conservés. Test obligatoire : conteneur sain inspecté mais origine publique routée vers un autre upstream (y compris version JSON identique) → refus. Tests Python/JS symétriques de l’origine exacte et refus de toutes les autres. Tests du vrai superviseur avec environnements séparés, cas ancien PLAN seul et refus de fonctionnalités promises sans configuration. Parcours HTTP synthétiques BODY/NUT/LIB/Builder et journal/reçus possédés, sous accords applicables, sans déploiement distant.
 
 Référence initiale de revue indépendante : `/Users/martinfeldmann/auren-review/rel03-ovh-amendment-20261115/REVIEW.md`. Une fois le contrat et son scope acceptés, le plan d’implémentation précis et les leases seront figés avant code. Les validations opérationnelles et installées restent distinctes.
+
+## OPS-02 — garde privée qualifiée,17novembre2026
+
+Parent canonique `d48a460fcfca5c7dfd6b6de4d9114d791d10b72d`. L'opérateur a répondu « ok » au paquet opérationnel, puis « ok continue » ; le GO est conservé dans le reçu de session et [la progression opérationnelle](../../../docs/release/rel-03/ops02/PRIVATE_CUSTODY_PROVISIONING_20261117.md). Le second approbateur humain n'est pas encore désigné. Aucun environnement protégé incomplet, rôle, secret ou build n'est créé pour contourner ce manque.
+
+### Brainstorming / Options / Risques / Choix retenu
+
+Attendre toutes les identités empêcherait aussi le travail indépendant sur la garde ; publier malgré leur absence affaiblirait les gates. Choix : qualifier uniquement le dépôt/release privés autorisés et livrer leur référence publique non secrète. La valeur CONFIGURED signifie référence de stockage qualifiée, pas droits d'upload disponibles ni release approuvée. Le préflight réel doit toujours revérifier private/full_name/release_id ; le workflow conserve le refus de l'environnement ou de l'approbation absente.
+
+Référence acquise par l'accès authentifié existant : `MFE-DSS/auren-qa-private`, repository_id1461698730, ownerMFE-DSS/id156458952/typeUser, private=true. Release de garde `qa-custody-v1`, release_id448927197, cible `e58904577ab54ef5c4dd97b1c8414e6d590471d6`, draft=false, zéro asset. Aucun secret, donnée ou ciphertext téléversé. Aucun nouvel abonnement. La référence `docs/release/rel-03/proof-store.json` peut donc devenir CONFIGURED pour ce seul dépôt ; aucun identifiant secret dans ce delta.
+
+Fichiers possédés : cette annexe, la référence JSON et le reçu documentaire lié. Tier effectif à vérifier avant contrôles ; protocole et CI réelle du nouveau SHA, quatre checks requis et merge gardé sous GOV-MERGE-01. La source image future doit être le nouveau canonique contenant CONFIGURED avec **ses propres checks**, jamais le parent d48a460. Image, QA distant, DNS/TLS, backup/rollback opérationnels et APK restent non réalisés.

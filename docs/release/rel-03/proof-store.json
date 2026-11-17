@@ -1,5 +1,5 @@
 {
   "schema_version": "qa-proof-store/1.0.0",
-  "state": "UNPROVISIONED",
-  "repository": null
+  "state": "CONFIGURED",
+  "repository": "MFE-DSS/auren-qa-private"
 }
