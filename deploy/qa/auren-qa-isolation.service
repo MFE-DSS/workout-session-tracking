@@ -1,0 +1,14 @@
+[Unit]
+Description=AUREN QA dedicated network and host ingress isolation
+Requires=docker.service
+After=docker.service
+Before=auren-qa-rel03.service
+PartOf=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /usr/local/libexec/auren-qa-isolation-v1 --apply
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

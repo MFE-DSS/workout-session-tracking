@@ -49,3 +49,12 @@ Le repair schéma précédent est effectivement livré par412/413, puis ses cons
 - [x] Acceptation opérateur du seul delta technique OVH avant code : call_657199a80f2441d3b3bd3d450dfaaabf, « Autoriser le build technique REL‑03 OVH » ; aucun nouveau GO des scopes produit.
 - [ ] Après ce GO : plan/leases, RED→GREEN, préparation locale, tests/CI/revue et livraison scopée sous GOV-MERGE-01.
 - [ ] Sous autorisations opérationnelles ultérieures seulement : producteur/transport privé réel, hôte supporté, observateur installé, service synthétique isolé, DNS/TLS et candidat installé.
+
+## OPS-02 — poursuite explicite après maintenance #422
+
+- [x] Scope local et leases réconciliés sur348dc8c3 ; mandat OPS-02 distinct des opérations distantes.
+- [x] Transport privé explicite, durabilité/UNKNOWN/readback, isolation dédiée et initialisation vide canonique implémentés et testés ; [ledger](OPS02_SCOPE_AND_LEDGER.md).
+- [x] Préflight frais en lecture seule et paquet opérationnel borné préparés ; backup historique défectueux conservé comme tel.
+- [ ] Finir contrôlesCI_INFRA/revue du paquet, CI exacte et livraison du delta technique.
+- [ ] GO opérationnel unique, séparation humaine GitHub, garde privée, image réelle et QA qualifié.
+- [ ] Candidat Android consolidé et update/rollback installés sous leurs autorisations distinctes ; recette physique séparée.

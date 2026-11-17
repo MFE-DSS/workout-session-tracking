@@ -12,6 +12,8 @@ RUN pip install --no-cache-dir -r requirements-lock.txt \
 COPY app ./app
 COPY data ./data
 COPY scripts ./scripts
+COPY migrations ./migrations
+COPY alembic.ini ./alembic.ini
 COPY tools ./tools
 COPY docs ./docs
 COPY CLAUDE.md ./CLAUDE.md

@@ -53,3 +53,19 @@ The QA supervisor SHALL supply only explicitly admitted synthetic feature settin
 - **WHEN** a candidate promises a feature without its private configuration, or ambient production/sensitive values contaminate either child environment
 - **THEN** extended service activation is refused without inheriting secrets or granting consent
 - **AND** legacy PLAN-only configuration and minimal post-withdrawal erasure semantics are preserved
+
+### Requirement: Explicit private custody and fresh initialization
+Image custody SHALL preserve the independently built archive through authenticated encryption, durable single-upload intent and downloaded-byte verification in the configured private store. Fresh QA initialization SHALL run only on explicitly approved new state, using canonical migrations and reference seeds without granting consent or fabricating performed facts.
+
+#### Scenario: Upload response or initialization outcome is uncertain
+- **WHEN** an upload response is lost or initialization leaves partial state
+- **THEN** automatic mutation replay is refused and the original intent/state is preserved for inspection
+- **AND** a failed image job is not accepted solely from reconciled metadata
+
+### Requirement: Shared host isolation is observed
+The OVH observer SHALL acquire the actual dedicated internal network, sole container attachment and bounded host filter. Startup SHALL install isolation before the QA service, and routing SHALL preserve existing host listener groups while binding QA TLS to the qualified public IP.
+
+#### Scenario: Network, filter or loaded routing changes
+- **WHEN** an extra attachment, unapproved network option, reordered filter hook or changed nginx generation is observed
+- **THEN** qualification is refused until actual administrator requalification
+- **AND** no global firewall policy, foreign service or historical database is automatically replaced
