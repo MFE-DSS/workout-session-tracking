@@ -3,6 +3,7 @@
 import hashlib
 import io
 import json
+import tarfile
 import zipfile
 
 import httpx
@@ -10,6 +11,63 @@ import pytest
 
 REPO = "MFE-DSS/workout-session-tracking"
 SHA = "a" * 40
+
+
+def exported_configuration(tmp_path, *, damage=None):
+    layer = io.BytesIO()
+    with tarfile.open(fileobj=layer, mode="w") as tar:
+        item = tarfile.TarInfo("synthetic.txt")
+        item.size = 4
+        tar.addfile(item, io.BytesIO(b"test"))
+    layer_bytes = layer.getvalue()
+    layer_id = "sha256:" + hashlib.sha256(layer_bytes).hexdigest()
+    config = {
+        "architecture": "amd64", "os": "linux",
+        "config": {"User": "10001", "Labels": {"org.opencontainers.image.revision": SHA},
+                   "Entrypoint": ["python", "-m", "tools.qa_delivery.bootstrap"],
+                   "Cmd": ["--config", "/etc/secrets/qa-config.json", "--activation",
+                           "/var/lib/qa/activation.json"]},
+        "rootfs": {"type": "layers", "diff_ids": [layer_id]},
+    }
+    image = {"Architecture": "amd64", "Os": "linux", "Config": config["config"].copy(),
+             "RootFS": {"Type": "layers", "Layers": [layer_id]}}
+    if damage == "source":
+        config["config"]["Labels"] = {"org.opencontainers.image.revision": "b" * 40}
+    if damage == "layers":
+        config["rootfs"]["diff_ids"] = ["sha256:" + "e" * 64]
+    raw = json.dumps(config).encode()
+    digest = hashlib.sha256(raw).hexdigest()
+    name = "blobs/sha256/" + ("0" * 64 if damage == "digest" else digest)
+    path = tmp_path / "export.tar"
+    with tarfile.open(path, "w") as tar:
+        entries = [("manifest.json", json.dumps([{"Config": name, "Layers": ["layer.tar"],
+                                                  "RepoTags": []}]).encode()),
+                   (name, raw), ("layer.tar", layer_bytes)]
+        if damage == "duplicate":
+            entries.append((name, raw))
+        for filename, content in entries:
+            info = tarfile.TarInfo(filename)
+            info.size = len(content)
+            tar.addfile(info, io.BytesIO(content))
+    return path, image, "sha256:" + digest
+
+
+@pytest.mark.parametrize("engine_id", ["configuration", "oci_index"])
+def test_exported_configuration_identity_is_portable_across_docker_stores(tmp_path, engine_id):
+    from tools.qa_delivery.image_receipts import exported_configuration_id
+
+    path, image, expected = exported_configuration(tmp_path)
+    image["Id"] = expected if engine_id == "configuration" else "sha256:" + "f" * 64
+    assert exported_configuration_id(path, image, SHA) == expected
+
+
+@pytest.mark.parametrize("damage", ["source", "layers", "digest", "duplicate"])
+def test_exported_configuration_refuses_unbound_or_ambiguous_image(tmp_path, damage):
+    from tools.qa_delivery.image_receipts import exported_configuration_id
+
+    path, image, _ = exported_configuration(tmp_path, damage=damage)
+    with pytest.raises(ValueError, match="qa_image"):
+        exported_configuration_id(path, image, SHA)
 
 
 def image_fixture():

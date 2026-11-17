@@ -70,6 +70,47 @@ def _time(value):
     return result
 
 
+def exported_configuration_id(archive, image, source):
+    """Bind the portable config digest, not a store-dependent Docker inspect Id."""
+    try:
+        with tarfile.open(archive) as tar:
+            def read(name):
+                members = [m for m in tar.getmembers() if m.name == name]
+                require(len(members) == 1)
+                member = members[0]
+                require(member.isfile() and 0 < member.size <= MAX_RECEIPT)
+                return tar.extractfile(member).read()
+
+            manifest = json.loads(read("manifest.json"), object_pairs_hook=_pairs)
+            require(isinstance(manifest, list) and len(manifest) == 1)
+            name = manifest[0]["Config"]
+            require(isinstance(name, str))
+            match = re.fullmatch(r"(?:blobs/sha256/([a-f0-9]{64})|([a-f0-9]{64})\.json)", name)
+            require(match is not None)
+            raw = read(name)
+            digest = sha(raw)
+            require(digest == (match[1] or match[2]))
+            config = json.loads(raw, object_pairs_hook=_pairs)
+        require(config["architecture"] == image["Architecture"] == "amd64")
+        require(config["os"] == image["Os"] == "linux")
+        require(config["rootfs"]["type"] == image["RootFS"]["Type"] == "layers")
+        require(config["rootfs"]["diff_ids"] == image["RootFS"]["Layers"])
+        runtime = config["config"]
+        require(runtime["Labels"]["org.opencontainers.image.revision"] == source)
+        expected = {
+            "User": "10001",
+            "Entrypoint": ["python", "-m", "tools.qa_delivery.bootstrap"],
+            "Cmd": ["--config", "/etc/secrets/qa-config.json", "--activation",
+                    "/var/lib/qa/activation.json"],
+        }
+        for key, value in expected.items():
+            require(runtime[key] == image["Config"][key] == value)
+        require(image["Config"]["Labels"]["org.opencontainers.image.revision"] == source)
+        return "sha256:" + digest
+    except (OSError, tarfile.TarError, ValueError, KeyError, TypeError, AttributeError, IndexError):
+        raise ValueError("qa_image_exported_configuration_refused") from None
+
+
 def validate_payload(p):
     require(isinstance(p, dict) and set(p) in (PAYLOAD_KEYS, PAYLOAD_KEYS | {"custody"}))
     require(p["schema_version"] == "qa-image-build-payload/1.0.0")
@@ -410,7 +451,7 @@ def prepare_image(checkout, output, environment=None, *, custody=None):
                     platform="linux/amd64",
                     exported_image_sha256=h.hexdigest(),
                     exported_image_bytes=image_file.stat().st_size,
-                    image_id=image["Id"],
+                    image_id=exported_configuration_id(image_file, image, source),
                     completed_at=datetime.now(UTC).isoformat(),
                 )
             )
