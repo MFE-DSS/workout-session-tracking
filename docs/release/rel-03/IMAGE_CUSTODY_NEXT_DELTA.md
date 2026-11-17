@@ -1,6 +1,6 @@
 # REL03 — raccordement image restant, avant application
 
-16 novembre2026. **DESIGN PROPOSÉ, NON APPLIQUÉ.** Le scope technique accepté a livré `prepare_image` metadata-only et le codec local `stage_image/restore_image`. Il exclut l’upload/custodie et conserve une approbation distincte de préparation cloud. Le mandat OPS demande de finir l’adaptateur seulement s’il est permis : le protocole de garde réelle et ses credentials ne sont pas encore admis. Aucun callback d’upload implicite ajouté sous couvert du GO précédent.
+17 novembre2026. **AMENDEMENT LOCAL OPS-02 EN VÉRIFICATION ; OPÉRATIONS NON AUTORISÉES.** Le reçu du16novembre décrivait la livraison metadata-only. Le mandat opérateur OPS-02 §2–5 autorise maintenant le raccordement technique local explicite, puis exige un paquet opérationnel unique avant provisioning/credentials/upload/transfert. [Plan et fichiers possédés](ops02/EXECUTION_PLAN.md), [décision exacte](ops02/OPERATIONAL_DECISION.md). Aucun callback implicite sous le seul ancien GO et aucune publication réelle : le workflow modifié exige les références privées explicites, l'environnement protégé et la séparation humaine déjà requise.
 
 ## Plus petit raccordement proposé
 
@@ -19,4 +19,4 @@ Fichiers du delta proposé : `tools/qa_delivery/image_receipts.py`, son test dé
 
 RED→GREEN : dépôt public/autre repo, mauvais run/SHA/attempt, image différente, limite d’enveloppe, fichier spécial/symlink, mauvaise clé/tag/checksum, destination existante, upload interrompu/réponse perdue, redirection avec fuite du Bearer, ancien reçu et double envoi. Test local streaming du vrai codec ; intégration du producteur avec garde simulée source-labellée. `check_scope` effectif CI_INFRA si workflow modifié : sweep local borné et CI réelle exact HEAD, revue indépendante, merge GOV‑MERGE‑01. Aucune publication réelle durant les tests.
 
-L’exécution cloud, provisioning privé, secrets, upload/transfert et Docker load exigent le GO opérationnel après les preuves/commandes concrètes. L’ancien reçu metadata-only ne fournit pas les octets disparus. Aucun code préparatoire de ce delta, image réelle, asset privé ou frais n’est déclaré livré ici.
+L’exécution cloud, provisioning privé, secrets, upload/transfert et Docker load exigent le GO opérationnel après les preuves/commandes concrètes. L’ancien reçu metadata-only ne fournit pas les octets disparus. Le statut de livraison du code OPS-02 est suivi dans son reçu ; aucune image réelle, asset privé ou frais n’est déclaré livré par des tests simulés.

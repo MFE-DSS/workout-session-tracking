@@ -1,4 +1,4 @@
-"""Image metadata acquired independently from GitHub; never transfers image bytes.
+"""Image metadata acquired independently from GitHub; optional private custody.
 
 The uploaded payload cannot contain its own not-yet-assigned artifact ID. Acquisition
 adds that independently read immutable ID to the normalized build receipt.
@@ -71,7 +71,7 @@ def _time(value):
 
 
 def validate_payload(p):
-    require(isinstance(p, dict) and set(p) == PAYLOAD_KEYS)
+    require(isinstance(p, dict) and set(p) in (PAYLOAD_KEYS, PAYLOAD_KEYS | {"custody"}))
     require(p["schema_version"] == "qa-image-build-payload/1.0.0")
     require(p["repository"] == REPO and p["workflow_path"] == WORKFLOW)
     require(isinstance(p["source_sha"], str) and re.fullmatch("[a-f0-9]{40}", p["source_sha"]))
@@ -85,6 +85,15 @@ def validate_payload(p):
     for key in ("base_image_digest", "image_id"):
         require(isinstance(p[key], str) and re.fullmatch("sha256:[a-f0-9]{64}", p[key]))
     _time(p["completed_at"])
+    if "custody" in p:
+        from tools.qa_delivery.image_transport import validate_record
+
+        custody = validate_record(p["custody"])
+        require(all(custody[k] == p[k] for k in ("source_sha", "run_id", "attempt")))
+        require(
+            custody["image_bytes"] == p["exported_image_bytes"]
+            and custody["image_sha256"] == p["exported_image_sha256"]
+        )
     return p
 
 
@@ -258,12 +267,13 @@ def image_preparation_approval(env, get=None):
         raise ValueError("qa_image_preparation_approval_required") from None
 
 
-def prepare_image(checkout, output, environment=None):
-    """Manual job producer: clean exact archive, local image only, metadata output.
+def prepare_image(checkout, output, environment=None, *, custody=None):
+    """Manual producer: clean exact archive and optional explicit private custody.
 
     Private image custody/transport is a separate authorized operation. This job
     removes its disposable local image/archive after recording their fingerprints.
-    It does not upload bytes, deploy or grant an external release.
+    Default metadata-only behavior is preserved. Custody must be explicitly wired
+    after its separate operational approval; neither path deploys or releases.
     """
     env = os.environ if environment is None else environment
     from tools.qa_delivery.pipeline import git
@@ -400,6 +410,12 @@ def prepare_image(checkout, output, environment=None):
                     completed_at=datetime.now(UTC).isoformat(),
                 )
             )
+            if custody is not None:
+                store, key, intent = custody
+                image_file.chmod(0o600)
+                staged = stage_image(image_file, key, root / "image.aqi")
+                payload["custody"] = store.upload(root / "image.aqi", staged, payload, intent)
+                validate_payload(payload)
             with output.open("x") as out:
                 json.dump(payload, out, sort_keys=True)
             return payload
@@ -535,10 +551,38 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--checkout", type=Path, default=Path.cwd())
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--custody-config", type=Path)
     args = parser.parse_args()
     try:
-        prepare_image(args.checkout, args.output)
-        print("QA_IMAGE_METADATA_ONLY_NO_TRANSFER")
+        if args.custody_config:
+            from tools.qa_delivery.image_transport import ImageStore
+            from tools.qa_delivery.proofs import key_bytes
+
+            _private_image_digest(args.custody_config, 65536)
+            config = json.loads(args.custody_config.read_text(), object_pairs_hook=_pairs)
+            require(set(config) == {"repository", "release_id", "key_file"})
+            key_bytes(config["key_file"])
+            with httpx.Client(trust_env=False, follow_redirects=False) as client:
+                store = ImageStore(
+                    config["repository"],
+                    config["release_id"],
+                    os.environ.get("QA_IMAGE_WRITE_TOKEN", ""),
+                    client,
+                )
+                store.preflight()
+                prepare_image(
+                    args.checkout,
+                    args.output,
+                    custody=(
+                        store,
+                        config["key_file"],
+                        args.custody_config.parent / "qa-image-upload-intent.json",
+                    ),
+                )
+            print("QA_IMAGE_PRIVATE_CUSTODY_VERIFIED_NO_DEPLOYMENT")
+        else:
+            prepare_image(args.checkout, args.output)
+            print("QA_IMAGE_METADATA_ONLY_NO_TRANSFER")
     except (ValueError, OSError, subprocess.SubprocessError):
         parser.exit(1, "qa_image_preparation_refused\n")
 

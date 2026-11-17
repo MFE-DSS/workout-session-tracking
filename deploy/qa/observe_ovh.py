@@ -9,6 +9,7 @@ This is not attestation against a compromised administrator or host.
 from __future__ import annotations
 
 import hashlib
+import ipaddress
 import json
 import os
 import re
@@ -79,6 +80,53 @@ def process_identity(pid):
     return {"pid": pid, "start_ticks": int(tail[19])}
 
 
+def qa_http_vhost():
+    return """server {
+    listen 80;
+    listen [::]:80;
+    server_name qa.spignos.com;
+    access_log off;
+    error_log /dev/null crit;
+    location ^~ /.well-known/acme-challenge/ {
+        root /var/lib/auren-qa-acme;
+        default_type text/plain;
+        try_files $uri =404;
+    }
+    location / {
+        return 404;
+    }
+}
+"""
+
+
+def qa_vhost(policy):
+    address = ipaddress.ip_address(policy["peer_ip"])
+    require(
+        not address.is_private
+        and not address.is_loopback
+        and not address.is_unspecified
+        and not address.is_multicast
+    )
+    peer = f"[{address}]" if address.version == 6 else str(address)
+    return (
+        qa_http_vhost()
+        + """server {
+    listen 443 ssl;
+    server_name qa.spignos.com;
+    ssl_certificate /etc/letsencrypt/live/qa.spignos.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/qa.spignos.com/privkey.pem;
+    access_log off;
+    error_log /dev/null crit;
+    location / {
+        proxy_pass http://127.0.0.1:8088;
+        proxy_set_header Host qa.spignos.com;
+        proxy_set_header X-Forwarded-Proto https;
+    }
+}
+""".replace("listen 443 ssl;", f"listen {peer}:443 ssl;")
+    )
+
+
 def verify_loaded_routing(policy, loaded, config, identities):
     require(set(loaded) == {"configuration_sha256", "master", "workers", "qa_vhost"})
     require(
@@ -87,27 +135,52 @@ def verify_loaded_routing(policy, loaded, config, identities):
         == policy["routing_sha256"]
     )
     require(loaded["master"] == identities["master"] and loaded["workers"] == identities["workers"])
-    # The single closed vhost forbids alternate /__qa_version or /api upstreams.
-    expected = """server {
-    listen 443 ssl;
-    server_name qa.spignos.com;
-    ssl_certificate /etc/letsencrypt/live/qa.spignos.com/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/qa.spignos.com/privkey.pem;
-    location / {
-        proxy_pass http://127.0.0.1:8088;
-        proxy_set_header Host qa.spignos.com;
-        proxy_set_header X-Forwarded-Proto https;
-    }
-}
-"""
+    expected = qa_vhost(policy)
     require(loaded["qa_vhost"] == expected)
     text = config.decode("utf-8")
-    marker = "# configuration file /etc/nginx/conf.d/auren-qa-rel03.conf:\n"
+    marker = "# configuration file /etc/nginx/sites-enabled/zz-auren-qa-rel03.conf:\n"
     require(text.count(marker) == 1)
     section = text.split(marker, 1)[1].split("# configuration file ", 1)[0].strip() + "\n"
     require(
         section == expected
-        and len(re.findall(r"\bserver_name\s+[^;]*\bqa\.spignos\.com\b", text)) == 1
+        and len(re.findall(r"\bserver_name\s+[^;]*\bqa\.spignos\.com\b", text)) == 2
+    )
+
+
+def verify_network(policy, container, network, input_rules, qa_rules):
+    """Acquire all these inputs on every observation; no app-provided network facts."""
+    name = "auren-qa-rel03-internal"
+    require(policy["network"] == network["Name"] == name)
+    require(network["Driver"] == "bridge" and network["Scope"] == "local")
+    require(network["Internal"] is True and network["EnableIPv6"] is False)
+    require(
+        network["Options"]
+        == {
+            "com.docker.network.bridge.name": "br-auren-qa",
+            "com.docker.network.bridge.enable_icc": "false",
+        }
+    )
+    require(network.get("Labels", {}).get("org.auren.qa") == "rel03")
+    require(set(network["Containers"]) == {container["Id"]})
+    attached = container["NetworkSettings"]["Networks"]
+    require(set(attached) == {name} and attached[name]["NetworkID"] == network["Id"])
+    rules = [line for line in input_rules.decode().splitlines() if line.startswith("-A INPUT ")]
+    require(
+        rules
+        and rules[0] == "-A INPUT -i br-auren-qa -j AUREN-QA-IN"
+        and rules.count(rules[0]) == 1
+    )
+    lines = qa_rules.decode().splitlines()
+    require(
+        lines
+        in [
+            [
+                "-N AUREN-QA-IN",
+                f"-A AUREN-QA-IN -m conntrack --ctstate {states} -j ACCEPT",
+                "-A AUREN-QA-IN -j DROP",
+            ]
+            for states in ("RELATED,ESTABLISHED", "ESTABLISHED,RELATED")
+        ]
     )
 
 
@@ -227,7 +300,7 @@ def collect(request):
     projection = (
         '{"Id":{{json .Id}},"Name":{{json .Name}},"Image":{{json .Image}},"State":{"Running":{{json .State.Running}},"StartedAt":{{json .State.StartedAt}},"Health":{"Status":{{json .State.Health.Status}}}},"HostConfig":{'
         + host
-        + '},"Mounts":{{json .Mounts}},"Config":{"User":{{json .Config.User}},"Entrypoint":{{json .Config.Entrypoint}},"Cmd":{{json .Config.Cmd}}},"NetworkSettings":{"Ports":{{json .NetworkSettings.Ports}}}}'
+        + '},"Mounts":{{json .Mounts}},"Config":{"User":{{json .Config.User}},"Entrypoint":{{json .Config.Entrypoint}},"Cmd":{{json .Config.Cmd}}},"NetworkSettings":{"Ports":{{json .NetworkSettings.Ports}},"Networks":{{json .NetworkSettings.Networks}}}}'
     )
     container = json.loads(
         fixed_read(["/usr/bin/docker", "inspect", "--format", projection, RESOURCE])
@@ -235,6 +308,17 @@ def collect(request):
     container = [container]
     require(len(container) == 1)
     container = container[0]
+    network = json.loads(
+        fixed_read(["/usr/bin/docker", "network", "inspect", "auren-qa-rel03-internal"])
+    )
+    require(isinstance(network, list) and len(network) == 1)
+    verify_network(
+        policy,
+        container,
+        network[0],
+        fixed_read(["/usr/sbin/iptables", "-S", "INPUT"]),
+        fixed_read(["/usr/sbin/iptables", "-S", "AUREN-QA-IN"]),
+    )
     writers = (
         fixed_read(
             [

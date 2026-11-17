@@ -73,7 +73,7 @@ def validate_policy(policy):
         not ip.is_loopback and not ip.is_private and not ip.is_multicast and not ip.is_unspecified
     )
     require(policy["uid"] == 10001 and type(policy["uid"]) is int)
-    require(policy["network"] == "bridge" and policy["restart_policy"] == "unless-stopped")
+    require(policy["network"] == "auren-qa-rel03-internal" and policy["restart_policy"] == "no")
     require(
         policy["mounts"]
         == [

@@ -1051,3 +1051,7 @@ Parent683e883,414/415 livrés et CI canonique43757855378 success ; PREPARE_ONLY 
 ### REL-03 OVH — GO technique reçu,15novembre2026
 
 Le statut NO_APPLY de la proposition précédente est historique : « Autoriser le build technique REL‑03 OVH », call_657199a80f2441d3b3bd3d450dfaaabf, [reçu](../../openspec/changes/rel-03-continuous-android-qa/OVH_BUILD_AUTHORIZATION.json). Implémentation et vérifications en cours sur parent683e883 ; aucun service/DNS/secret/transfert d’image/APK/OTA/déploiement autorisé. Les tâches opérationnelles du change REL03 restent ouvertes.
+
+### REL-03 OPS-02 — raccordement local explicite,17novembre2026
+
+Parent348dc8c3 après maintenance#422. Le mandat OPS-02 autorise transport image privé explicite, initialisation synthétique neuve et isolation/routage propres au VPS partagé ; [amendement et ledger](../../openspec/changes/rel-03-continuous-android-qa/OPS02_SCOPE_AND_LEDGER.md). **ENGINEERING_IN_VERIFICATION / NO_OPERATIONAL_GO / ANDROID_NOT_READY.** Le [paquet opérationnel unique](../release/rel-03/ops02/OPERATIONAL_DECISION.md) reste à autoriser après livraison du code. Aucun service distant, secret, DNS/TLS ou binaire changé ; les features fusionnées et leurs pixels acceptés restent conservés. REL03 actif, pas de clôture de la pipeline installée.

@@ -415,6 +415,10 @@ digest=build_bundle(bundle)
 result=execute_science('authorities',{},root=bundle,expected_digest=digest)
 assert result['calibration_inventory']['version']=='plan-calibration-inventory/2.0.0'
 assert (root/'app/static').is_dir() and (root/'app/templates').is_dir()
+from alembic.config import Config
+from alembic.script import ScriptDirectory
+config=Config(); config.set_main_option('script_location',str(root/'migrations'))
+assert ScriptDirectory.from_config(config).get_current_head()=='program_builder_operations_01'
 print('ISOLATED_IMAGE_CONTEXT_REAL_SCI_PASS')
 """
     result = subprocess.run(
@@ -826,3 +830,59 @@ def test_private_feature_fifo_refuses_without_blocking_before_ssh_deadline(tmp_p
         timed_out = True
     assert not timed_out, "private FIFO must refuse before any blocking open"
     assert result.returncode != 0 and "qa_feature_private_reference_required" in result.stderr
+
+
+def test_ops02_initialization_uses_empty_migration_and_never_overwrites_state(tmp_path, bundle):
+    import os
+    import secrets
+
+    tmp_path.chmod(0o700)
+    config_file = tmp_path / "initialize.json"
+    accounts = tmp_path / "accounts.json"
+    accounts.write_text(
+        json.dumps(
+            [
+                {"username": "qa02-rel03-local-a", "password": secrets.token_urlsafe(32)},
+                {"username": "qa02-rel03-local-b", "password": secrets.token_urlsafe(32)},
+            ]
+        )
+    )
+    auth = tmp_path / "auth.key"
+    auth.write_text(secrets.token_urlsafe(48))
+    source = subprocess.check_output(
+        ["git", "-C", str(ROOT), "rev-parse", "HEAD"], text=True
+    ).strip()
+    config_file.write_text(
+        json.dumps(
+            {
+                "schema_version": "qa-initialization/1.0.0",
+                "source_sha": source,
+                "environment_id": "qa-rel03-local-init",
+                "approval_ref": "SYNTHETIC_LOCAL_TEST_ONLY",
+                "accounts_file": str(accounts),
+                "auth_secret_file": str(auth),
+                "data_dir": str(tmp_path),
+                "bundle_root": str(bundle),
+                "science_mode": "ACTIVE_PUBLISHED",
+            }
+        )
+    )
+    for path in (config_file, accounts, auth):
+        path.chmod(0o600)
+    env = {"PATH": os.environ["PATH"], "PYTHONPATH": str(ROOT), "PYTHONDONTWRITEBYTECODE": "1"}
+    args = [sys.executable, "-m", "tools.qa_delivery.initialization", "--config", str(config_file)]
+    first = subprocess.run(args, cwd=tmp_path, env=env, capture_output=True, text=True, timeout=45)
+    assert first.returncode == 0, first.stderr[-1000:]
+    receipt = json.loads(first.stdout)
+    assert receipt["schema"] == "program_builder_operations_01" and receipt["accounts"] == 2
+    assert receipt["science_state"] == "ACTIVE" and receipt["authority_generation"] == 1
+    with sqlite3.connect(tmp_path / "state" / "qa.db") as db:
+        assert db.execute("SELECT count(*) FROM users").fetchone() == (2,)
+        assert db.execute("SELECT count(*) FROM device_sessions").fetchone() == (2,)
+        assert db.execute("SELECT count(*) FROM exercises").fetchone()[0] > 0
+        assert db.execute("SELECT count(*) FROM body_measurements").fetchone() == (0,)
+        assert db.execute("SELECT count(*) FROM nutrition_day_revisions_v1").fetchone() == (0,)
+        assert db.execute("PRAGMA foreign_key_check").fetchall() == []
+    second = subprocess.run(args, cwd=tmp_path, env=env, capture_output=True, text=True, timeout=10)
+    assert second.returncode != 0 and "refused" in second.stderr
+    assert auth.read_text() not in first.stdout + first.stderr + second.stdout + second.stderr
