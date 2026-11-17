@@ -29,3 +29,8 @@ Paquet concret [OPERATIONAL_DECISION](../../../docs/release/rel-03/ops02/OPERATI
 ## Correctif feuille avant livraison finale
 
 Observation nginx-T : conf.d précède les sites existants et aucun default_server nest déclaré. Le chemin fixe est corrigé vers sites-enabled/zz-auren-qa-rel03.conf ; le paquet exige de comparer routage/certificat par défaut avant/après. Deux témoins de chemin RED puis25GREEN,169tests consommateurs PASS ; relecture indépendante favorable. Le sweep global précédent reste un reçu de son état ; pas de replay local complet pour cette feuille, CI finale exacte requise. CI initiale44095240072 success11jobs sur2ac1a60, non réutilisée comme preuve du HEAD corrigé.
+
+
+## Actualisation explicite — opérateur solo,17novembre2026
+
+Le blocage « second compte humain » ci-dessus est historique et remplacé par la décision « je travail seul donc uniquement le mien, MFE-DSS ». [Amendement, options/risques/choix et plan](SOLO_OPERATOR_AMENDMENT.md). MFE-DSS seul, self-review permis explicitement, bypass administrateur désactivé ; approbation réelle du run/SHA toujours requise. Aucun auto-approve de l'agent, aucun nouveau GO produit/SCI/APK/OTA. Correction bornée de la préparation d'image pour respecter cette politique déjà supportée par la publication générale ; anciennes protections si true conservées.

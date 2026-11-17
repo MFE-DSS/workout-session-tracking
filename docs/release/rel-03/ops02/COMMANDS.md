@@ -1,21 +1,23 @@
 # OPS-02 — commandes et actions bornées à faire approuver
 
-**NON EXÉCUTÉES.** Ce document est destiné à l'agent ; l'opérateur n'a pas à copier ces commandes. Source et références sont remplies depuis DELIVERY_RECEIPT.md et les acquisitions réelles. Aucun `eval`, fichier JSON sourcé comme shell, token dans argv, `--clobber`, prune ou suppression globale.
+**Étapes opérationnelles partielles.** Garde privée déjà livrée par #425 ; image/service QA non réalisés. L'agent exécute les étapes restantes séquentiellement après qualification de leurs prérequis. Aucun `eval`, JSON sourcé comme shell, token en argv, `--clobber`, prune ou suppression globale.
 
-## 1. Garde, source et préparation d'image
+## 1. Garde existante, source et préparation d'image
 
-Dans GitHub, après choix des deux acteurs humains : créer/qualifier seulement le dépôt privé de garde et une release dédiée. Créer `qa-release` avec reviewer direct, prevent_self_review=true et sans bypass administrateur. Conserver toutes les protections existantes. Définir la référence publique `docs/release/rel-03/proof-store.json` sur le dépôt effectivement privé et actualiser le contrat opérationnel existant `openspec/changes/rel-03-continuous-android-qa/OVH_EVIDENCE_AND_CONFIG.md` avec l'identité non secrète et le reçu du GO. Livrer ce delta de configuration explicite par PR : ce n'est pas un push100%docs, la CI canonique s'exécute donc réellement. Puis définir les variables `QA_IMAGE_REPOSITORY`, `QA_IMAGE_RELEASE_ID` et les références protégées `QA_IMAGE_WRITE_TOKEN`, `QA_IMAGE_AES256_KEY_HEX`, `QA_RELEASE_AUDIT_TOKEN` ; aucun contenu secret dans Git.
+Relire les ressources existantes sans les recréer : dépôt privé `MFE-DSS/auren-qa-private` (id1461698730), release `qa-custody-v1` (id448927197). Vérifier de nouveau identité/private et release ; conflit → arrêt. Après livraison de l'amendement solo, créer/qualifier seulement l'environnement `qa-release`, MFE-DSS (User/id156458952) seul reviewer direct, `prevent_self_review=false`, `can_admins_bypass=false`. Relire les valeurs effectives avant toute exécution. C'est une exception explicite à la séparation initiale entre deux humains ; l'approbation humaine du run/SHA reste distincte du dispatch, et l'agent ne l'exécute pas à la place de l'opérateur. Une liste de reviewers élargie ne bénéficie pas de l'exception d'auto-approbation d'image.
 
-Le token image ne reçoit que Contents:write sur ce seul dépôt privé. Le token d'audit reste en lecture seule avec les droits de lecture de protection nécessaires. Clé image32octets dédiée, distincte des clés d'application, de preuve et de backups personnels. La clé SSH d'audit dédiée et les known_hosts qualifiés deviennent les références protégées `QA_OVH_AUDIT_KEY` / `QA_OVH_KNOWN_HOSTS` avant release ; pas de copie de la clé SSH personnelle.
+La référence de garde CONFIGURED est déjà canonique par #425. La source d'image doit être le canonique contenant **#425 et l'amendement solo**, avec ses propres quatre checks completed/success et sa propre CI, jamais le parent `6126171` seul. Relever le SHA effectif après merge ; aucun SHA futur inventé ni preuve de CI héritée.
 
-Figer **le nouveau SHA canonique contenant CONFIGURED**, pas le parent OPS-02 encore UNPROVISIONED. Attendre ses propres quatre check-runs completed/success et sa CI réelle ; les checks du parent ne sont jamais réutilisés comme checks de ce SHA. L'acteur de dispatch choisi exécute alors le workflow sur cette source vérifiée. Une nouvelle ref de tag `qa-ops02-<12premiershex>` peut pointer **ce seul nouveau SHA** après ce GO, sans remplacement de tag. Le garde vérifie encore GITHUB_SHA ; une ref déplacée entraîne un refus. Toute autre modification produit/code entre les deux impose une nouvelle qualification de source, sans extension tacite du paquet.
+Définir les variables `QA_IMAGE_REPOSITORY`, `QA_IMAGE_RELEASE_ID` et références protégées `QA_IMAGE_WRITE_TOKEN`, `QA_IMAGE_AES256_KEY_HEX`, `QA_RELEASE_AUDIT_TOKEN` depuis les matériaux privés qualifiés. Token image : Contents:write sur le seul dépôt privé ; audit : lecture seule et droits nécessaires de lecture de protection. Clé image32octets dédiée, distincte des clés app/preuve/backups. Clé SSH d'audit propre et known_hosts qualifiés : `QA_OVH_AUDIT_KEY` / `QA_OVH_KNOWN_HOSTS`. Aucun secret personnel substitué, aucune valeur secrète dans Git ou le chat.
+
+Une ref `qa-ops02-<12premiershex>` peut pointer exclusivement le nouveau canonique qualifié, sans déplacement de tag. Le garde vérifie GITHUB_SHA. L'acteur lance :
 
 ```bash
 gh workflow run qa-release.yml --repo MFE-DSS/workout-session-tracking \
   --ref "$QA_SOURCE_REF" -f operation=PREPARE_IMAGE -f source_sha="$QA_SOURCE_SHA"
 ```
 
-Le reviewer humain distinct examine le SHA et approuve avec `APPROVE_QA_IMAGE <SHA exact>`. Pas de rerun héritant de l'approbation. Acquérir le résultat et son artifactID depuis GitHub, puis télécharger/déchiffrer les mêmes octets en privé avec les outils existants :
+MFE-DSS examine cette source et approuve le run avec `APPROVE_QA_IMAGE <SHA exact>`. Aucun rerun héritant d'une approbation. Acquérir résultat/run/attempt/artifactID depuis GitHub, puis télécharger et déchiffrer les mêmes octets en privé :
 
 ```bash
 python -m tools.qa_delivery.image_transport restore \
@@ -23,7 +25,7 @@ python -m tools.qa_delivery.image_transport restore \
   --output /chemin/prive/nouveau-image.tar
 ```
 
-Les chemins ci-dessus sont des entrées privées à qualifier, pas des destinations existantes à écraser. Config privée0600/parent0700 : repository,release_id,key_file ; reference privée : run_id,attempt,artifact_id,source_sha. GH_TOKEN sert l'acquisition de provenance ; QA_IMAGE_READ_TOKEN sert seulement la garde. En cas d'intention d'upload sans succès qualifié, `image_transport reconcile --config … --intent … --output <nouveau-reçu>` ne fait que lire. Un job image échoué ne devient pas un build indépendant accepté par cette seule lecture ; nouvelle opération approuvée si nécessaire, aucune répétition automatique d'upload.
+Config privée0600/parent0700 : repository,release_id,key_file ; référence privée : run_id,attempt,artifact_id,source_sha. GH_TOKEN acquiert la provenance ; QA_IMAGE_READ_TOKEN sert la seule garde. Réponse d'upload perdue : UNKNOWN ; `image_transport reconcile` lit la tentative sans nouveau POST. Aucun Docker load implicite. Un job image échoué n'est pas accepté par un simple readback ; nouvelle opération approuvée si nécessaire.
 
 ## 2. Installation isolée et état synthétique
 
