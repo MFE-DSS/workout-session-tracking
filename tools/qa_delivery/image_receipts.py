@@ -237,7 +237,8 @@ def image_preparation_approval(env, get=None):
         run_id = env["GITHUB_RUN_ID"]
         require(re.fullmatch("[1-9][0-9]*", run_id))
         protection, rule = protected_environment(get)
-        require(rule.get("prevent_self_review") is True)
+        prevent_self_review = rule.get("prevent_self_review")
+        require(type(prevent_self_review) is bool)
         run = get(f"actions/runs/{run_id}")
         require(
             run["head_sha"] == env["GITHUB_SHA"]
@@ -260,9 +261,12 @@ def image_preparation_approval(env, get=None):
             approval["state"] == "approved"
             and approval["user"]["type"] == "User"
             and approval["user"]["id"] in reviewers
-            and approval["user"]["id"] != run["actor"]["id"]
+            and (not prevent_self_review or approval["user"]["id"] != run["actor"]["id"])
             and approval["comment"].strip() == "APPROVE_QA_IMAGE " + env["GITHUB_SHA"]
         )
+        if approval["user"]["id"] == run["actor"]["id"]:
+            # Explicit OPS-02 solo exception: MFE-DSS, sole direct reviewer.
+            require(len(rule["reviewers"]) == 1 and reviewers == {156458952})
     except (ValueError, KeyError, TypeError):
         raise ValueError("qa_image_preparation_approval_required") from None
 

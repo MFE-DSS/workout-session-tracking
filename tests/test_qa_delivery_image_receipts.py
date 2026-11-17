@@ -140,9 +140,8 @@ def test_forged_or_incomplete_image_provenance_refused(damage):
         acquire(pages, blob)
 
 
-def test_image_preparation_requires_actual_single_human_deployment_review():
-    from tools.qa_delivery.image_receipts import image_preparation_approval
-
+@pytest.fixture
+def image_approval_case():
     env = {
         "GITHUB_REPOSITORY": REPO,
         "GITHUB_RUN_ID": "123",
@@ -178,8 +177,88 @@ def test_image_preparation_requires_actual_single_human_deployment_review():
             }
         ],
     }
+    return env, pages
+
+
+@pytest.mark.parametrize(
+    "prevent_self_review,actor_id,reviewer_id",
+    [(True, 11, 10), (False, 11, 10), (False, 156458952, 156458952)],
+)
+def test_image_preparation_honors_explicit_environment_self_review_policy(
+    image_approval_case, prevent_self_review, actor_id, reviewer_id
+):
+    from tools.qa_delivery.image_receipts import image_preparation_approval
+
+    env, pages = image_approval_case
+    rule = pages["environments/qa-release"]["protection_rules"][0]
+    rule["prevent_self_review"] = prevent_self_review
+    rule["reviewers"][0]["reviewer"]["id"] = reviewer_id
+    pages["actions/runs/123/approvals"][0]["user"]["id"] = reviewer_id
+    pages["actions/runs/123"]["actor"]["id"] = actor_id
     image_preparation_approval(env, pages.__getitem__)
-    pages["actions/runs/123/approvals"][0]["comment"] = "GO MERGE"
+
+
+@pytest.mark.parametrize(
+    "damage",
+    [
+        "forbidden_self_review", "missing_policy", "non_boolean_policy", "missing_approval",
+        "duplicate_approval", "non_reviewer", "bot", "wrong_comment", "wrong_sha",
+        "wrong_environment", "rerun", "wrong_workflow",
+    ],
+)
+def test_image_preparation_refuses_invalid_human_approval(image_approval_case, damage):
+    from tools.qa_delivery.image_receipts import image_preparation_approval
+
+    env, pages = image_approval_case
+    rule = pages["environments/qa-release"]["protection_rules"][0]
+    run = pages["actions/runs/123"]
+    approvals = pages["actions/runs/123/approvals"]
+    if damage == "forbidden_self_review":
+        run["actor"]["id"] = 10
+    else:
+        rule["prevent_self_review"] = False
+    if damage == "missing_policy":
+        del rule["prevent_self_review"]
+    elif damage == "non_boolean_policy":
+        rule["prevent_self_review"] = 0
+    elif damage == "missing_approval":
+        approvals.clear()
+    elif damage == "duplicate_approval":
+        approvals.append(approvals[0].copy())
+    elif damage == "non_reviewer":
+        approvals[0]["user"]["id"] = 12
+    elif damage == "bot":
+        approvals[0]["user"]["type"] = "Bot"
+    elif damage == "wrong_comment":
+        approvals[0]["comment"] = "GO MERGE"
+    elif damage == "wrong_sha":
+        run["head_sha"] = "b" * 40
+    elif damage == "wrong_environment":
+        approvals[0]["environments"][0]["id"] = 99
+    elif damage == "rerun":
+        env["GITHUB_RUN_ATTEMPT"] = "2"
+        run["run_attempt"] = 2
+    elif damage == "wrong_workflow":
+        run["path"] = ".github/workflows/ci.yml"
+    with pytest.raises(ValueError, match="qa_image"):
+        image_preparation_approval(env, pages.__getitem__)
+
+
+@pytest.mark.parametrize("damage", ["other_identity", "extra_user", "extra_team"])
+def test_image_self_review_is_limited_to_designated_solo_operator(image_approval_case, damage):
+    from tools.qa_delivery.image_receipts import image_preparation_approval
+
+    env, pages = image_approval_case
+    rule = pages["environments/qa-release"]["protection_rules"][0]
+    rule["prevent_self_review"] = False
+    operator = 10 if damage == "other_identity" else 156458952
+    rule["reviewers"][0]["reviewer"]["id"] = operator
+    pages["actions/runs/123"]["actor"]["id"] = operator
+    pages["actions/runs/123/approvals"][0]["user"]["id"] = operator
+    if damage == "extra_user":
+        rule["reviewers"].append({"type": "User", "reviewer": {"id": 12}})
+    elif damage == "extra_team":
+        rule["reviewers"].append({"type": "Team", "reviewer": {"id": 12}})
     with pytest.raises(ValueError, match="qa_image"):
         image_preparation_approval(env, pages.__getitem__)
 

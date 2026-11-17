@@ -30,6 +30,13 @@ A merge SHALL NOT itself publish a backend, APK or OTA. The QA workflow SHALL ve
 - **WHEN** the environment is unprotected, approval is absent or the runtime is incompatible
 - **THEN** publication fails closed while a nonpublishing preparation job remains usable
 
+#### Scenario: The operator explicitly works alone
+- **WHEN** the operator designates MFE-DSS as the sole human QA reviewer and configures self-review as permitted
+- **THEN** image preparation still requires one actual direct-human environment approval for the exact run and source SHA
+- **AND** image self-review is permitted only for the designated sole direct reviewer MFE-DSS (User/id156458952), never for another reviewer or an expanded User/Team list
+- **AND** the image guard honors the explicit boolean self-review policy, refuses an absent or malformed policy, and forbids self-review when that policy is true
+- **AND** an agent does not approve on the human's behalf, and no merge authorization substitutes for the run-bound approval
+
 ### Requirement: Installed update and rollback evidence
 OTA support SHALL be claimed only after a real installed client downloads and runs a compatible controlled QA update and a known-good rollback without losing owned SQLite facts. HTTP, emulator and physical results SHALL remain distinct.
 
