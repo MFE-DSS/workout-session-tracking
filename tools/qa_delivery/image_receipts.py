@@ -111,7 +111,7 @@ def acquire_image_receipt(reference, client, token):
         )
 
         def get(path, binary=False):
-            url = f"https://api.github.com/repos/{REPO}/{path}"
+            url = f"https://api.github.com/repos/{REPO}/{path}".rstrip("/")
             with client.stream(
                 "GET",
                 url,

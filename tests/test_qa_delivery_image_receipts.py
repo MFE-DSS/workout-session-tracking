@@ -79,12 +79,17 @@ def image_fixture():
     return payload, blob, pages
 
 
-def acquire(pages, blob, reference=None):
+def acquire(pages, blob, reference=None, *, repository_status=200):
     from tools.qa_delivery.image_receipts import acquire_image_receipt
 
     def serve(request):
         assert request.url.host == "api.github.com"
-        key = str(request.url).split(f"/repos/{REPO}/")[1]
+        root = f"https://api.github.com/repos/{REPO}"
+        if str(request.url) == root:
+            return httpx.Response(repository_status, json=pages[""])
+        if str(request.url) == root + "/":
+            return httpx.Response(404)
+        key = str(request.url).split(root + "/")[1]
         if key == "actions/artifacts/456/zip":
             return httpx.Response(200, content=blob)
         return httpx.Response(200, json=pages[key])
@@ -103,6 +108,16 @@ def test_independent_image_receipt_binds_download_and_ci():
     assert receipt["schema_version"] == "qa-image-build/1.0.0"
     assert receipt["artifact_id"] == 456 and receipt["image_id"] == payload["image_id"]
     assert receipt["exported_image_sha256"] != receipt["image_id"].split(":")[1]
+
+
+@pytest.mark.parametrize("repository_status", [200, 403, 404])
+def test_image_receipt_requires_readable_canonical_repository_endpoint(repository_status):
+    _, blob, pages = image_fixture()
+    if repository_status == 200:
+        assert acquire(pages, blob, repository_status=repository_status)["artifact_id"] == 456
+    else:
+        with pytest.raises(ValueError, match="qa_image"):
+            acquire(pages, blob, repository_status=repository_status)
 
 
 @pytest.mark.parametrize(

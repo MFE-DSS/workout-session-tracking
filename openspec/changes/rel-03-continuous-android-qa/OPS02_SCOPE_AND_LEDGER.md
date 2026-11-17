@@ -34,3 +34,14 @@ Observation nginx-T : conf.d précède les sites existants et aucun default_serv
 ## Actualisation explicite — opérateur solo,17novembre2026
 
 Le blocage « second compte humain » ci-dessus est historique et remplacé par la décision « je travail seul donc uniquement le mien, MFE-DSS ». [Amendement, options/risques/choix et plan](SOLO_OPERATOR_AMENDMENT.md). MFE-DSS seul, self-review permis explicitement, bypass administrateur désactivé ; approbation réelle du run/SHA toujours requise. Aucun auto-approve de l'agent, aucun nouveau GO produit/SCI/APK/OTA. Correction bornée de la préparation d'image pour respecter cette politique déjà supportée par la publication générale ; anciennes protections si true conservées.
+
+
+## Correction de récupération du 17 novembre — endpoint GitHub
+
+### Brainstorming / Options / Risques / Choix retenu
+
+Le run image44166495880, source389221fa821c58e4119d93c1c69645ab5504ac72, est successful et approuvé par MFE-DSS avec le commentaire exact. La récupération refuse ensuite GET `/repos/MFE-DSS/workout-session-tracking/` (404), après téléchargement du reçu200. L’endpoint sans slash est déjà employé par `pipeline.gh_get`. Choix : corriger seulement la construction de cette URL et rendre la frontière HTTP de test fidèle (root canonique200, variante slash404, accès refusé toujours bloquant). Ni ignorer le404, ni remplacer les contrôles par un reçu copié, ni reconstruire l’image ne corrige cette cause. Risque : casser les suffixes des autres lectures ; la suite image et ses consommateurs servent de garde. Aucun changement du producteur, Dockerfile, image, app, SCI, DB, UI ou autorisation.
+
+Plan borné : régression RED → correction minimale → GREEN ciblé/broad QA selon check_scope → revue indépendante → PR/CI/merge gardé → reprendre la lecture des mêmes octets avec le client corrigé. Le nouveau SHA du client ne réattribue pas l’image source389221f. Correction couverte par le scope REL03 et GOV-MERGE-01 ; aucun nouveau GO.
+
+Vérification avant commit : tier ISOLATED ; RED2échecs/30PASS, puis broad `tests/test_qa_delivery_*.py`402PASS (une dépréciation Starlette/httpx existante), Ruff des deux fichiers PASS, budget259≤548, protocole PASS, OpenSpec28/28, Bandit-ll PASS et Gitleaks outils PASS. Les exécutables Ruff/Bandit n’étaient pas présents dans le venv QA : invocation des outils déjà installés du checkout opérateur, sans installation ni modification de son venv. Aucun full sweep local. Revue indépendante du diff complet : zéro Critical/Important/Minor. Test réel du client corrigé : même run44166495880/attempt1/artefact14366208172, `QA_IMAGE_RESTORED_AUTHENTICATED_NO_DOCKER_LOAD`. Ce reçu ne vaut aucun chargement VPS ou release. CI exacte et closeout encore à suivre après publication.
