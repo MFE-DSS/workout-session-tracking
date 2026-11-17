@@ -25,3 +25,7 @@ Le présent amendement remplace explicitement les propositions jamais appliquée
 ## Bornes restantes
 
 Paquet concret [OPERATIONAL_DECISION](../../../docs/release/rel-03/ops02/OPERATIONAL_DECISION.md), commandes associées et reçu de livraison. Le second compte humain GitHub doit être désigné pour respecter prevent_self_review et approbation directe. Aucun provisioning, secret, DNS/TLS, service distant, cloud image, Docker load, APK ou OTA autorisé par la livraison technique. REL03 reste actif jusqu'aux preuves opérationnelles et installées ; aucun faux archivage COMPLETE.
+
+## Correctif feuille avant livraison finale
+
+Observation nginx-T : conf.d précède les sites existants et aucun default_server nest déclaré. Le chemin fixe est corrigé vers sites-enabled/zz-auren-qa-rel03.conf ; le paquet exige de comparer routage/certificat par défaut avant/après. Deux témoins de chemin RED puis25GREEN,169tests consommateurs PASS ; relecture indépendante favorable. Le sweep global précédent reste un reçu de son état ; pas de replay local complet pour cette feuille, CI finale exacte requise. CI initiale44095240072 success11jobs sur2ac1a60, non réutilisée comme preuve du HEAD corrigé.

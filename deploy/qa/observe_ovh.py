@@ -138,7 +138,7 @@ def verify_loaded_routing(policy, loaded, config, identities):
     expected = qa_vhost(policy)
     require(loaded["qa_vhost"] == expected)
     text = config.decode("utf-8")
-    marker = "# configuration file /etc/nginx/conf.d/auren-qa-rel03.conf:\n"
+    marker = "# configuration file /etc/nginx/sites-enabled/zz-auren-qa-rel03.conf:\n"
     require(text.count(marker) == 1)
     section = text.split(marker, 1)[1].split("# configuration file ", 1)[0].strip() + "\n"
     require(

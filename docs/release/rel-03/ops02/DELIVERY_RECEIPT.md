@@ -14,9 +14,15 @@ Revue indépendante du changement entier : fsync et catalogue builder vide corri
 - Ruff neuf PASS ; budget259≤548 ; actionlint PASS ; protocole PASS ; OpenSpec strict28/28PASS. Aucun seuil ni baseline changé.
 - Bandit nouveaux outils :0Medium/High. Scan étendu signale B108Medium sur la constante `/tmp` de la politique de tmpfs existante du collecteur, sans création de fichier hôte ; ligne inchangée. Pas de suppression/neutralisation du signal. Bandit applicatif obligatoire sera rejoué par CI.
 - Sweep borné Python3.14 interrompu à187/458fichiers par mémoire ; Python3.11.14 (version cible déjà installée) atteint386/458, puis `test_training_preferences.py` dépasse1600Mio. Aucun test rouge observé dans ces passages. Continuation des72fichiers à partir de ce fichier, dont ses tests divisés en lots de20, sous **le même plafond1600Mio** et sans changer sources/fixtures : terminée :458/458fichiers couverts,8810PASS/3ignorés. Les97tests du fichier lourd ont tous été exécutés ;76lots de continuation verts, pic918Mio. Aucun faux PASS du script interrompu.
-- Gitleaks du diff stagé PASS, zéro fuite. CI PR et canonique : à acquérir avant fusion. Aucun run d'une ancienne livraison ne couvre ce diff.
+- Gitleaks du diff stagé PASS, zéro fuite. CI finale PR et canonique : à acquérir avant fusion. Aucun run d'une ancienne livraison ne couvre ce diff.
 
 Preuves privées persistantes : `/Users/martinfeldmann/auren-review/rel03-ops02-20261116/`. Aucun secret ou contenu DB publié. Les limites et écarts restent dans les logs, y compris les arrêts mémoire.
+
+## Correction finale de routage
+
+La configuration hôte lit conf.d avant sites-enabled et ne déclare pas default_server. Le chemin QA initial pouvait donc remplacer le vhost par défaut. Le collecteur et le paquet exigent maintenant `/etc/nginx/sites-enabled/zz-auren-qa-rel03.conf`, après les sites existants, avec vérification effective du routage/certificat par défaut avant/après. Deux témoins RED puis25gardes GREEN et169consommateurs PASS ; relecture indépendante favorable. Les tests prouvent la politique de chemin, pas un nginx distant modifié. La [documentation nginx](https://nginx.org/en/docs/http/request_processing.html) décrit ce choix implicite du premier serveur.
+
+CI initiale44095240072 :success11jobs sur2ac1a60 avant ce correctif ; elle ne couvre pas le nouveau HEAD. La CI finale devra être acquise séparément.
 
 ## État opérationnel
 

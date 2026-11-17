@@ -73,7 +73,7 @@ def test_shared_host_vhost_uses_public_address_and_no_request_logging():
     assert "access_log off;" in text
     assert "location ^~ /.well-known/acme-challenge/" in text
     assert text.count("server_name qa.spignos.com;") == 2
-    config = ("# configuration file /etc/nginx/conf.d/auren-qa-rel03.conf:\n" + text).encode()
+    config = ("# configuration file /etc/nginx/sites-enabled/zz-auren-qa-rel03.conf:\n" + text).encode()
     policy["routing_sha256"] = hashlib.sha256(config).hexdigest()
     identities = {
         "master": {"pid": 10, "start_ticks": 12},
@@ -115,3 +115,26 @@ def test_isolation_checker_never_repairs_or_flushes_existing_foreign_rules(monke
         installer.execute(apply=True)
     assert all("-S" in c or c[1] == "network" for c in calls)
     assert not any("-F" in c or "-A" in c or "-I" in c for c in calls)
+
+
+@pytest.mark.parametrize("late_site", [False, True])
+def test_qa_loaded_file_preserves_existing_default_server_order(late_site):
+    policy, _, _ = fixture()
+    text = qa_vhost(policy)
+    path = (
+        "/etc/nginx/sites-enabled/zz-auren-qa-rel03.conf"
+        if late_site
+        else "/etc/nginx/conf.d/auren-qa-rel03.conf"
+    )
+    config = (f"# configuration file {path}:\n" + text).encode()
+    policy["routing_sha256"] = hashlib.sha256(config).hexdigest()
+    identities = {
+        "master": {"pid": 10, "start_ticks": 12},
+        "workers": [{"pid": 11, "start_ticks": 13}],
+    }
+    loaded = {"configuration_sha256": policy["routing_sha256"], **identities, "qa_vhost": text}
+    if late_site:
+        verify_loaded_routing(policy, loaded, config, identities)
+    else:
+        with pytest.raises(ValueError):
+            verify_loaded_routing(policy, loaded, config, identities)

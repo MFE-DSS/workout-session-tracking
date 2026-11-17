@@ -88,7 +88,7 @@ Installer le collecteur root-owned et le compte à mot de passe verrouillé `qa-
 
 Dans OVH DNS de spignos.com : créer uniquement A `qa`→51.91.79.44 si absent. Pas d'AAAA, racine/www/anciens RR modifiés. Relever la valeur/TTL et son reçu. Créer le webroot vide `/var/lib/auren-qa-acme`, sans lien vers fichiers applicatifs.
 
-Générer d'abord `qa_http_vhost()` du collecteur dans un nouveau `/etc/nginx/conf.d/auren-qa-rel03.conf`, root-owned. HTTP80 garde les écoutes wildcard déjà utilisées par les sites : ne pas introduire une écoute IP80 plus spécifique qui détournerait leurs requêtes. `nginx -t`, reload explicite et contrôle des huit domaines préexistants avant/après. Puis avec le compte ACME existant seulement :
+Générer d'abord `qa_http_vhost()` du collecteur dans un nouveau `/etc/nginx/sites-enabled/zz-auren-qa-rel03.conf`, root-owned. Ce fichier est chargé après les sites existants : aucun default_server nouveau. Vérifier avant/après aussi les requêtes Host inconnu/IP et le certificat par défaut, en plus des domaines nommés. HTTP80 garde les écoutes wildcard déjà utilisées par les sites : ne pas introduire une écoute IP80 plus spécifique qui détournerait leurs requêtes. `nginx -t`, reload explicite et contrôle des huit domaines préexistants avant/après. Puis avec le compte ACME existant seulement :
 
 ```bash
 sudo certbot certonly --webroot --webroot-path /var/lib/auren-qa-acme \
