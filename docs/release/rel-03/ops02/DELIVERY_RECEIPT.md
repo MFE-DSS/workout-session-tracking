@@ -1,6 +1,6 @@
 # OPS-02 — reçu technique et gates réelles
 
-17 novembre2026. Parent canonique348dc8c3fda4a0c9a74be54fe1e92f159e382142. **VÉRIFICATIONS LOCALES TERMINÉES ; CI/INTÉGRATION À ACQUÉRIR ; AUCUNE ACTIVATION QA.** Ce reçu conserve son instant de publication ; les références finales PR/HEAD/merge/CI seront acquises après exécution, jamais anticipées.
+17 novembre2026. Parent canonique348dc8c3fda4a0c9a74be54fe1e92f159e382142. **Code fusionné par423, c2e32e7 ; aucune activation QA.** Le [closeout technique](TECHNICAL_CLOSEOUT_20261117.md) consigne HEAD/merge, CI PR finale, PREPARE réel et suivi canonique. Les paragraphes ci-dessous conservent leur checkpoint local initial ; ils ne remplacent pas ce reçu actualisé.
 
 ## Résultat du delta
 
