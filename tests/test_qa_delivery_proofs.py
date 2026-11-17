@@ -239,7 +239,7 @@ def test_store_refuses_unsafe_remote_before_upload_or_import(store_case, damage)
         if damage == "wrong_asset":
             boundary.asset_id = 999
         else:
-            boundary.blob = boundary.blob[:-1] + b"X"
+            boundary.blob = boundary.blob[:-1] + bytes([boundary.blob[-1] ^ 1])
         with pytest.raises(ValueError, match="qa_proof_"):
             store.download(uploaded)
     else:

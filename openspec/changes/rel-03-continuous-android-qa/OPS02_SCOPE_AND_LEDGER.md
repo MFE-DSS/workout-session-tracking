@@ -34,3 +34,30 @@ Observation nginx-T : conf.d précède les sites existants et aucun default_serv
 ## Actualisation explicite — opérateur solo,17novembre2026
 
 Le blocage « second compte humain » ci-dessus est historique et remplacé par la décision « je travail seul donc uniquement le mien, MFE-DSS ». [Amendement, options/risques/choix et plan](SOLO_OPERATOR_AMENDMENT.md). MFE-DSS seul, self-review permis explicitement, bypass administrateur désactivé ; approbation réelle du run/SHA toujours requise. Aucun auto-approve de l'agent, aucun nouveau GO produit/SCI/APK/OTA. Correction bornée de la préparation d'image pour respecter cette politique déjà supportée par la publication générale ; anciennes protections si true conservées.
+
+
+## Correction de récupération du 17 novembre — endpoint GitHub
+
+### Brainstorming / Options / Risques / Choix retenu
+
+Le run image44166495880, source389221fa821c58e4119d93c1c69645ab5504ac72, est successful et approuvé par MFE-DSS avec le commentaire exact. La récupération refuse ensuite GET `/repos/MFE-DSS/workout-session-tracking/` (404), après téléchargement du reçu200. L’endpoint sans slash est déjà employé par `pipeline.gh_get`. Choix : corriger seulement la construction de cette URL et rendre la frontière HTTP de test fidèle (root canonique200, variante slash404, accès refusé toujours bloquant). Ni ignorer le404, ni remplacer les contrôles par un reçu copié, ni reconstruire l’image ne corrige cette cause. Risque : casser les suffixes des autres lectures ; la suite image et ses consommateurs servent de garde. Aucun changement du producteur, Dockerfile, image, app, SCI, DB, UI ou autorisation.
+
+Plan borné : régression RED → correction minimale → GREEN ciblé/broad QA selon check_scope → revue indépendante → PR/CI/merge gardé → reprendre la lecture des mêmes octets avec le client corrigé. Le nouveau SHA du client ne réattribue pas l’image source389221f. Correction couverte par le scope REL03 et GOV-MERGE-01 ; aucun nouveau GO.
+
+Vérification avant commit : tier ISOLATED ; RED2échecs/30PASS, puis broad `tests/test_qa_delivery_*.py`402PASS (une dépréciation Starlette/httpx existante), Ruff des deux fichiers PASS, budget259≤548, protocole PASS, OpenSpec28/28, Bandit-ll PASS et Gitleaks outils PASS. Les exécutables Ruff/Bandit n’étaient pas présents dans le venv QA : invocation des outils déjà installés du checkout opérateur, sans installation ni modification de son venv. Aucun full sweep local. Revue indépendante du diff complet : zéro Critical/Important/Minor. Test réel du client corrigé : même run44166495880/attempt1/artefact14366208172, `QA_IMAGE_RESTORED_AUTHENTICATED_NO_DOCKER_LOAD`. Ce reçu ne vaut aucun chargement VPS ou release. CI exacte et closeout encore à suivre après publication.
+
+
+### Second défaut réel — identité exportée, même correction OPS
+
+Après récupération et transfert vérifiés (image75357184octets, SHA25676cbbd867c22d223a7d2cbf8deb72c7e6439d3525c4c93cada5ff8102462a069), le seul Docker load autorisé ne démarre aucun conteneur. Le reçu indique `sha256:1ade5a8337ad39f2630519b39bf67db4a7a75ea336b810caf7ddb9506ea03ee6`, index OCI containerd ; le VPS expose `sha256:6d08d4880cf4ab0d3c5bb324ddb21ef369f8f3f9bee5079a295f7878cff4a32a`, configuration amd64 effectivement incluse. Le contrat OVH_EVIDENCE_AND_CONFIG exige déjà le digest de configuration, pas celui d’un manifeste. Le producteur emploie à tort Docker inspect.Id comme si sa sémantique était portable.
+
+Choix : calculer le digest de configuration depuis les octets exportés, vérifier le chemin content-addressed, le profil/source et les couches contre l’inspection de l’image, puis publier ce digest contractuel. Ni modifier le moteur Docker du VPS partagé, ni réécrire le reçu389221f, ni accepter des IDs arbitrairement différents. Ce correctif du producteur reste dans le même scope/PR427 ; il exigera sa propre CI et une nouvelle préparation d’image approuvée. L’image389221f est conservée comme preuve de l’écart, jamais déclarée qualifiée. Les services, volumes, réseau QA et DNS/TLS ne sont pas créés.
+
+Vérification du second correctif : six cas RED (nouvelle API de calcul absente), puis38tests image PASS et broad QA408PASS sur l’état corrigé ; une dépréciation historique Starlette/httpx. Le calcul sur l’archive réelle retourne6d08d488… et correspond à l’inspection VPS, sans modifier son ancien reçu. Revue indépendante complète : aucun Critical/Important ; un mineur de fidélité de fixture (Layers vide contre rootfs non vide) corrigé avec une vraie couche tar et son diff_id. Pas de seconde relecture de ce seul changement de fixture revendiquée. Ruff/budget259≤548, protocole, Bandit-ll et Gitleaks PASS. L’ancien run CI du premier commit ne couvrira pas le nouveau HEAD ; une nouvelle CI sera attendue, sans annulation manuelle ni résultat hérité.
+
+
+### CI finale044b41c — échec de fixture de checksum
+
+Run44177319803/job134372169626, pytest shard3, step Run pytest with coverage : `test_store_refuses_unsafe_remote_before_upload_or_import[wrong_checksum]`, `DID NOT RAISE ValueError` (1724PASS/2ignorés dans ce shard). Cause vérifiée : la corruption remplace le dernier octet du ciphertext aléatoire par X ; si ce dernier vaut déjà0x58, aucun octet ne change (probabilité1/256). Ce n’est ni une annulation infra, ni une preuve d’un garde crypto défaillant. Patch minimal en scope : XOR1 du dernier octet, conservation de longueur et de toutes les assertions de refus. Le RED CI est conservé ; aucun simple rerun pour chercher un vert. Nouvelle CI de tout le HEAD après correctif, sans réutiliser l’ancien résultat.
+
+Correctif de fixture vérifié : broad QA408PASS, une dépréciation historique ; Ruff/protocole/budget259≤548 PASS. Le témoin mathématique sur256valeurs confirme l’ancien no-op à88 et la différence garantie par XOR1. Revue indépendante finale des quatre fichiers : zéro Critical/Important/Minor ; fidélité de couche tar relue et résolue. Aucun garde de production ni seuil modifié. Le prochain HEAD exact attend sa CI complète ; aucune réussite de44177319803 n’est prétendue.
