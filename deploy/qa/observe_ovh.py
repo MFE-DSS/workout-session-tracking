@@ -23,6 +23,21 @@ POLICY = Path("/etc/auren-qa/observer-policy.json")
 ACTIVATION = Path("/etc/auren-qa/activation-proof.json")
 ROUTING = Path("/etc/auren-qa/routing-loaded.json")
 RESOURCE = "auren-qa-rel03"
+RUNTIME_POLICY_FIELDS = (
+    "environment_id",
+    "uid",
+    "mounts",
+    "ports",
+    "container_ip",
+    "network",
+    "restart_policy",
+    "memory_bytes",
+    "nano_cpus",
+    "pids_limit",
+    "configuration_sha256",
+    "routing_sha256",
+    "feature_profiles",
+)
 
 
 def require(ok):
@@ -108,6 +123,7 @@ def qa_vhost(policy):
         and not address.is_multicast
     )
     peer = f"[{address}]" if address.version == 6 else str(address)
+    upstream = private_address(policy["container_ip"])
     return (
         qa_http_vhost()
         + """server {
@@ -118,17 +134,97 @@ def qa_vhost(policy):
     access_log off;
     error_log /dev/null crit;
     location / {
-        proxy_pass http://127.0.0.1:8088;
+        proxy_pass http://CONTAINER_IP:8080;
         proxy_set_header Host qa.spignos.com;
         proxy_set_header X-Forwarded-Proto https;
     }
 }
-""".replace("listen 443 ssl;", f"listen {peer}:443 ssl;")
+""".replace("listen 443 ssl;", f"listen {peer}:443 ssl;").replace("CONTAINER_IP", upstream)
+    )
+
+
+def private_address(value):
+    address = ipaddress.ip_address(value)
+    require(
+        isinstance(address, ipaddress.IPv4Address)
+        and str(address) == value
+        and any(
+            address in ipaddress.ip_network(n)
+            for n in ("10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16")
+        )
+    )
+    return str(address)
+
+
+def validate_policy(policy):
+    """Close the administrator input before any projection reaches SSH stdout."""
+    require(
+        isinstance(policy, dict)
+        and set(policy) == set(RUNTIME_POLICY_FIELDS) | {"resource", "origin", "peer_ip"}
+    )
+    require(policy["resource"] == RESOURCE and policy["origin"] == "https://qa.spignos.com")
+    require(
+        isinstance(policy["environment_id"], str)
+        and re.fullmatch("qa-[a-z0-9_-]{3,60}", policy["environment_id"])
+    )
+    peer = ipaddress.ip_address(policy["peer_ip"])
+    require(
+        not peer.is_private
+        and not peer.is_loopback
+        and not peer.is_multicast
+        and not peer.is_unspecified
+    )
+    private_address(policy["container_ip"])
+    require(type(policy["uid"]) is int and policy["uid"] == 10001)
+    require(
+        policy["ports"] == []
+        and policy["network"] == "auren-qa-rel03-internal"
+        and policy["restart_policy"] == "no"
+    )
+    require(
+        policy["mounts"]
+        == [
+            {
+                "type": "volume",
+                "source": "auren-qa-rel03-data",
+                "destination": "/var/lib/qa",
+                "rw": True,
+            },
+            {
+                "type": "volume",
+                "source": "auren-qa-rel03-config",
+                "destination": "/etc/secrets",
+                "rw": False,
+            },
+        ]
+    )
+    for key, maximum in (
+        ("memory_bytes", 2 * 1024**3),
+        ("nano_cpus", 2 * 10**9),
+        ("pids_limit", 256),
+    ):
+        require(type(policy[key]) is int and 0 < policy[key] <= maximum)
+    for key in ("configuration_sha256", "routing_sha256"):
+        require(isinstance(policy[key], str) and re.fullmatch("[a-f0-9]{64}", policy[key]))
+    require(
+        policy["feature_profiles"]
+        == {
+            "BODY": "body-measurements/1.0.0",
+            "NUT": "nutrition-manual/1.0.0",
+            "LIBRARY": "owned-library/1.0.0",
+            "BUILDER": "program-builder/1.0.0",
+        }
     )
 
 
 def verify_loaded_routing(policy, loaded, config, identities):
-    require(set(loaded) == {"configuration_sha256", "master", "workers", "qa_vhost"})
+    require(
+        set(loaded) == {"configuration_sha256", "master", "workers", "qa_vhost", "container_id"}
+    )
+    require(
+        loaded["container_id"] == identities["container_id"]
+        and re.fullmatch("[a-f0-9]{64}", loaded["container_id"])
+    )
     require(
         hashlib.sha256(config).hexdigest()
         == loaded["configuration_sha256"]
@@ -164,6 +260,15 @@ def verify_network(policy, container, network, input_rules, qa_rules):
     require(set(network["Containers"]) == {container["Id"]})
     attached = container["NetworkSettings"]["Networks"]
     require(set(attached) == {name} and attached[name]["NetworkID"] == network["Id"])
+    address = private_address(policy["container_ip"])
+    require(attached[name]["IPAddress"] == address)
+    endpoint = ipaddress.ip_interface(network["Containers"][container["Id"]]["IPv4Address"])
+    require(str(endpoint.ip) == address)
+    subnets = network["IPAM"]["Config"]
+    require(len(subnets) == 1 and endpoint.network == ipaddress.ip_network(subnets[0]["Subnet"]))
+    require(
+        endpoint.ip not in (endpoint.network.network_address, endpoint.network.broadcast_address)
+    )
     rules = [line for line in input_rules.decode().splitlines() if line.startswith("-A INPUT ")]
     require(
         rules
@@ -186,6 +291,7 @@ def verify_network(policy, container, network, input_rules, qa_rules):
 
 def project_runtime(policy, activation, container, writers):
     """Pure projection; caller supplies actually acquired fixed-command output."""
+    validate_policy(policy)
     state, host = container["State"], container["HostConfig"]
     require(container["Name"] == "/" + RESOURCE and state["Running"] is True)
     require(state["Health"]["Status"] == "healthy")
@@ -211,8 +317,14 @@ def project_runtime(policy, activation, container, writers):
     )
     require(host["Tmpfs"] == {"/tmp": "rw,noexec,nosuid,size=67108864,mode=1777"})  # noqa: S108 — bounded container tmpfs policy, no host temp path
     require(host["NetworkMode"] == policy["network"])
-    require(host["PortBindings"] == {"8080/tcp": [{"HostIp": "127.0.0.1", "HostPort": "8088"}]})
-    require(set(container["NetworkSettings"]["Ports"]) == {"8080/tcp"})
+    require(host["PortBindings"] in (None, {}) and host["PublishAllPorts"] is False)
+    require(container["NetworkSettings"]["Ports"] == {"8080/tcp": None})
+    require(policy["ports"] == [])
+    address = private_address(policy["container_ip"])
+    attached = container["NetworkSettings"]["Networks"]
+    require(
+        set(attached) == {policy["network"]} and attached[policy["network"]]["IPAddress"] == address
+    )
     mounts = [
         {
             "type": m["Type"],
@@ -238,7 +350,7 @@ def project_runtime(policy, activation, container, writers):
     )
     require(len(writers) == 1 and container["Id"].startswith(writers[0]))
     return {
-        **{k: v for k, v in policy.items() if k not in {"resource", "origin", "peer_ip"}},
+        **{key: policy[key] for key in RUNTIME_POLICY_FIELDS},
         "container_id": container["Id"],
         "image_id": container["Image"],
         "running": True,
@@ -255,7 +367,7 @@ def project_runtime(policy, activation, container, writers):
             "origin": policy["origin"],
             "peer_ip": policy["peer_ip"],
             "container_id": container["Id"],
-            "upstream": "http://127.0.0.1:8088",
+            "upstream": f"http://{address}:8080",
             "loaded_configuration_sha256": policy["routing_sha256"],
         },
     }
@@ -268,7 +380,7 @@ def collect(request):
         == {"schema_version", "nonce", "candidate_sha256", "environment_id", "resource"}
     )
     require(
-        request["schema_version"] == "qa-ovh-observation-request/1.0.0"
+        request["schema_version"] == "qa-ovh-observation-request/2.0.0"
         and request["resource"] == RESOURCE
     )
     require(
@@ -278,6 +390,7 @@ def collect(request):
         )
     )
     policy = admin_json(POLICY)
+    validate_policy(policy)
     require(request["environment_id"] == policy["environment_id"])
     fields = (
         "Privileged",
@@ -291,6 +404,7 @@ def collect(request):
         "Tmpfs",
         "NetworkMode",
         "PortBindings",
+        "PublishAllPorts",
         "RestartPolicy",
         "Memory",
         "NanoCpus",
@@ -340,13 +454,14 @@ def collect(request):
     identities = {
         "master": process_identity(master),
         "workers": [process_identity(int(p)) for p in children],
+        "container_id": container["Id"],
     }
     verify_loaded_routing(
         policy, loaded, fixed_read(["/usr/sbin/nginx", "-T"], 1024 * 1024), identities
     )
     return {
         **result,
-        "schema_version": "qa-ovh-observation/1.0.0",
+        "schema_version": "qa-ovh-observation/2.0.0",
         "nonce": request["nonce"],
         "candidate_sha256": request["candidate_sha256"],
         "observed_at": datetime.now(UTC).isoformat(),

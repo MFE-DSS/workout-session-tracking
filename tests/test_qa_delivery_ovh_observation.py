@@ -32,7 +32,8 @@ def fixture():
                 "rw": False,
             },
         ],
-        ports=[{"host_ip": "127.0.0.1", "host_port": 8088, "container_port": 8080}],
+        ports=[],
+        container_ip="172.23.0.2",
         network="auren-qa-rel03-internal",
         restart_policy="no",
         memory_bytes=1073741824,
@@ -43,14 +44,14 @@ def fixture():
         feature_profiles=FEATURE_PROFILES,
     )
     request = dict(
-        schema_version="qa-ovh-observation-request/1.0.0",
+        schema_version="qa-ovh-observation-request/2.0.0",
         nonce="a" * 64,
         candidate_sha256="b" * 64,
         environment_id="qa-rel03",
         resource="auren-qa-rel03",
     )
     observation = dict(
-        schema_version="qa-ovh-observation/1.0.0",
+        schema_version="qa-ovh-observation/2.0.0",
         nonce=request["nonce"],
         candidate_sha256=request["candidate_sha256"],
         observed_at="2026-11-15T12:00:00Z",
@@ -69,7 +70,7 @@ def fixture():
             "origin": policy["origin"],
             "peer_ip": policy["peer_ip"],
             "container_id": "f" * 64,
-            "upstream": "http://127.0.0.1:8088",
+            "upstream": "http://172.23.0.2:8080",
             "loaded_configuration_sha256": policy["routing_sha256"],
         },
     )
@@ -90,6 +91,28 @@ def test_fresh_observation_requires_runtime_routing_not_only_healthy_container()
         )
         == record
     )
+
+
+@pytest.mark.parametrize("old", ["request", "observation", "policy"])
+def test_loopback_generation_cannot_authorize_direct_bridge_transport(old):
+    from tools.qa_delivery.ovh_observation import validate_observation
+
+    policy, request, record = fixture()
+    if old == "request":
+        request["schema_version"] = "qa-ovh-observation-request/1.0.0"
+    elif old == "observation":
+        record["schema_version"] = "qa-ovh-observation/1.0.0"
+    else:
+        policy.pop("container_ip")
+        policy["ports"] = [{"host_ip": "127.0.0.1", "host_port": 8088, "container_port": 8080}]
+    with pytest.raises(ValueError, match="qa_ovh"):
+        validate_observation(
+            record,
+            request,
+            policy,
+            record["image_id"],
+            now=datetime(2026, 11, 15, 12, 0, 20, tzinfo=UTC),
+        )
 
 
 @pytest.mark.parametrize(
@@ -127,7 +150,7 @@ def test_observation_rejects_replay_runtime_or_routing_mismatch(damage):
     if damage == "mount":
         record["mounts"].append({"source": "/var/run/docker.sock"})
     if damage == "port":
-        record["ports"][0]["host_ip"] = "0.0.0.0"
+        record["ports"].append({"host_ip": "0.0.0.0", "host_port": 8088, "container_port": 8080})
     if damage == "route":
         record["routing"]["upstream"] = "http://127.0.0.1:9999"
     if damage == "unknown":
@@ -300,7 +323,8 @@ def test_collector_refuses_private_or_extra_mounts_and_changed_loaded_generation
         "IpcMode": "private",
         "Tmpfs": {"/tmp": "rw,noexec,nosuid,size=67108864,mode=1777"},
         "NetworkMode": "auren-qa-rel03-internal",
-        "PortBindings": {"8080/tcp": [{"HostIp": "127.0.0.1", "HostPort": "8088"}]},
+        "PortBindings": {},
+        "PublishAllPorts": False,
         "RestartPolicy": {"Name": "no"},
         "Memory": policy["memory_bytes"],
         "NanoCpus": policy["nano_cpus"],
@@ -326,7 +350,10 @@ def test_collector_refuses_private_or_extra_mounts_and_changed_loaded_generation
                 "/var/lib/qa/activation.json",
             ],
         },
-        "NetworkSettings": {"Ports": {"8080/tcp": []}},
+        "NetworkSettings": {
+            "Ports": {"8080/tcp": None},
+            "Networks": {policy["network"]: {"IPAddress": "172.23.0.2"}},
+        },
         "Mounts": [
             {"Type": x["type"], "Name": x["source"], "Destination": x["destination"], "RW": x["rw"]}
             for x in policy["mounts"]
@@ -342,6 +369,9 @@ def test_collector_refuses_private_or_extra_mounts_and_changed_loaded_generation
         project_runtime(policy, activation, container, [record["container_id"][:12]])["image_id"]
         == record["image_id"]
     )
+    unexpected = {**policy, "unexpected_private": "SYNTHETIC_SENTINEL_NEVER_EMIT"}
+    with pytest.raises(ValueError, match="qa_ovh"):
+        project_runtime(unexpected, activation, container, [record["container_id"][:12]])
     wrong_command = deepcopy(container)
     wrong_command["Config"]["Entrypoint"] = ["python", "-m", "tools.qa_delivery.server"]
     wrong_command["Config"]["Cmd"] = ["--facade-only"]

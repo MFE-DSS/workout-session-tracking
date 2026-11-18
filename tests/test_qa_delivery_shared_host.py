@@ -13,7 +13,9 @@ def network_fixture():
     policy, _, _ = fixture()
     container = {
         "Id": "f" * 64,
-        "NetworkSettings": {"Networks": {policy["network"]: {"NetworkID": "a" * 64}}},
+        "NetworkSettings": {
+            "Networks": {policy["network"]: {"NetworkID": "a" * 64, "IPAddress": "172.23.0.2"}}
+        },
     }
     network = {
         "Id": "a" * 64,
@@ -23,7 +25,8 @@ def network_fixture():
         "Internal": True,
         "EnableIPv6": False,
         "Labels": {"org.auren.qa": "rel03"},
-        "Containers": {container["Id"]: {}},
+        "Containers": {container["Id"]: {"IPv4Address": "172.23.0.2/16"}},
+        "IPAM": {"Config": [{"Subnet": "172.23.0.0/16", "Gateway": "172.23.0.1"}]},
         "Options": {
             "com.docker.network.bridge.name": "br-auren-qa",
             "com.docker.network.bridge.enable_icc": "false",
@@ -65,19 +68,54 @@ def test_dedicated_internal_network_and_host_filter_are_both_required():
             verify_network(p, c, n, i, q)
 
 
+@pytest.mark.parametrize(
+    "damage", ["policy_ip", "endpoint_ip", "network_ip", "subnet", "extra_member"]
+)
+def test_upstream_pin_must_match_both_real_docker_projections(damage):
+    policy, container, network, input_rules, qa_rules = network_fixture()
+    if damage == "policy_ip":
+        policy["container_ip"] = "172.23.0.3"
+    elif damage == "endpoint_ip":
+        container["NetworkSettings"]["Networks"][policy["network"]]["IPAddress"] = "172.23.0.3"
+    elif damage == "network_ip":
+        network["Containers"][container["Id"]]["IPv4Address"] = "172.23.0.3/16"
+    elif damage == "subnet":
+        network["IPAM"]["Config"][0]["Subnet"] = "172.24.0.0/16"
+    else:
+        network["Containers"]["e" * 64] = {"IPv4Address": "172.23.0.3/16"}
+    with pytest.raises(ValueError, match="qa_ovh"):
+        verify_network(policy, container, network, input_rules, qa_rules)
+
+
+@pytest.mark.parametrize(
+    "address",
+    ["127.0.0.1", "8.8.8.8", "169.254.1.2", "::1", "172.23.0.2;return 200", "172.023.0.2"],
+)
+def test_vhost_rejects_nonprivate_or_noncanonical_upstream(address):
+    policy, _, _ = fixture()
+    policy["container_ip"] = address
+    with pytest.raises(ValueError):
+        qa_vhost(policy)
+
+
 def test_shared_host_vhost_uses_public_address_and_no_request_logging():
     policy, _, _ = fixture()
     text = qa_vhost(policy)
+    assert "proxy_pass http://172.23.0.2:8080;" in text
+    assert "127.0.0.1:8088" not in text
     assert "listen 8.8.8.8:443 ssl;" in text
     assert "listen 443 ssl;" not in text
     assert "access_log off;" in text
     assert "location ^~ /.well-known/acme-challenge/" in text
     assert text.count("server_name qa.spignos.com;") == 2
-    config = ("# configuration file /etc/nginx/sites-enabled/zz-auren-qa-rel03.conf:\n" + text).encode()
+    config = (
+        "# configuration file /etc/nginx/sites-enabled/zz-auren-qa-rel03.conf:\n" + text
+    ).encode()
     policy["routing_sha256"] = hashlib.sha256(config).hexdigest()
     identities = {
         "master": {"pid": 10, "start_ticks": 12},
         "workers": [{"pid": 11, "start_ticks": 13}],
+        "container_id": "f" * 64,
     }
     loaded = {"configuration_sha256": policy["routing_sha256"], **identities, "qa_vhost": text}
     verify_loaded_routing(policy, loaded, config, identities)
@@ -86,6 +124,33 @@ def test_shared_host_vhost_uses_public_address_and_no_request_logging():
     loaded["qa_vhost"] = wildcard.decode().split("\n", 1)[1]
     with pytest.raises(ValueError):
         verify_loaded_routing(policy, loaded, wildcard, identities)
+
+
+def test_same_ip_replacement_requires_new_root_routing_receipt():
+    policy, _, _ = fixture()
+    text = qa_vhost(policy)
+    config = (
+        "# configuration file /etc/nginx/sites-enabled/zz-auren-qa-rel03.conf:\n" + text
+    ).encode()
+    policy["routing_sha256"] = hashlib.sha256(config).hexdigest()
+    identities = {
+        "master": {"pid": 10, "start_ticks": 12},
+        "workers": [{"pid": 11, "start_ticks": 13}],
+        "container_id": "e" * 64,
+    }
+    # Historical shape: no assertion about which container was actually qualified.
+    old = {
+        "configuration_sha256": policy["routing_sha256"],
+        "master": identities["master"],
+        "workers": identities["workers"],
+        "qa_vhost": text,
+    }
+    with pytest.raises(ValueError, match="qa_ovh"):
+        verify_loaded_routing(policy, old, config, identities)
+    stale = {**old, "container_id": "f" * 64}
+    with pytest.raises(ValueError, match="qa_ovh"):
+        verify_loaded_routing(policy, stale, config, identities)
+    verify_loaded_routing(policy, {**stale, "container_id": "e" * 64}, config, identities)
 
 
 def test_isolation_checker_never_repairs_or_flushes_existing_foreign_rules(monkeypatch):
@@ -131,6 +196,7 @@ def test_qa_loaded_file_preserves_existing_default_server_order(late_site):
     identities = {
         "master": {"pid": 10, "start_ticks": 12},
         "workers": [{"pid": 11, "start_ticks": 13}],
+        "container_id": "f" * 64,
     }
     loaded = {"configuration_sha256": policy["routing_sha256"], **identities, "qa_vhost": text}
     if late_site:
