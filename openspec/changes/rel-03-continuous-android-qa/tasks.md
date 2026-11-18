@@ -58,3 +58,12 @@ Le repair schéma précédent est effectivement livré par412/413, puis ses cons
 - [ ] Finir contrôlesCI_INFRA/revue du paquet, CI exacte et livraison du delta technique.
 - [ ] GO opérationnel unique, séparation humaine GitHub, garde privée, image réelle et QA qualifié.
 - [ ] Candidat Android consolidé et update/rollback installés sous leurs autorisations distinctes ; recette physique séparée.
+
+## OPS-03 — 18 November public qualification
+
+- [x] Authoritative/public A record and no AAAA; existing ACME accounts, actual QA certificate/renewal dry-run, scoped vhost and loaded nginx generation.
+- [x] Fresh restricted observations around public TLS, exact image/config/API/SCI/schema identity and current synthetic HTTP smokes; personal services preserved.
+- [x] Post-public-write encrypted export/disposable restore; prior backups retained. [Actual operational receipt](../../../docs/release/rel-03/OPS03_PUBLIC_QUALIFICATION_20261118.md).
+- [ ] Deliver exact target/native fingerprint/candidate metadata through scope checks, independent review, CI and guarded merge. [Scope/ledger](OPS03_SCOPE_AND_LEDGER.md).
+- [ ] Freeze merged source, fresh PREPARE and candidate-bound release proof, then distinct candidate GO. No automatic build at merge.
+- [ ] Signed APK/upgrade, complete installed-client smokes, controlled update/rollback and separate physical acceptance remain open.

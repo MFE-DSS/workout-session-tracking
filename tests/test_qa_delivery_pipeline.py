@@ -73,8 +73,11 @@ def test_tracked_candidate_prepares_for_current_canonical_schema_without_distrib
     prepared = prepare(template, checkout)
     assert prepared["compatibility"]["server_schema"] == "program_builder_operations_01"
     assert prepared["distributable"] is False
-    assert prepared["target"] is None
-    assert prepared["native"]["fingerprint"] is None
+    assert prepared["target"]["url"] == "https://qa.spignos.com"
+    assert prepared["target"]["provider"] == "OVH"
+    assert prepared["target"]["source_sha"] == "b8fc63ffadba35028af9e1c92c2e48892f9fe403"
+    assert prepared["native"]["fingerprint"] == prepared["native"]["runtime_version"]
+    assert len(prepared["native"]["fingerprint"]) == 40
     assert prepared["eas"]["build_id"] is None
     # Older nutrition inputs remain fail-closed; the active default is current.
     stale = deepcopy(template)
@@ -1084,7 +1087,7 @@ def test_cli_prepare_uses_real_template_and_refuses_stale_copy_without_external_
     assert result.returncode == 0, result.stderr
     assert result.stdout.strip() == "QA_PREPARED_NON_DISTRIBUTABLE"
     package = json.loads(output.read_text())
-    assert package["candidate"]["target"] is None
+    assert package["candidate"]["target"] == json.loads(template_bytes)["target"]
     assert package["proof_sha256"] is None and package["canonical_sha"] is None
     assert package["candidate"]["distributable"] is False
     assert output.stat().st_mode & 0o777 == 0o600
