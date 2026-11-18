@@ -1,3 +1,11 @@
+> **Current operational state, 18 November 2026:** public OVH synthetic QA is now
+> [qualified](OPS03_PUBLIC_QUALIFICATION_20261118.md). The tracked target and
+> candidate runtime have been acquired; [the Android decision](MVP_RC01_ANDROID_DECISION.md)
+> remains separate from engineering merge. No new APK/OTA or installed acceptance.
+> Historical UNPROVISIONED wording below describes initial preparation, not today's
+> target. The existing private proof store is CONFIGURED; actual proof transport
+> and release guards still apply.
+
 # REL03 — PREPARED / BLOCKED_EXTERNAL
 
 This package prepares a controlled Android QA release. Code engineering/merge
@@ -90,8 +98,12 @@ The allowlisted private staging directory contains:
   OTA also requires real EAS build ID/source/runtime/package/version readback;
 - cutover.json: schema_version qa-cutover/1.0.0, assurance OPERATOR_ATTESTED,
   exact target, backup_reference, continuity_reference, files_sha256 entries for
-  all three DB/manifest files, provider.service_id/deploy_id/branch, and version
-  containing the complete **current** independently captured /__qa_version result;
+  all three DB/manifest files, and version containing the complete **current**
+  independently captured /__qa_version result. For the active OVH path, provider
+  has exactly `kind`, `image_reference`, `ssh`, `policy` as specified in the
+  [OVH proof protocol](OVH_TECHNICAL_RUNBOOK.md) and
+  `tools/qa_delivery/ovh_observation.py::observe_ovh`. Render-only historical
+  provider fields `service_id`, `deploy_id`, `branch` must not be supplied to OVH;
 - its old_writer_stopped, single_writer_opened and
   uid10001_volume_and_private_files_qualified fields describe actual operator
   observations from the approved cutover/qualification. Mere true values or

@@ -32,8 +32,15 @@ test.each(['https://qa-fake.trycloudflare.com','https://qa-fake.ngrok-free.app',
 test.each(['UNPROVISIONED','PENDING'])('unknown target %s fails closed',state=>{
   expect(()=>applyQADelivery(base,env,{...target,state})).toThrow();
 });
-test('checked-in unprovisioned target fails before build/export',()=>{
-  expect(()=>applyQADelivery(base,env)).toThrow();
+test('tracked target selects only the qualified OVH environment and preserves the QA upgrade identity',()=>{
+  const actual=require('../../qa-delivery-target.json');
+  const config=applyQADelivery(base,{...env,EXPO_PUBLIC_API_URL:'https://qa.spignos.com'});
+  expect(actual).toMatchObject({schemaVersion:'qa-delivery-target/2.0.0',provider:'OVH',state:'ATTESTED',
+    availability:'STABLE',dataScope:'SYNTHETIC_ONLY',apiUrl:'https://qa.spignos.com',
+    environmentId:'qa-rel03-rc01-20261117',configurationSha256:'24f9b58aed1455d5183c809fc65aa1250c395b23451a4c156a925686f84eec94'});
+  expect(config.android).toEqual({package:'dev.auren.releaseqa02',versionCode:3});
+  expect(config.extra.qaDelivery.apiUrl).toBe(actual.apiUrl);
+  expect(()=>applyQADelivery(base,{...env,EXPO_PUBLIC_API_URL:'https://spignos.com'})).toThrow();
 });
 test.each([{AUREN_QA_BUILD:'1'},{EXPO_PUBLIC_GALLERY:'fixture'},{EAS_BUILD_PLATFORM:'ios'},
   {EXPO_PUBLIC_PLAN_V3_CONTROLLED_TEST:'0'},{EXPO_PUBLIC_API_URL:'https://qa-other.onrender.com'},
