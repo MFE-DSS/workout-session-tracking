@@ -2,6 +2,10 @@
 
 17 novembre 2026, Europe/Paris. **PAQUET AUTORISÉ ; exécution opérationnelle partielle.** Le GO explicite et la désignation MFE-DSS seul sont enregistrés dans [l’amendement solo](../../../../openspec/changes/rel-03-continuous-android-qa/SOLO_OPERATOR_AMENDMENT.md). Garde privée livrée par #425 ; image et service QA pas encore réalisés. Hôte existant uniquement, aucun achat. Cette proposition suit la maintenance livrée par #422 et le mandat OPS-02. La livraison technique locale, sa CI et son SHA final sont consignés dans DELIVERY_RECEIPT.md avant soumission de cette décision.
 
+## Amendement du18novembre
+
+Après le conflit réel du bridge interne, l’opérateur demande de continuer sur le paquet borné soumis : [contrat et ledger](../../../../openspec/changes/rel-03-continuous-android-qa/INTERNAL_BRIDGE_AMENDMENT.md). Internal, filtre et limites sont conservés ; `ports=[]`, `container_ip` pinné et preuves SSH2.0.0 remplacent le raccordement loopback jamais qualifié. Les observations du17novembre ci-dessous gardent leur date ; les ressources QA ont depuis été créées et initialisées mais restent arrêtées sans activation à ce checkpoint.
+
 ## État actuel et impact proposé
 
 Observation fraîche du17novembre à13:23:26UTC : Ubuntu26.04.1, noyau7.0.0-43, huit conteneurs préservés, sept services initiaux actifs,6178Mio disponibles et43178Mio libres sur la racine. Les fichiers nginx et générations de processus sont observés, **pas une preuve de routage QA chargé**. Certbot4.0.0/timer actif ; iptables1.8.11 backendnf_tables. Aucun compte QA, conteneur, volume ou réseau de ce nom n'était présent.
@@ -21,7 +25,7 @@ Origine `qa.spignos.com` non résolue lors du probe ; aucun certificat QA ou end
 | Réseau | `auren-qa-rel03-internal`, bridge `br-auren-qa`, internal, IPv4 seulement, ICC désactivé | Un seul conteneur raccordé. Filtre INPUT dédié en tête, retours établis autorisés puis DROP sur cette seule interface. Aucune policy globale modifiée, aucun flush. |
 | Démarrage | Docker restart=no ; systemd ordonne isolation avant lancement et recontrôle le filtre avant chaque start | Pas de fenêtre de démarrage Docker automatique avant installation du filtre. Aucun service personnel arrêté/reconfiguré. |
 | Comptes / clés | Deux comptes neufs `qa02-rel03-rc01-a/b` proposés, backend `qa-rel03-rc01-20261117`, références auth/NUT/Library/Builder distinctes ; clés image/proof/audit distinctes | Les préfixes qa02- sont imposés par les contrats historiques, **sans réutiliser leurs comptes, DB, tokens ou backend**. Aucun secret personnel, aucune valeur secrète dans le chat ou Git. |
-| Domaine / TLS | Un RR A `qa.spignos.com`→51.91.79.44, pas d'AAAA ; certificat exact QA via compte Certbot existant et webroot propre | Racine/www/autres domaines inchangés. HTTP80 : ACME seulement, autres chemins404. HTTPS : écoute explicite51.91.79.44:443, upstream127.0.0.1:8088, logs de requête QA coupés. |
+| Domaine / TLS | Un RR A `qa.spignos.com`→51.91.79.44, pas d'AAAA ; certificat exact QA via compte Certbot existant et webroot propre | Racine/www/autres domaines inchangés. HTTP80 : ACME seulement, autres chemins404. HTTPS : écoute explicite51.91.79.44:443, upstream vers l’IPv4 privée du seul conteneur QA:8080, acquise et pinnée, sans port Docker publié, logs de requête QA coupés. |
 | Audit | `qa-audit`, clé dédiée, forced-command/restrict, sudo limité au collecteur root-owned | Aucun shell interactif/PTY/forwarding/agent-forwarding/Docker group. Reçus admin de config/activation/routage effectivement chargé. |
 | Backup | Répertoire privé neuf, copie avant activation et avant chaque release, acquisition bornée et export chiffré hors writer | Outils backup/restore existants ; caps DB128Mio/fichier,256Mio/paquet conservées. Pas de purge automatique ni rétention de données personnelles décidée ici. Stop avant dépassement du plafond local approuvé. |
 

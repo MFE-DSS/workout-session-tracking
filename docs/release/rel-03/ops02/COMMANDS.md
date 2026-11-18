@@ -1,6 +1,8 @@
 # OPS-02 — commandes et actions bornées à faire approuver
 
-**Étapes opérationnelles partielles.** Garde privée déjà livrée par #425 ; image/service QA non réalisés. L'agent exécute les étapes restantes séquentiellement après qualification de leurs prérequis. Aucun `eval`, JSON sourcé comme shell, token en argv, `--clobber`, prune ou suppression globale.
+**Reprise du18novembre.** Image backend b8fc acquise/run44188461111, volumes et base synthétiques déjà initialisés, snapshot chiffré/restauré, QA arrêté sans marqueur. **Ne pas rejouer les créations/initialisations ci-dessous.** Elles décrivent le premier provisioning ; la reprise vérifie leurs identités, conserve l’état et remplace seulement le conteneur QA si nécessaire. Aucun `eval`, JSON sourcé comme shell, token en argv, `--clobber`, prune ou suppression globale.
+
+Trois révisions distinctes : `QA_BACKEND_SOURCE_SHA` identifie l’image acquise (actuellement `b8fc63ffadba35028af9e1c92c2e48892f9fe403`) ; `QA_COLLECTOR_SOURCE_SHA` est le canonique réel, avec sa propre CI, contenant l’amendement bridge/protocole2.0.0 ; la future `source_sha` du candidat natif/workflow doit elle aussi contenir le client2.0.0. Aucune révision future inventée. La garde accepte un backend ancêtre canonique compatible, pas un relabelling de son image. `QA_SOURCE_SHA` dans PREPARE_IMAGE ci-dessous concerne uniquement une nouvelle opération image, pas un ordre de reconstruire le backend existant.
 
 ## 1. Garde existante, source et préparation d'image
 
@@ -29,7 +31,7 @@ Config privée0600/parent0700 : repository,release_id,key_file ; référence pri
 
 ## 2. Installation isolée et état synthétique
 
-VPS exact : ubuntu@vps-491c685f.vps.ovh.net, IP51.91.79.44, contrôle strict de clé existante. Transférer uniquement image/outil acquis et références privées dédiées, jamais DB/secret personnel. Installer un checkout/outillage immuable de ce SHA sous `/opt/auren-qa-ops/<SHA>` ; pas de modification du site `/opt/workout-session-tracking`. L'outillage Python privé est séparé du venv web, avec httpx0.28.1 et Node existant pour les codecs ; aucun upgrade Python/FastAPI du site.
+VPS exact : ubuntu@vps-491c685f.vps.ovh.net, IP51.91.79.44, contrôle strict de clé existante. Transférer uniquement image/outil acquis et références privées dédiées, jamais DB/secret personnel. Installer les sources immuables du **collecteur2.0.0** sous `/opt/auren-qa-ops/<QA_COLLECTOR_SOURCE_SHA>` et son wrapper root depuis ces sources vérifiées, jamais depuis l’ancien checkout backend b8fc contenant le collecteur1.0.0. Le backend garde son propre SHA/ID/configuration. Pas de modification du site `/opt/workout-session-tracking`. L'outillage Python privé est séparé du venv web, avec httpx0.28.1 et Node existant pour les codecs ; aucun upgrade Python/FastAPI du site.
 
 Avant chaque création : refuser les noms préexistants, les drivers/Options non attendus, UID/propriétaire/mode non conformes et collisions de comptes. Le helper d'isolation vérifie aussi le label du réseau et refuse des règles étrangères ; il ne les flush/reconstruit pas.
 
@@ -45,11 +47,11 @@ sudo systemctl daemon-reload
 sudo systemctl start auren-qa-isolation.service
 ```
 
-Les sources relatives `deploy/qa/*` sont prises exclusivement dans le checkout vérifié du SHA livré, avec empreintes. Aucun install sur un fichier préexistant sans comparaison et décision d'incident. Le helper ajoute un réseau nommé interne et le seul hook INPUT `-i br-auren-qa -j AUREN-QA-IN` ; chaîne : ACCEPT retours RELATED,ESTABLISHED puis DROP. Aucun flush/policy globale ou changement Tailscale.
+Les sources relatives `deploy/qa/*` sont prises exclusivement dans le checkout vérifié `QA_COLLECTOR_SOURCE_SHA`, avec empreintes. En reprise, les unités/helper existent : comparer leurs empreintes et conserver ceux inchangés ; vérifier le filtre existant sans recréer réseau/volumes. Aucun install sur un fichier préexistant sans comparaison et décision d'incident. Le helper ajoute un réseau nommé interne et le seul hook INPUT `-i br-auren-qa -j AUREN-QA-IN` ; chaîne : ACCEPT retours RELATED,ESTABLISHED puis DROP. Aucun flush/policy globale ou changement Tailscale.
 
 Préparer les racines des **deux seuls volumes neufs data et config** en UID10001/GID10001 et mode0700, avant la première écriture. Pas de chown/chmod récursif ni de volume préexistant. Matérialiser les fichiers privés dans config en UID10001/mode0600, par opérations exclusives depuis le canal privé. Les mountpoints Docker ne sont utilisés qu'après vérification driverlocal, Options vides, noms/labels exacts et lien avec les volumes créés par cette opération. Ne jamais utiliser un chemin fourni librement par une preuve comme destination système.
 
-Entrée `initialize.json` privée : schema_version=`qa-initialization/1.0.0`, source_sha exact, environment_id=`qa-rel03-rc01-20261117`, approval_ref de cette décision, accounts_file, auth_secret_file, data_dir=`/var/lib/qa`, bundle_root=`/opt/science`, science_mode=`ACTIVE_PUBLISHED`. Le fichier accounts est uniquement les deux nouveaux usernames qa02-rel03-rc01-a/b et leurs nouveaux mots de passe ; pas d'email. Le secret auth est neuf et distinct. Aucune valeur secrète dans ces exemples.
+Entrée `initialize.json` privée : schema_version=`qa-initialization/1.0.0`, source_sha=`QA_BACKEND_SOURCE_SHA`, environment_id=`qa-rel03-rc01-20261117`, approval_ref de cette décision, accounts_file, auth_secret_file, data_dir=`/var/lib/qa`, bundle_root=`/opt/science`, science_mode=`ACTIVE_PUBLISHED`. Le fichier accounts est uniquement les deux nouveaux usernames qa02-rel03-rc01-a/b et leurs nouveaux mots de passe ; pas d'email. Le secret auth est neuf et distinct. Aucune valeur secrète dans ces exemples.
 
 ```bash
 sudo docker run --rm --network none --read-only --cap-drop ALL --security-opt no-new-privileges \
@@ -61,18 +63,19 @@ sudo docker run --rm --network none --read-only --cap-drop ALL --security-opt no
   --config /etc/secrets/initialize.json
 ```
 
-Cette surcharge d'entrypoint concerne le seul conteneur d'initialisation jetable sans réseau ; le service est créé ensuite avec les Entrypoint/Cmd originaux. Initialisation depuis vide par migrations, seeds de **références canoniques** (catalogue/méthodes/identités), register/device canoniques, autorité existante et ancre. Aucun lifespan/create_all ni fixture de base. Un état `state` existant ou partiel refuse toute reprise ; aucun reset automatique. Relever tables/FK/versions et catalogue builder réellement non vide, zéro mesure/nutrition/fait d'entraînement créé.
+**Initialisation déjà réussie : ne pas relancer cette commande sur l’état existant.** Cette surcharge d'entrypoint concerne le seul conteneur d'initialisation jetable sans réseau ; le service est créé ensuite avec les Entrypoint/Cmd originaux. Initialisation depuis vide par migrations, seeds de **références canoniques** (catalogue/méthodes/identités), register/device canoniques, autorité existante et ancre. Aucun lifespan/create_all ni fixture de base. Un état `state` existant ou partiel refuse toute reprise ; aucun reset automatique. Relever tables/FK/versions et catalogue builder réellement non vide, zéro mesure/nutrition/fait d'entraînement créé.
 
 Copier l'ancre privée produite dans le nouveau volume config et écrire le `qa-config.json` exact avec digest acquis, auth/access/features/signing refs distinctes (voir OVH_TECHNICAL_RUNBOOK.md). DB=`/var/lib/qa/state/qa.db`. Config/accords BODY/NUT ne sont pas interchangeables. Conserver le kit privé hors runtime puis retirer de ce nouveau montage uniquement les entrées d'initialisation contenant les mots de passe ; garder les clés nécessaires au runtime. Aucune suppression de données historiques.
 
 ## 3. Service exact, d'abord en maintenance
+
+**Amendement bridge interne du18novembre :** aucun port publié. Acquérir l’IPv4 privée du seul conteneur dans les deux projections Docker et le sous-réseau, puis la pinner dans `container_ip`/politique et le vhost QA. Ne jamais coder l’adresse observée comme constante. Le contrat SSH2.0.0 refuse les anciens reçus loopback. Voir [amendement](../../../../openspec/changes/rel-03-continuous-android-qa/INTERNAL_BRIDGE_AMENDMENT.md).
 
 ```bash
 sudo docker create --name auren-qa-rel03 --restart no --read-only --cap-drop ALL \
   --security-opt no-new-privileges --network auren-qa-rel03-internal --ipc private \
   --cpus 1 --memory 2147483648 --pids-limit 128 \
   --tmpfs /tmp:rw,noexec,nosuid,size=67108864,mode=1777 \
-  --publish 127.0.0.1:8088:8080 \
   --mount type=volume,source=auren-qa-rel03-data,target=/var/lib/qa \
   --mount type=volume,source=auren-qa-rel03-config,target=/etc/secrets,readonly \
   --log-driver local --log-opt max-size=10m --log-opt max-file=3 \
@@ -84,7 +87,7 @@ sudo systemctl start auren-qa-rel03.service
 
 Sans marqueur : liveness200/data_readyfalse, toutes routes métier503. Valider image/argv/source/UID/config/ancre, puis effectuer la sauvegarde/restauration initiale du §5 **avant** toute activation. Seulement après cette preuve, écrire le seul marqueur privé `qa-activation/1.0.0` avec source_sha et config_sha256 réels dans `/var/lib/qa/activation.json`. Redémarrer **QA seul**, puis version/health/API/SCI concordants. `systemctl enable` des deux unités propres seulement après tests de reprise du service et persistance. Aucun reboot du VPS inclus.
 
-Installer le collecteur root-owned et le compte à mot de passe verrouillé `qa-audit`, shell d'exécution `/bin/sh` (OpenSSH l'utilise pour la forced-command), sans accès interactif/PTY/forwarding. Sa seule clé dédiée porte `restrict,command="sudo -n /usr/local/libexec/auren-qa-observe-v1"`. Aucun droit Docker, aucune modification globale de sshd. Le sudoers exact est `qa-audit ALL=(root) NOPASSWD: /usr/local/libexec/auren-qa-observe-v1 ""` : aucun argument admis. Le wrapper root-owned emploie l'interpréteur qualifié et le seul collecteur immuable ; jamais sudo python arbitraire. Valider sudoers avec visudo avant installation, clé publique exacte et parents non modifiables par l'auditeur. Les trois reçus root `/etc/auren-qa/{observer-policy,activation-proof,routing-loaded}.json` sont enregistrés depuis l'état acquis réel, pas depuis l'application. `network=auren-qa-rel03-internal`, restart_policy=no ; limites exactes du conteneur ci-dessus.
+Installer le collecteur root-owned et le compte à mot de passe verrouillé `qa-audit`, shell d'exécution `/bin/sh` (OpenSSH l'utilise pour la forced-command), sans accès interactif/PTY/forwarding. Sa seule clé dédiée porte `restrict,command="sudo -n /usr/local/libexec/auren-qa-observe-v1"`. Aucun droit Docker, aucune modification globale de sshd. Le sudoers exact est `qa-audit ALL=(root) NOPASSWD: /usr/local/libexec/auren-qa-observe-v1 ""` : aucun argument admis. Lors de la construction Python d’argv, employer `shlex.join(["python", "-c", code])` pour la valeur de `--health-cmd` : les guillemets Python internes ne doivent pas être retirés. Vérifier le vrai healthcheck Docker, pas seulement une liveness exécutée à la main. Le wrapper root-owned emploie l'interpréteur qualifié et le seul collecteur immuable ; jamais sudo python arbitraire. Valider sudoers avec visudo avant installation, clé publique exacte et parents non modifiables par l'auditeur. Les trois reçus root `/etc/auren-qa/{observer-policy,activation-proof,routing-loaded}.json` sont enregistrés depuis l'état acquis réel, pas depuis l'application. `network=auren-qa-rel03-internal`, restart_policy=no ; limites exactes du conteneur ci-dessus.
 
 ## 4. DNS/TLS et routage chargé
 
@@ -97,7 +100,7 @@ sudo certbot certonly --webroot --webroot-path /var/lib/auren-qa-acme \
   --cert-name qa.spignos.com -d qa.spignos.com --non-interactive
 ```
 
-Si aucun compte utilisable, conflit de certificat, challenge ou signature incorrect : arrêt, pas d'acceptation automatique de conditions ni remplacement des certificats personnels. Générer ensuite `qa_vhost(policy)` complet (ACME + TLS IPpublique, aucun logging de requête QA), nginx-t, reload et huit domaines préexistants vérifiés. Qualifier réellement la nouvelle génération master/workers/config dans routing-loaded.json. Certbot renew QA en dry-run, puis requalifier tout reload ; le remplacement de workers impose aussi une nouvelle attestation, pas un auto-stamp depuis fichiers.
+Si aucun compte utilisable, conflit de certificat, challenge ou signature incorrect : arrêt, pas d'acceptation automatique de conditions ni remplacement des certificats personnels. Générer ensuite `qa_vhost(policy)` complet (ACME + TLS IPpublique, aucun logging de requête QA), nginx-t, reload et huit domaines préexistants vérifiés. Qualifier réellement la nouvelle génération master/workers/config **et container_id** dans routing-loaded.json ; même une réattribution de la même IP à un autre conteneur exige un nouveau reçu root. Certbot renew QA en dry-run, puis requalifier tout reload ; le remplacement de workers impose aussi une nouvelle attestation, pas un auto-stamp depuis fichiers.
 
 ## 5. Backup, copie jetable et rollback
 
@@ -121,7 +124,7 @@ Conserver noms, tailles et SHA256 plaintext/ciphertext dans le reçu privé d'ex
 
 Sauvegarde constatée avant activation et avant chaque release ; **aucun timer quotidien automatiquement sain n'est déclaré**. Le fonctionnement périodique peut être cadré séparément ; les tests de ce paquet prouvent la récupération effectuée, pas une supervision de production.
 
-Rollback de service : fermer QA, `systemctl stop auren-qa-rel03`, vérifier absence8088 et services personnels actifs ; conserver état/image/volumes/preuves. Restaurer uniquement le vhost et le RR QA propres si créés, nginx-t/reload puis sites/Tailscale. Ne retirer le réseau/filtre propre qu'après arrêt de tous ses raccordements et vérification des seules références créées. Après écritures : sauvegarder l'état courant ; aucune ancienne copie promue comme writer ni downgrade de schéma.
+Rollback de service : fermer QA, `systemctl stop auren-qa-rel03`, vérifier conteneur arrêté et upstream QA non disponible et services personnels actifs ; conserver état/image/volumes/preuves. Restaurer uniquement le vhost et le RR QA propres si créés, nginx-t/reload puis sites/Tailscale. Ne retirer le réseau/filtre propre qu'après arrêt de tous ses raccordements et vérification des seules références créées. Après écritures : sauvegarder l'état courant ; aucune ancienne copie promue comme writer ni downgrade de schéma.
 
 ## 6. Acceptation et arrêt
 

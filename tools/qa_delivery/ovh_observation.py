@@ -31,6 +31,7 @@ POLICY_KEYS = {
     "uid",
     "mounts",
     "ports",
+    "container_ip",
     "network",
     "restart_policy",
     "memory_bytes",
@@ -91,8 +92,15 @@ def validate_policy(policy):
             },
         ]
     )
+    address = ipaddress.ip_address(policy["container_ip"])
     require(
-        policy["ports"] == [{"host_ip": "127.0.0.1", "host_port": 8088, "container_port": 8080}]
+        isinstance(address, ipaddress.IPv4Address)
+        and str(address) == policy["container_ip"]
+        and any(
+            address in ipaddress.ip_network(n)
+            for n in ("10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16")
+        )
+        and policy["ports"] == []
     )
     require(_hex(policy["configuration_sha256"]) and _hex(policy["routing_sha256"]))
     for key, upper in [
@@ -110,7 +118,7 @@ def validate_policy(policy):
 def validate_request(request):
     require(isinstance(request, dict) and set(request) == REQUEST_KEYS)
     require(
-        request["schema_version"] == "qa-ovh-observation-request/1.0.0"
+        request["schema_version"] == "qa-ovh-observation-request/2.0.0"
         and request["resource"] == RESOURCE
         and _hex(request["nonce"])
         and _hex(request["candidate_sha256"])
@@ -124,7 +132,7 @@ def validate_observation(record, request, policy, image_id, now=None):
         validate_request(request)
         validate_policy(policy)
         require(isinstance(record, dict) and set(record) == OBSERVATION_KEYS)
-        require(record["schema_version"] == "qa-ovh-observation/1.0.0")
+        require(record["schema_version"] == "qa-ovh-observation/2.0.0")
         require(
             record["nonce"] == request["nonce"]
             and record["candidate_sha256"] == request["candidate_sha256"]
@@ -153,7 +161,7 @@ def validate_observation(record, request, policy, image_id, now=None):
                 "origin": ORIGIN,
                 "peer_ip": policy["peer_ip"],
                 "container_id": record["container_id"],
-                "upstream": "http://127.0.0.1:8088",
+                "upstream": f"http://{policy['container_ip']}:8080",
                 "loaded_configuration_sha256": policy["routing_sha256"],
             }
         )
@@ -299,7 +307,7 @@ def observe_ovh(candidate, proof, client, ssh_runner=bounded_ssh, image_acquirer
 
         def observe():
             request = {
-                "schema_version": "qa-ovh-observation-request/1.0.0",
+                "schema_version": "qa-ovh-observation-request/2.0.0",
                 "nonce": os.urandom(32).hex(),
                 "candidate_sha256": digest(candidate),
                 "environment_id": target["environment_id"],
