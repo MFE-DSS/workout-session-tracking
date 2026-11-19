@@ -73,6 +73,8 @@ jobs:
           node-version: '22.20.0'
       - name: Verify release source hygiene without credentials
         if: inputs.operation == 'PREPARE'
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           check_source() {
             echo "QA source hygiene: $1"
@@ -90,6 +92,12 @@ jobs:
           check_source after-mobile-dependencies
           npm install --global eas-cli@27.2.0
           check_source after-eas-cli
+          gh --version
+          python - <<'PY'
+          from tools.qa_delivery.proofs import gh_command
+          gh_command(['api', '--method', 'GET', 'repos/MFE-DSS/workout-session-tracking'])
+          PY
+          check_source after-github-proof-reader
       - name: Prepare frozen non-distributable candidate without private credentials
         if: inputs.operation != 'PREPARE_IMAGE'
         env:

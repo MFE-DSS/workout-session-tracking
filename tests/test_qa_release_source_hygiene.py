@@ -10,7 +10,7 @@ import pytest
 import yaml
 
 
-@pytest.mark.parametrize("damage", ["clean", "tracked", "untracked"])
+@pytest.mark.parametrize("damage", ["clean", "tracked", "untracked", "gh-state"])
 def test_prepare_dependency_setup_reports_and_refuses_source_changes(tmp_path, damage):
     workflow = yaml.safe_load(
         (Path(__file__).resolve().parents[1] / ".github/workflows/qa-release.yml").read_text()
@@ -35,7 +35,7 @@ def test_prepare_dependency_setup_reports_and_refuses_source_changes(tmp_path, d
     # setup might. The guard must catch the resulting observable repository state.
     binaries = tmp_path / "bin"
     binaries.mkdir()
-    for name in ["pip", "npm"]:
+    for name in ["pip", "npm", "python", "gh"]:
         script = binaries / name
         script.write_text(
             "#!/bin/sh\n"
@@ -46,7 +46,13 @@ def test_prepare_dependency_setup_reports_and_refuses_source_changes(tmp_path, d
                 " untracked) printf private-content > unexpected-generated.txt ;;\n"
                 " esac\nfi\n"
                 if name == "npm"
-                else ""
+                else (
+                    'if [ "$DAMAGE" = gh-state ]; then\n'
+                    ' mkdir -p .local/state/gh\n'
+                    ' printf private-content > .local/state/gh/device-id\nfi\n'
+                    if name == "python"
+                    else ""
+                )
             )
         )
         script.chmod(0o700)
@@ -62,7 +68,11 @@ def test_prepare_dependency_setup_reports_and_refuses_source_changes(tmp_path, d
         assert result.returncode == 0, result.stdout + result.stderr
     else:
         assert result.returncode != 0
-        expected = "requirements-lock.txt" if damage == "tracked" else "unexpected-generated.txt"
+        expected = {
+            "tracked": "requirements-lock.txt",
+            "untracked": "unexpected-generated.txt",
+            "gh-state": ".local/state/gh/device-id",
+        }[damage]
         assert expected in result.stdout
         assert "private-content" not in result.stdout + result.stderr
         # It reports and stops; it never cleans or hides the evidence.
