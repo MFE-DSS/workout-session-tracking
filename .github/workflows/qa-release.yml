@@ -67,6 +67,29 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: python -c 'from tools.qa_delivery.pipeline import protected_environment; protected_environment()'
+      - uses: actions/setup-node@v6
+        if: inputs.operation == 'PREPARE'
+        with:
+          node-version: '22.20.0'
+      - name: Verify release source hygiene without credentials
+        if: inputs.operation == 'PREPARE'
+        run: |
+          check_source() {
+            echo "QA source hygiene: $1"
+            changes="$(git status --porcelain --untracked-files=all)"
+            if [[ -n "$changes" ]]; then
+              # Path/status metadata only; never cat generated files or reset.
+              printf '%s\n' "$changes" | head -80
+              return 1
+            fi
+          }
+          check_source after-toolchain
+          pip install -r requirements-lock.txt httpx==0.28.1
+          check_source after-python-dependencies
+          (cd clients/mobile && npm ci)
+          check_source after-mobile-dependencies
+          npm install --global eas-cli@27.2.0
+          check_source after-eas-cli
       - name: Prepare frozen non-distributable candidate without private credentials
         if: inputs.operation != 'PREPARE_IMAGE'
         env:
@@ -252,7 +275,10 @@ jobs:
           GH_TOKEN: ${{ secrets.QA_RELEASE_AUDIT_TOKEN || github.token }}
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
-        run: python -m tools.qa_delivery.pipeline publish --candidate "$RUNNER_TEMP/qa-package/qa-prepared.json" --proof "$RUNNER_TEMP/qa-proof-private/proof" --output "$RUNNER_TEMP/qa-submitted.json"
+        run: |
+          # Report only source path/status metadata before the existing guard.
+          git status --porcelain --untracked-files=all
+          python -m tools.qa_delivery.pipeline publish --candidate "$RUNNER_TEMP/qa-package/qa-prepared.json" --proof "$RUNNER_TEMP/qa-proof-private/proof" --output "$RUNNER_TEMP/qa-submitted.json"
       - name: Remove runner private proof and AES key
         if: always()
         run: rm -rf -- "$RUNNER_TEMP/qa-proof-private"
