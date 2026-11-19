@@ -225,20 +225,32 @@ def gh_command(args):
     executable = shutil.which("gh")
     require(executable, "github_cli_missing")
     try:
-        result = subprocess.run(  # noqa: S603 — fixed gh operations, no shell/URLs
-            [executable, *args],
-            capture_output=True,
-            timeout=120,
-            check=False,
-            env={
-                "PATH": os.environ.get("PATH", ""),
-                "GH_HOST": "github.com",
-                "GH_TOKEN": os.environ.get("GH_TOKEN", ""),
-                "GH_PROMPT_DISABLED": "1",
-            },
-        )
-        require(result.returncode == 0, "github_operation_failed_no_retry")
-        return result.stdout
+        # With HOME absent, recent gh versions write relative CLI state into
+        # cwd. Keep the explicit token-only envelope, never inherit user auth,
+        # and isolate all CLI state outside the attested checkout.
+        with tempfile.TemporaryDirectory(prefix="auren-qa-gh-") as temporary:
+            home = Path(temporary).resolve()
+            require(
+                not home.is_relative_to(Path(__file__).resolve().parents[2])
+                and not home.is_relative_to(Path.cwd().resolve()),
+                "cli_state_in_source",
+            )
+            result = subprocess.run(  # noqa: S603 — fixed gh operations, no shell/URLs
+                [executable, *args],
+                capture_output=True,
+                timeout=120,
+                check=False,
+                env={
+                    "PATH": os.environ.get("PATH", ""),
+                    "HOME": str(home),
+                    "GH_HOST": "github.com",
+                    "GH_TOKEN": os.environ.get("GH_TOKEN", ""),
+                    "GH_PROMPT_DISABLED": "1",
+                    "GH_TELEMETRY": "disabled",
+                },
+            )
+            require(result.returncode == 0, "github_operation_failed_no_retry")
+            return result.stdout
     except (OSError, subprocess.SubprocessError):
         raise ValueError("qa_proof_github_operation_failed_no_retry") from None
 

@@ -4,9 +4,69 @@ import io
 import json
 import os
 import stat
+import sys
 import zipfile
+from pathlib import Path
 
 import pytest
+
+
+@pytest.mark.parametrize("exit_code", [0, 1])
+def test_github_cli_state_is_private_outside_source_and_removed(tmp_path, monkeypatch, exit_code):
+    from tools.qa_delivery.proofs import gh_command
+
+    source = tmp_path / "source"
+    source.mkdir()
+    binaries = tmp_path / "bin"
+    binaries.mkdir()
+    witness = tmp_path / "cli-state.json"
+    cli = binaries / "gh"
+    cli.write_text(
+        f"#!{sys.executable}\n"
+        "import os, json, pathlib, stat, sys\n"
+        "home=pathlib.Path(os.environ.get('HOME') or '.')\n"
+        "state=home/'.local/state/gh/device-id'\n"
+        "state.parent.mkdir(parents=True,exist_ok=True)\n"
+        "state.write_text('synthetic-device-id')\n"
+        f"pathlib.Path({str(witness)!r}).write_text(json.dumps({{\n"
+        " 'home':str(home), 'mode':stat.S_IMODE(home.stat().st_mode),\n"
+        " 'ambient': 'UNRELATED_SECRET' in os.environ,\n"
+        " 'telemetry':os.environ.get('GH_TELEMETRY'),\n"
+        "}))\n"
+        "sys.stdout.write('synthetic-api-response')\n"
+        "sys.stderr.write('synthetic-private-stderr')\n"
+        f"sys.exit({exit_code})\n"
+    )
+    cli.chmod(0o700)
+    monkeypatch.chdir(source)
+    monkeypatch.setenv("PATH", str(binaries))
+    monkeypatch.setenv("GH_TOKEN", "synthetic-dedicated-token")
+    monkeypatch.setenv("UNRELATED_SECRET", "must-not-reach-cli")
+    if exit_code:
+        with pytest.raises(ValueError, match="qa_proof_github_operation_failed_no_retry"):
+            gh_command(["api", "repos/example/qa"])
+    else:
+        assert gh_command(["api", "repos/example/qa"]) == b"synthetic-api-response"
+    state = json.loads(witness.read_text())
+    home = Path(state["home"])
+    assert home.is_absolute() and not home.is_relative_to(source)
+    assert state["mode"] == 0o700
+    assert state["ambient"] is False
+    assert state["telemetry"] == "disabled"
+    assert not home.exists()
+    assert list(source.iterdir()) == []
+
+
+def test_github_cli_refuses_temporary_state_inside_source(tmp_path, monkeypatch):
+    from tools.qa_delivery import proofs
+
+    source = tmp_path / "source"
+    source.mkdir()
+    monkeypatch.chdir(source)
+    monkeypatch.setattr(proofs.tempfile, "tempdir", str(source))
+    with pytest.raises(ValueError, match="qa_proof_cli_state_in_source"):
+        proofs.gh_command(["api", "repos/example/qa"])
+    assert list(source.iterdir()) == []
 
 
 @pytest.fixture
