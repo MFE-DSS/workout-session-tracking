@@ -4,7 +4,7 @@
   "state": "PREPARED",
   "action": "BUILD_APK",
   "source": {
-    "native_sha": null,
+    "native_sha": "3bd4099941f2affe77fb9c3cfa97b1450b49ee74",
     "js_sha": null
   },
   "native": {

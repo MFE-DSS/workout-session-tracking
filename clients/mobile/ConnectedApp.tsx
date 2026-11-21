@@ -159,7 +159,7 @@ export default function ConnectedApp() {
   const legacyStartUnknownRef=useRef(false),closePendingRef=useRef(false);
   const [,paintMission]=useState(0);
   const libraryBlocked=useRef(false),libraryAttachment=useRef<object|null>(null);
-  const [libraryPorts,setLibraryPorts]=useState<LibraryOpeningPorts|null>(null);
+  const [libraryPorts,setLibraryPorts]=useState<(LibraryOpeningPorts&{present:()=>void})|null>(null);
   const [libraryAtToday,setLibraryAtToday]=useState(false);
   const [missionMenu,setMissionMenu]=useState(false);
   const [missionRefusal,setMissionRefusal]=useState<string|null>(null);
@@ -476,7 +476,8 @@ export default function ConnectedApp() {
       await changed();if(!active())return false;
       setLibraryPorts({client,pending,uuid:()=>Crypto.randomUUID(),now:()=>Date.now(),readOwned,adoptLegacy,resumeOwned,
         otherActionPending:()=>!active()||sessionActionInFlight.current||legacyStartUnknownRef.current||closePendingRef.current||Boolean(localOpeningState({legacyStartUnknown:false,closePending:false,v3:planV3Ref.current?.state??null}))||['SET','REST'].includes(stateRef.current.phase),
-        onOpened:()=>{if(!active())return;setLibraryAtToday(true);if(adopted){apply({type:'RESTORE',state:adopted});setPaused(false);setPlanV3Open(false);}else if(typedResume)setPlanV3Open(true);missionResource.invalidate();void loadMission();}});
+        present:()=>{if(active()&&typedResume)setPlanV3Open(true);},
+        onOpened:()=>{if(!active())return;setLibraryAtToday(true);if(adopted){apply({type:'RESTORE',state:adopted});setPaused(false);setPlanV3Open(false);}missionResource.invalidate();void loadMission();}});
     }else libraryBlocked.current=false;
     engineRef.current = new SyncEngine(j, (row) => {
       if (!active()) return Promise.reject(new ApiFailure('http', 401, 'auth'));
@@ -938,9 +939,9 @@ export default function ConnectedApp() {
   useEffect(() => {
     const sub = BackHandler.addEventListener('hardwareBackPress', () => {
       if(missionMenu){setMissionMenu(false);return true;}
-      if (accountView) {
-        if(accountView==='body'){bodyExit.current?.();return true;}
-        if(accountView==='nutrition'){nutritionExit.current?.();return true;}
+      if(accountView==='body'&&bodyExit.current){bodyExit.current();return true;}
+      if(accountView==='nutrition'&&nutritionExit.current){nutritionExit.current();return true;}
+      if (accountView&&accountView!=='body'&&accountView!=='nutrition') {
         if (accountView === 'preferences' || accountView === 'first-use-preferences') { preferencesExit.current?.(); return true; }
         if (!accountFlight.current) { setAccountView(null); setAccountOutcome(null); }
         return true;
@@ -999,7 +1000,7 @@ export default function ConnectedApp() {
     const controller=planV3Ref.current;
     if(controller?.active)await controller.load();if(!current())return;
     await loadMission();if(!current())return;
-    if(controller?.active&&(controller.state?.source.pending||['unknown','submitted'].includes(controller.state?.intent?.state??'')))setPlanV3Open(true);
+    if(controller?.active&&!bodyExit.current&&!nutritionExit.current&&(controller.state?.source.pending||['unknown','submitted'].includes(controller.state?.intent?.state??'')))setPlanV3Open(true);
   },[auth,loadMission]);
   const openMissionAction=useCallback(async(action:MissionAction)=>{
     const revision=auth.revision,target=journalRef.current;
@@ -1016,7 +1017,7 @@ export default function ConnectedApp() {
     if(controller.state?.execution)await controller.pause();
     await controller.load();
     if(!controller.active||revision!==auth.revision||!missionActionCurrent(action,missionResource.state,currentOpening()))return;
-    if(command.kind==='OPEN_FIRST_USE'||('session_id' in command&&controller.state?.execution?.session_id===command.session_id))setPlanV3Open(true);
+    if(!bodyExit.current&&!nutritionExit.current&&(command.kind==='OPEN_FIRST_USE'||('session_id' in command&&controller.state?.execution?.session_id===command.session_id)))setPlanV3Open(true);
   },[auth,mission,missionResource,resumeFromServer]);
 
   const resume=useCallback(async()=>{
@@ -1032,7 +1033,7 @@ export default function ConnectedApp() {
   const readCapturedV3=useCallback(async()=>{
     const controller=planV3Ref.current,revision=auth.revision;
     if(!controller?.active||!controller.state?.execution)return;
-    await controller.pause();if(controller.active&&revision===auth.revision)setPlanV3Open(true);
+    await controller.pause();if(controller.active&&revision===auth.revision&&!bodyExit.current&&!nutritionExit.current)setPlanV3Open(true);
   },[auth]);
 
   const signOut = useCallback(async () => {
@@ -1102,15 +1103,13 @@ export default function ConnectedApp() {
     const resume = state.phase === 'SET' || state.phase === 'REST' || mission?.state === 'RESUME';
     if (!accountFlight.current) setAccountView(screen === 'APP' && !resume && !libraryBlocked.current ? 'first-use' : null);
   };
-  const bodyInShell=screen==='APP'&&accountView==='body'&&state.phase!=='SET'&&state.phase!=='REST';
-  const nutritionInShell=screen==='APP'&&accountView==='nutrition'&&state.phase!=='SET'&&state.phase!=='REST';
+  const bodyInShell=screen==='APP'&&accountView==='body';
+  const nutritionInShell=screen==='APP'&&accountView==='nutrition';
   const nutritionSurface=nutritionRuntime?<BodyTabConsumer><NutritionSurface key={`nutrition-${auth.revision}`} auth={auth} client={nutritionRuntime.client} pending={journal?.nutritionPending} current={nutritionRuntime.current} newId={()=>Crypto.randomUUID()} onClose={leaveAccountView} registerExit={registerNutritionExit}/></BodyTabConsumer>:null;
   const bodySurface=bodyRuntime?<BodyTabConsumer><BodyMeasurementsSurface inTab key={`body-${auth.revision}`} auth={auth} client={bodyRuntime.client} pending={journal?.bodyPending} current={bodyRuntime.current} newId={()=>Crypto.randomUUID()} onClose={leaveAccountView} registerExit={registerBodyExit}/></BodyTabConsumer>:null;
-  const accountOverlay = screen !== 'APP' ? null : accountView==='nutrition'&&nutritionRuntime
-    ? nutritionInShell?null:<NutritionSurface key={`nutrition-${auth.revision}`} auth={auth} client={nutritionRuntime.client} pending={journal?.nutritionPending} current={nutritionRuntime.current} newId={()=>Crypto.randomUUID()} onClose={leaveAccountView} registerExit={registerNutritionExit}/>
-    : accountView==='body'&&bodyRuntime
-    ? bodyInShell?null:<BodyMeasurementsSurface key={`body-${auth.revision}`} auth={auth} client={bodyRuntime.client} pending={journal?.bodyPending} current={bodyRuntime.current} newId={()=>Crypto.randomUUID()} onClose={leaveAccountView} registerExit={registerBodyExit}/>
-    : accountView === 'first-use'
+  // BODY/NUT remain tab-owned selections; adopting a workout never promotes
+  // an unfocused tab into an overlay or discards a later account-form draft.
+  const accountOverlay = screen !== 'APP' ? null : accountView === 'first-use'
     ? planV3?.active ? <PlanV3Host controller={planV3} onExit={()=>{setPlanV3Open(false);leaveAccountView();}} onPreferences={()=>setAccountView('first-use-preferences')} onSync={async()=>{await engineRef.current?.kick();}}/> : <FirstUseScreen key={auth.revision} controller={firstUse} onPreferences={() => setAccountView('first-use-preferences')} onToday={leaveAccountView} onBack={leaveAccountView} />
     : accountView === 'preferences' || accountView === 'first-use-preferences'
     ? <TrainingPreferencesScreen key={auth.revision} client={preferencesClient} onClose={accountView === 'first-use-preferences' ? () => setAccountView('first-use') : leaveAccountView}
@@ -1131,7 +1130,7 @@ export default function ConnectedApp() {
     body = <LoginScreen error={loginError} busy={busy} onSubmit={(u, p) => void login(u, p)}
       onCreateAccount={() => { setAccountOutcome(null); setAccountView('signup'); }}
       onRecover={API_URL ? () => openWeb('/forgot-password') : undefined} onPrivacy={privacy} />;
-  } else if (screen === 'APP' && planV3?.active && planV3Open && !accountView && state.phase!=='SET' && state.phase!=='REST') {
+  } else if (screen === 'APP' && planV3?.active && planV3Open && !accountOverlay && state.phase!=='SET' && state.phase!=='REST') {
     body = <PlanV3Host controller={planV3} onExit={()=>setPlanV3Open(false)} onPreferences={()=>setAccountView('preferences')} onSync={async()=>{await engineRef.current?.kick();}}/>;
   } else if (screen === 'APP') {
     const inWorkout = !libraryAtToday && (state.phase === 'SET' || state.phase === 'REST');
@@ -1201,7 +1200,7 @@ export default function ConnectedApp() {
         onAction={openMissionAction} onVerify={verifyMission} onSelectPath={path=>{setMissionRefusal(null);missionResource.selectPath(path);setMission(null);void loadMission();}}
         onOpenJournal={openJournalSheet} historical={historical}/></View>;
       body = (
-        <ShellProvider value={{ today, openJournal: openJournalSheet, siteUrl: API_URL, account: bodyInShell&&bodyOrigin==='profile'?bodySurface:accountSettings, programmes:libraryPorts?(onOpened,active)=><LibraryHost active={active} ports={libraryPorts} builderPorts={builderPorts??undefined} onOpened={onOpened} onResumeExisting={()=>{void resume();}} existingSession={missionResource.state.state==='confirmed'&&missionResource.state.value.state==='RESUME'?{session_id:missionResource.state.value.primary_action.session_id,session_profile:missionResource.state.value.primary_action.kind==='RESUME_V3'?'PLAN_V3':'LEGACY'}:null}/>:undefined, progress:nutritionInShell?nutritionSurface:bodyInShell&&bodyOrigin==='progress'?bodySurface:<TrainingHistoryHost auth={auth} call={transport} typed={historicalSessions} bodyClient={bodyRuntime?.client} onBody={bodyRuntime?()=>{setBodyOrigin('progress');setAccountView('body');}:undefined} onNutrition={nutritionRuntime?()=>setAccountView('nutrition'):undefined}/> }}>
+        <ShellProvider value={{ today, openJournal: openJournalSheet, siteUrl: API_URL, account: bodyInShell&&bodyOrigin==='profile'?bodySurface:accountSettings, programmes:libraryPorts?(onOpened,active)=><LibraryHost active={active} ports={libraryPorts} builderPorts={builderPorts??undefined} onOpened={()=>{libraryPorts.present();onOpened();}} onResumeExisting={()=>{void resume();}} existingSession={missionResource.state.state==='confirmed'&&missionResource.state.value.state==='RESUME'?{session_id:missionResource.state.value.primary_action.session_id,session_profile:missionResource.state.value.primary_action.kind==='RESUME_V3'?'PLAN_V3':'LEGACY'}:null}/>:undefined, progress:nutritionInShell?nutritionSurface:bodyInShell&&bodyOrigin==='progress'?bodySurface:<TrainingHistoryHost auth={auth} call={transport} typed={historicalSessions} bodyClient={bodyRuntime?.client} onBody={bodyRuntime?()=>{setBodyOrigin('progress');setAccountView('body');}:undefined} onNutrition={nutritionRuntime?()=>setAccountView('nutrition'):undefined}/> }}>
           <ExpoRoot context={shellRoutes} linking={SHELL_LINKING} />
         </ShellProvider>
       );
@@ -1229,7 +1228,7 @@ export default function ConnectedApp() {
             <SheetRow key={o.choice} title={o.label} onPress={() => onExitChoice(o.choice)} />
           ))}
         </Sheet>
-        <Sheet visible={missionMenu&&screen==='APP'&&!accountView&&state.phase==='MISSION'} title="Journal et parcours" onClose={()=>setMissionMenu(false)}>
+        <Sheet visible={missionMenu&&screen==='APP'&&!accountOverlay&&state.phase==='MISSION'} title="Journal et parcours" onClose={()=>setMissionMenu(false)}>
           <SheetRow title="Journal local" onPress={()=>{setMissionMenu(false);setLab(true);}}/>
           <SheetRow title="Premier parcours" onPress={()=>{setMissionMenu(false);missionResource.selectPath('FIRST_USE');setMission(null);void loadMission();}}/>
         </Sheet>

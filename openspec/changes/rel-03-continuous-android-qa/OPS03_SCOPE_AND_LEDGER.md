@@ -72,3 +72,16 @@ backend/release/visual tests; protocol, strictOpenSpec28/28 and budget259≤548 
 Review Important Unicode whitespace corrected with two negative RED cases before
 SP/HTAB-only normalization. No UI pixel gate is opened by this transport fix.
 PR/CI/canonical and installed corrected-client verification remain pending here.
+
+## 2026-11-21 — actual native handoff and update-parent preparation
+
+PR432 merged60f9fa817262f0fdb750051946910dce96489cae after exact HEAD3436c75
+mandatory CI44892289949 success. Source3bd APK remains unchanged. Its real native
+Library start exposed a retained Nutrition overlay. The [bounded correction and
+review](../../../docs/release/rel-03/RC01_SESSION_HANDOFF_AND_UPDATE_20261121.md)
+keeps BODY/NUT tab-owned and separates durable adoption from focused presentation,
+without discarding later account forms. The candidate pins the actual native3bd
+only for compatible UPDATE preparation; default BUILD_APK still derives its own
+source. No publication, installed corrected JS, rollback or physical acceptance
+is inferred. Local final1473 mobile/TS and257 broad tests pass; current exact HEAD
+CI remains to acquire before merge. No new geometry or baseline.
