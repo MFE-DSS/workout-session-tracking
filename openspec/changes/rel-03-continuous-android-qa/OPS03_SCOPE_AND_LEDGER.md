@@ -92,3 +92,17 @@ the exact-session close guard before presenting COMPLETE. First-close durability
 ordering is unchanged. Restart/ACK/refusal and real file-SQLite witnesses pass;
 review rejected an asynchronous alternative before delivery. The source3bd APK
 still contains the defect until an approved compatible JS update is installed.
+
+## 2026-11-21 — real EAS grouped channel after first OTA
+
+UPDATE44901053814 is human-approved, published and active on the installed RC01.
+Its subsequent local rollback preflight stops before dispatch on the SDK27.2
+nested updateGroups shape. [Bounded repair, options and plan](../../../docs/release/rel-03/RC01_EAS_CHANNEL_SHAPE_20261121.md)
+retains the independently acquired exact-runtime rollout authority; no invented
+null flags, publication, mobile geometry, native/runtime or data change.
+
+Current correction:168publisher tests PASS; real authenticated EAS observation
+matches exact branch/update/group/runtime; missing witness refused. Both review
+Important findings corrected and independently reread; no Critical/Important.
+Bounded local sweep459/459files allgreen, peak1715MiB. No geometry/native/schema
+change and no new publication. CI/merge receipts follow on the actual finalHEAD.
