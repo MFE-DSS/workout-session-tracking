@@ -592,8 +592,8 @@ def check_quota(usage, action):
         raise ValueError("qa_eas_quota_unknown") from None
 
 
-def check_channel(raw, c):
-    """Only one unconditional qa→qa mapping; reject unknown/partial rollouts."""
+def check_channel(raw, c, *, runtime_rollout=None):
+    """Validate qa mapping; grouped SDK rows require an exact-runtime witness."""
     try:
         channel = raw["currentPage"]
         require(
@@ -610,13 +610,53 @@ def check_channel(raw, c):
             },
             "qa_eas_rollout_unknown",
         )
-        for update in branches[0]["updateGroups"]:
+        groups = branches[0]["updateGroups"]
+        require(isinstance(groups, list), "qa_eas_groups_unknown")
+        grouped = bool(groups) and isinstance(groups[0], list)
+        if grouped:
+            require(
+                isinstance(runtime_rollout, dict)
+                and runtime_rollout.get("project_id") == c["eas"]["project_id"]
+                and runtime_rollout.get("branch") == "qa"
+                and runtime_rollout.get("platform") == "android"
+                and runtime_rollout.get("runtime_version") == c["native"]["runtime_version"]
+                and runtime_rollout.get("branch_id") == branches[0]["id"],
+                "qa_eas_exact_runtime_witness_required",
+            )
+            # SDK27.2 groups platform updates in one array per publication. This
+            # QA workflow publishes Android only. Never manufacture rollout flags
+            # absent from channel:view; the authenticated runtime query owns them.
+            require(
+                all(isinstance(group, list) and len(group) == 1 for group in groups),
+                "qa_eas_group_shape_unknown",
+            )
+            groups = [group[0] for group in groups]
+        for update in groups:
             require(
                 update["platform"] == "android"
                 and isinstance(update["runtime"]["version"], str)
                 and bool(update["runtime"]["version"]),
                 "qa_eas_runtime_unknown",
             )
+            if grouped:
+                require(
+                    update["branch"]["id"] == branches[0]["id"]
+                    and update["branch"]["name"] == "qa"
+                    and update["isRollBackToEmbedded"] is False,
+                    "qa_eas_group_identity_unknown",
+                )
+                if update["runtime"]["version"] == c["native"]["runtime_version"]:
+                    require(
+                        runtime_rollout["update"] == {"id": update["id"], "group": update["group"]},
+                        "qa_eas_runtime_update_identity_mismatch",
+                    )
+                if "rolloutPercentage" in update or "rolloutControlUpdate" in update:
+                    require(
+                        update["rolloutPercentage"] in (None, 100)
+                        and update["rolloutControlUpdate"] is None,
+                        "qa_eas_group_rollout_unknown_or_active",
+                    )
+                continue
             # channel:view exposes only the latest global group. Another native
             # runtime cannot establish this installed runtime's compatibility or
             # rollout; the exact-runtime query below is the mandatory authority.
@@ -696,7 +736,7 @@ def check_remote_environment(c, token, client):
 def check_current_runtime_rollout(c, token, client):
     """Channel view only shows the latest group globally; inspect this runtime."""
     try:
-        query = 'query QARuntimeRollout($id:String!,$runtime:String!) { app { byId(appId:$id) { updateBranchByName(name:"qa") { name updates(offset:0,limit:1,filter:{platform:ANDROID,runtimeVersions:[$runtime]}) { runtime { version } rolloutPercentage rolloutControlUpdate { id } } } } } }'
+        query = 'query QARuntimeRollout($id:String!,$runtime:String!) { app { byId(appId:$id) { updateBranchByName(name:"qa") { id name updates(offset:0,limit:1,filter:{platform:ANDROID,runtimeVersions:[$runtime]}) { id group runtime { version } rolloutPercentage rolloutControlUpdate { id } } } } } }'
         response = client.post(
             "https://api.expo.dev/graphql",
             json={
@@ -714,9 +754,16 @@ def check_current_runtime_rollout(c, token, client):
             response.status_code == 200 and len(response.content) < 1024 * 1024,
             "qa_eas_rollout_unavailable",
         )
-        branch = response.json()["data"]["app"]["byId"]["updateBranchByName"]
+        payload = response.json()
+        require(
+            isinstance(payload, dict) and payload.get("errors") in (None, []),
+            "qa_eas_rollout_partial_response",
+        )
+        branch = payload["data"]["app"]["byId"]["updateBranchByName"]
         require(
             branch["name"] == "qa"
+            and isinstance(branch["id"], str)
+            and bool(branch["id"])
             and isinstance(branch["updates"], list)
             and len(branch["updates"]) <= 1,
             "qa_eas_rollout_unknown",
@@ -724,10 +771,22 @@ def check_current_runtime_rollout(c, token, client):
         for update in branch["updates"]:
             require(
                 update["runtime"]["version"] == c["native"]["runtime_version"]
+                and re.fullmatch(r"[a-f0-9-]{36}", update["id"]) is not None
+                and re.fullmatch(r"[a-f0-9-]{36}", update["group"]) is not None
                 and update["rolloutPercentage"] in (None, 100)
                 and update["rolloutControlUpdate"] is None,
                 "qa_eas_rollout_active_or_unknown",
             )
+        return {
+            "project_id": c["eas"]["project_id"],
+            "branch": "qa",
+            "platform": "android",
+            "runtime_version": c["native"]["runtime_version"],
+            "branch_id": branch["id"],
+            "update": {key: branch["updates"][0][key] for key in ("id", "group")}
+            if branch["updates"]
+            else None,
+        }
     except (httpx.HTTPError, KeyError, TypeError, ValueError):
         raise ValueError("qa_eas_rollout_current_runtime_unqualified") from None
 
@@ -837,6 +896,7 @@ def publish(package, checkout, proof_root, gate=None, eas_factory=EAS, client=No
         try:
             target = observe_target(c, proof, os.environ.get("RENDER_API_KEY", ""), client)
             check_remote_environment(c, os.environ["EXPO_TOKEN"], client)
+            runtime_rollout = check_current_runtime_rollout(c, os.environ["EXPO_TOKEN"], client)
         finally:
             if own_client:
                 client.close()
@@ -868,7 +928,11 @@ def publish(package, checkout, proof_root, gate=None, eas_factory=EAS, client=No
         observe_native(checkout, c, environment)
         eas = eas_factory(Path(checkout) / "clients/mobile", environment)
         check_quota(eas("account:usage", "grimais", "--json", "--non-interactive"), c["action"])
-        check_channel(eas("channel:view", "qa", "--json", "--non-interactive"), c)
+        check_channel(
+            eas("channel:view", "qa", "--json", "--non-interactive"),
+            c,
+            runtime_rollout=runtime_rollout,
+        )
         if c["action"] in {"UPDATE", "ROLLBACK"}:
             require(classify_update(previous, c) == "JS_ASSETS_ONLY", "qa_publish_new_apk_required")
             build_id = previous["eas"]["build_id"]
@@ -931,7 +995,12 @@ def publish(package, checkout, proof_root, gate=None, eas_factory=EAS, client=No
         )
         try:
             observe_target(c, proof, os.environ.get("RENDER_API_KEY", ""), final_client)
-            check_current_runtime_rollout(c, os.environ["EXPO_TOKEN"], final_client)
+            final_rollout = check_current_runtime_rollout(c, os.environ["EXPO_TOKEN"], final_client)
+            check_channel(
+                eas("channel:view", "qa", "--json", "--non-interactive"),
+                c,
+                runtime_rollout=final_rollout,
+            )
             check_remote_environment(c, os.environ["EXPO_TOKEN"], final_client)
         finally:
             if own_client:

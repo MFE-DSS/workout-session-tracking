@@ -96,9 +96,12 @@ def test_tracked_template_prepares_update_for_actual_native_without_distributing
     template["action"] = "UPDATE"
     prepared = prepare(template, checkout)
     assert prepared["source"]["native_sha"] == "3bd4099941f2affe77fb9c3cfa97b1450b49ee74"
-    assert prepared["source"]["js_sha"] == subprocess.check_output(
-        ["git", "-C", str(checkout), "rev-parse", "HEAD"], text=True
-    ).strip()
+    assert (
+        prepared["source"]["js_sha"]
+        == subprocess.check_output(
+            ["git", "-C", str(checkout), "rev-parse", "HEAD"], text=True
+        ).strip()
+    )
     assert prepared["native"]["version_code"] == 3
     assert prepared["native"]["updates_enabled"] is True
     assert prepared["eas"]["channel"] == "qa"
@@ -682,8 +685,16 @@ def release_case(tmp_path, checkout, qa_database, monkeypatch):
                             "app": {
                                 "byId": {
                                     "updateBranchByName": {
+                                        "id": "qa-id",
                                         "name": "qa",
-                                        "updates": data.get("runtime_updates", []),
+                                        "updates": [
+                                            {
+                                                "id": "01a1fe9c-d75e-78cb-b38a-045af4a30421",
+                                                "group": "38aa24c8-b221-41d6-8d4d-7d6e080f9916",
+                                                **row,
+                                            }
+                                            for row in data.get("runtime_updates", [])
+                                        ],
                                     }
                                 }
                             }
@@ -815,8 +826,9 @@ def test_actual_publish_entrypoint_has_zero_mutations_when_a_gate_is_missing(
 
 @pytest.mark.parametrize("action", ["UPDATE", "ROLLBACK"])
 @pytest.mark.parametrize("runtime_rollout", ["none", "active", "unknown", "installed_mismatch"])
+@pytest.mark.parametrize("channel_shape", ["flat", "grouped_other", "grouped_current"])
 def test_publish_ota_uses_sdk_environment_and_known_good_group_without_embedding_claim(
-    release_case, action, runtime_rollout
+    release_case, action, runtime_rollout, channel_shape
 ):
     from tools.qa_delivery.pipeline import digest, proof_digest, publish
 
@@ -879,6 +891,19 @@ def test_publish_ota_uses_sdk_environment_and_known_good_group_without_embedding
                         "rolloutControlUpdate": None,
                     }
                 ]
+                if channel_shape != "flat":
+                    row = page["currentPage"]["updateBranches"][0]["updateGroups"][0]
+                    row.pop("rolloutPercentage")
+                    row.pop("rolloutControlUpdate")
+                    row.update(
+                        branch={"id": "qa-id", "name": "qa"},
+                        isRollBackToEmbedded=False,
+                        id="01a1fe9c-d75e-78cb-b38a-045af4a30421",
+                        group="38aa24c8-b221-41d6-8d4d-7d6e080f9916",
+                    )
+                    if channel_shape == "grouped_current":
+                        row["runtime"]["version"] = c["native"]["runtime_version"]
+                    page["currentPage"]["updateBranches"][0]["updateGroups"] = [[row]]
                 return page
             if args[0] == "update:view":
                 calls.append(args)
@@ -897,7 +922,7 @@ def test_publish_ota_uses_sdk_environment_and_known_good_group_without_embedding
 
         return eas
 
-    if action == "ROLLBACK":
+    if action == "ROLLBACK" or channel_shape == "grouped_current":
         # A known-good R2 update exists even if global latest belongs to R1.
         data["runtime_updates"] = [
             {
@@ -909,7 +934,7 @@ def test_publish_ota_uses_sdk_environment_and_known_good_group_without_embedding
     if runtime_rollout != "none":
         update = {
             "runtime": {"version": c["native"]["runtime_version"]},
-            "rolloutPercentage": 50,
+            "rolloutPercentage": None if runtime_rollout == "installed_mismatch" else 50,
             "rolloutControlUpdate": None,
         }
         if runtime_rollout == "unknown":
@@ -1028,6 +1053,8 @@ def test_current_runtime_rollout_is_queried_even_if_channel_latest_is_another_ru
 
     c, _ = approved()
     update = {
+        "id": "01a1fe9c-d75e-78cb-b38a-045af4a30421",
+        "group": "38aa24c8-b221-41d6-8d4d-7d6e080f9916",
         "runtime": {"version": c["native"]["runtime_version"]},
         "rolloutPercentage": None,
         "rolloutControlUpdate": None,
@@ -1049,7 +1076,11 @@ def test_current_runtime_rollout_is_queried_even_if_channel_latest_is_another_ru
             200,
             json={
                 "data": {
-                    "app": {"byId": {"updateBranchByName": {"name": "qa", "updates": [update]}}}
+                    "app": {
+                        "byId": {
+                            "updateBranchByName": {"id": "qa-id", "name": "qa", "updates": [update]}
+                        }
+                    }
                 }
             },
         )
@@ -1602,3 +1633,210 @@ def test_owned_sync_name_bound_only_outside_preview_is_refused_before_sdk(
     with client, pytest.raises(ValueError, match="qa_eas_environment"):
         publish(package, root, proof, gate, eas, client)
     assert calls == []
+
+
+def sdk_grouped_channel(c):
+    """Sanitized EAS27.2 channel:view shape observed after the first real QA OTA."""
+    return {
+        "currentPage": {
+            "name": "qa",
+            "isPaused": False,
+            "branchMapping": json.dumps(
+                {"version": 0, "data": [{"branchId": "qa-id", "branchMappingLogic": "true"}]}
+            ),
+            "updateBranches": [
+                {
+                    "id": "qa-id",
+                    "name": "qa",
+                    "updateGroups": [
+                        [
+                            {
+                                "id": "01a1fe9c-d75e-78cb-b38a-045af4a30421",
+                                "group": "38aa24c8-b221-41d6-8d4d-7d6e080f9916",
+                                "platform": "android",
+                                "runtime": {"version": c["native"]["runtime_version"]},
+                                "branch": {"id": "qa-id", "name": "qa"},
+                                "isRollBackToEmbedded": False,
+                            }
+                        ]
+                    ],
+                }
+            ],
+        }
+    }
+
+
+def acquired_rollout(c):
+    from tools.qa_delivery.pipeline import check_current_runtime_rollout
+
+    def http(request):
+        assert json.loads(request.content)["variables"] == {
+            "id": c["eas"]["project_id"],
+            "runtime": c["native"]["runtime_version"],
+        }
+        return httpx.Response(
+            200,
+            json={
+                "data": {
+                    "app": {
+                        "byId": {
+                            "updateBranchByName": {
+                                "id": "qa-id",
+                                "name": "qa",
+                                "updates": [
+                                    {
+                                        "id": "01a1fe9c-d75e-78cb-b38a-045af4a30421",
+                                        "group": "38aa24c8-b221-41d6-8d4d-7d6e080f9916",
+                                        "runtime": {"version": c["native"]["runtime_version"]},
+                                        "rolloutPercentage": None,
+                                        "rolloutControlUpdate": None,
+                                    }
+                                ],
+                            }
+                        }
+                    }
+                }
+            },
+        )
+
+    with httpx.Client(transport=httpx.MockTransport(http)) as client:
+        return check_current_runtime_rollout(c, "synthetic-only", client)
+
+
+def test_real_sdk_nested_channel_requires_acquired_exact_runtime_rollout():
+    from tools.qa_delivery.pipeline import check_channel
+
+    c, _ = approved()
+    raw = sdk_grouped_channel(c)
+    with pytest.raises(ValueError, match="qa_eas"):
+        check_channel(raw, c)
+    check_channel(raw, c, runtime_rollout=acquired_rollout(c))
+
+
+@pytest.mark.parametrize(
+    "damage",
+    [
+        "empty_group",
+        "nested_again",
+        "mixed",
+        "branch",
+        "platform",
+        "runtime",
+        "embedded",
+        "witness_runtime",
+        "witness_project",
+        "witness_absent_update",
+        "witness_branch",
+        "update_id",
+        "group_id",
+        "missing_id",
+    ],
+)
+def test_nested_sdk_channel_does_not_infer_unknown_identity_or_rollout(damage):
+    from tools.qa_delivery.pipeline import check_channel
+
+    c, _ = approved()
+    raw, witness = sdk_grouped_channel(c), acquired_rollout(c)
+    groups = raw["currentPage"]["updateBranches"][0]["updateGroups"]
+    update = groups[0][0]
+    if damage == "empty_group":
+        groups[0] = []
+    if damage == "nested_again":
+        groups[0] = [groups[0]]
+    if damage == "mixed":
+        groups.append(update)
+    if damage == "branch":
+        update["branch"]["name"] = "production"
+    if damage == "platform":
+        update["platform"] = "ios"
+    if damage == "runtime":
+        update["runtime"] = {}
+    if damage == "embedded":
+        update["isRollBackToEmbedded"] = True
+    if damage == "witness_runtime":
+        witness["runtime_version"] = "2" * 40
+    if damage == "witness_project":
+        witness["project_id"] = "another-project"
+    if damage == "witness_absent_update":
+        witness["update"] = None
+    if damage == "witness_branch":
+        witness["branch_id"] = "other-branch"
+    if damage == "update_id":
+        update["id"] = "b" * 36
+    if damage == "group_id":
+        update["group"] = "b" * 36
+    if damage == "missing_id":
+        del update["id"]
+    with pytest.raises(ValueError, match="qa_eas"):
+        check_channel(raw, c, runtime_rollout=witness)
+
+
+@pytest.mark.parametrize("reading", [1, 2])
+def test_publish_refuses_partial_graphql_rollout_before_any_effect(release_case, reading):
+    from tools.qa_delivery.pipeline import publish
+
+    package, root, proof, gate, factory, calls, client, data = release_case
+    original = client._transport
+    observed = 0
+
+    def partial(request):
+        nonlocal observed
+        response = original.handle_request(request)
+        if (
+            request.url.host == "api.expo.dev"
+            and "QARuntimeRollout" in json.loads(request.content)["query"]
+        ):
+            observed += 1
+            if observed == reading:
+                payload = response.json()
+                payload["errors"] = [
+                    {
+                        "message": "rollout resolver unavailable",
+                        "path": [
+                            "app",
+                            "byId",
+                            "updateBranchByName",
+                            "updates",
+                            0,
+                            "rolloutPercentage",
+                        ],
+                    }
+                ]
+                return httpx.Response(200, json=payload)
+        return response
+
+    client._transport = httpx.MockTransport(partial)
+    with client, pytest.raises(ValueError, match="qa_eas_rollout_current_runtime_unqualified"):
+        publish(package, root, proof, gate, factory, client)
+    assert observed == reading
+    assert not any(call[0] in {"env:set", "build", "update", "update:republish"} for call in calls)
+
+
+@pytest.mark.parametrize("damage", ["paused", "remapped"])
+def test_publish_rechecks_channel_immediately_before_effects(release_case, damage):
+    from tools.qa_delivery.pipeline import publish
+
+    package, root, proof, gate, factory, calls, client, data = release_case
+    reads = 0
+
+    def changed_factory(mobile, environment):
+        basic = factory(mobile, environment)
+
+        def eas(*args):
+            nonlocal reads
+            result = basic(*args)
+            if args[0] == "channel:view":
+                reads += 1
+                if reads == 2:
+                    if damage == "paused":
+                        result["currentPage"]["isPaused"] = True
+                    else:
+                        result["currentPage"]["updateBranches"][0]["name"] = "production"
+            return result
+
+        return eas
+
+    with client, pytest.raises(ValueError, match="qa_eas_channel_or_rollout_refused"):
+        publish(package, root, proof, gate, changed_factory, client)
+    assert reads == 2
+    assert not any(call[0] in {"env:set", "build", "update", "update:republish"} for call in calls)
