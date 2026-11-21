@@ -75,3 +75,16 @@ test('foreground during durable preparation must not invalidate the confirmed ch
  await act(async()=>{finish();await new Promise(r=>setTimeout(r,10));await flush();});
  expect(s.posts).toBe(1);expect(s.adopted).toBe(1);
 });
+
+test('a background adoption remains durable but waits for Programmes focus before presenting the session',async()=>{
+ const s=await setup(),navigate=jest.fn(),original=s.ports.adoptLegacy;let active=true,adopting=false,finish=()=>{};
+ const gate=new Promise<void>(resolve=>{finish=resolve;});
+ s.ports.adoptLegacy=async()=>{adopting=true;await gate;await original();};
+ const render=()=>root.render(React.createElement(LibraryHost,{ports:s.ports,active,onResumeExisting:()=>{},onOpened:navigate}));
+ await act(async()=>{render();await flush();});
+ await press('library-entry-'+witness.created.source_ref);await press('library-ask-start');await press('library-confirm-start');
+ await act(async()=>{await new Promise(r=>setTimeout(r,10));await flush();});expect(adopting).toBe(true);
+ await act(async()=>{active=false;render();await flush();finish();await new Promise(r=>setTimeout(r,10));await flush();});
+ expect(s.adopted).toBe(1);expect(await s.ports.pending.unresolved(()=>true)).toBeNull();expect(navigate).not.toHaveBeenCalled();
+ await act(async()=>{active=true;render();await flush();});expect(navigate).toHaveBeenCalledTimes(1);expect(s.posts).toBe(1);
+});

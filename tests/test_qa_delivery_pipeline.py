@@ -79,12 +79,32 @@ def test_tracked_candidate_prepares_for_current_canonical_schema_without_distrib
     assert prepared["native"]["fingerprint"] == prepared["native"]["runtime_version"]
     assert len(prepared["native"]["fingerprint"]) == 40
     assert prepared["eas"]["build_id"] is None
+    assert prepared["source"]["native_sha"] == prepared["source"]["js_sha"]
     # Older nutrition inputs remain fail-closed; the active default is current.
     stale = deepcopy(template)
     stale["compatibility"]["server_schema"] = "nutrition_manual_01"
     with pytest.raises(ValueError, match="qa_release_refused"):
         prepare(stale, checkout)
     assert template["compatibility"]["server_schema"] == "program_builder_operations_01"
+
+
+def test_tracked_template_prepares_update_for_actual_native_without_distributing(checkout):
+    from tools.qa_delivery.pipeline import prepare
+
+    root = Path(__file__).resolve().parents[1]
+    template = json.loads((root / "docs/release/rel-03/candidate.json").read_text())
+    template["action"] = "UPDATE"
+    prepared = prepare(template, checkout)
+    assert prepared["source"]["native_sha"] == "3bd4099941f2affe77fb9c3cfa97b1450b49ee74"
+    assert prepared["source"]["js_sha"] == subprocess.check_output(
+        ["git", "-C", str(checkout), "rev-parse", "HEAD"], text=True
+    ).strip()
+    assert prepared["native"]["version_code"] == 3
+    assert prepared["native"]["updates_enabled"] is True
+    assert prepared["eas"]["channel"] == "qa"
+    assert prepared["distributable"] is False
+    assert prepared["eas"]["build_id"] is None
+    assert prepared["artifact"]["sha256"] is None
 
 
 def github_payloads(c):
