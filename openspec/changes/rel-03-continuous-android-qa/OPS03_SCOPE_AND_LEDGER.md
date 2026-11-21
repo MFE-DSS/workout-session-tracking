@@ -54,3 +54,21 @@ change. Real EAS quota/channel checked by existing release validators. Actual
 premerge production Android export PASS,1,569source-map modules; none of the five
 advisory root packages in the JS map. Native APK and development tools remain
 separate security surfaces.
+
+## 2026-11-21 — actual installed RC01 Builder header refusal
+
+Approved run44758281534/source3bd produced a real installable APK. ConnectedApp
+Android exposed a strict-client interoperability defect with repeated no-store
+headers; the server committed the exact CREATE once and GET recovers it. See
+[scoped incident/options/plan](../../../docs/release/rel-03/RC01_BUILDER_CACHE_INCIDENT_20261121.md).
+Correct only the Builder cache-policy decoder and its regression tests. No UI,
+producer, command replay, native dependency or edge policy change. Existing GO
+covers this corrective scope; deployment/publication and physical gates remain.
+RED: three regression cases return UNKNOWN instead of a confirmed owner read;
+19 existing/negative cases PASS. Original installed command is preserved.
+
+Final local:25Builder tests,127suites/1464mobile+TypeScript,144targeted
+backend/release/visual tests; protocol, strictOpenSpec28/28 and budget259≤548 pass.
+Review Important Unicode whitespace corrected with two negative RED cases before
+SP/HTAB-only normalization. No UI pixel gate is opened by this transport fix.
+PR/CI/canonical and installed corrected-client verification remain pending here.
