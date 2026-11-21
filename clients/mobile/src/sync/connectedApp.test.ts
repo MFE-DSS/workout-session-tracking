@@ -6,7 +6,7 @@ import type { LabFixture } from '../domain/types';
 import { initialState, reduce } from '../domain/workout';
 import { openJournal as openMemoryJournal } from '../storage/journal.web';
 import type { Journal } from '../storage/journalTypes';
-import { setCommand, substituteCommand } from '../storage/outbox';
+import { closeCommand, setCommand, substituteCommand } from '../storage/outbox';
 import { ApiFailure } from '../api/http';
 import {firstUse as mockFirstUse,negotiatedReply} from '../../test/missionActionHarness';
 import { SyncEngine } from './syncEngine';
@@ -172,6 +172,32 @@ test('une série persistée acquittée est reçue dans le vrai chemin exécution
   await boot();
   await act(async () => screen('Resume').onResume());
   expect(screen('Execution').serverStateOf(first.set_id)).toBe('synced');
+});
+
+test.each(['pending','acked','failed','resolved'] as const)('restoring a completed session retains its original close identity and timestamp in state %s',async(status)=>{
+ const snapshot=await saved('acked',true),original=closeCommand('original-close','SESSION_FINISH',plan.session_id,Date.parse('2026-11-01T12:00:00Z'));
+ await mockJournal.enqueue(original,snapshot);await mockJournal.markOutbox(original.op_id,status,1);
+ await boot(false);expect(screen('Complete')).toBeDefined();
+ let closes=(await mockJournal.restore()).outbox.filter(r=>r.kind==='SESSION_FINISH'&&r.target===original.target);
+ expect(closes).toHaveLength(1);expect(closes[0].op_id).toBe(original.op_id);expect(closes[0].payload).toBe(JSON.stringify(original.payload));
+ await act(async()=>root.unmount());root=createRoot();await boot(false);
+ closes=(await mockJournal.restore()).outbox.filter(r=>r.kind==='SESSION_FINISH'&&r.target===original.target);
+ expect(closes).toHaveLength(1);expect(closes[0].op_id).toBe(original.op_id);expect(closes[0].payload).toBe(JSON.stringify(original.payload));
+});
+
+test('a restored completed snapshot does not replace an existing abandonment with a new finish',async()=>{
+ const snapshot=await saved('acked',true),original=closeCommand('original-abandon','SESSION_ABANDON',plan.session_id,Date.parse('2026-11-01T12:00:00Z'));
+ await mockJournal.enqueue(original,snapshot);await mockJournal.markOutbox(original.op_id,'resolved',1);await boot(false);
+ const rows=(await mockJournal.restore()).outbox;expect(rows.filter(r=>r.kind==='SESSION_FINISH')).toHaveLength(0);
+ expect(rows.find(r=>r.op_id===original.op_id)?.payload).toBe(JSON.stringify(original.payload));
+});
+
+test('a different session close cannot suppress the first durable finish of the completed session',async()=>{
+ const snapshot=await saved('acked',true),older=closeCommand('other-session-close','SESSION_FINISH',plan.session_id+1,Date.parse('2026-11-01T12:00:00Z'));
+ await mockJournal.enqueue(older,snapshot);await mockJournal.markOutbox(older.op_id,'acked',1);await boot(false);
+ const rows=(await mockJournal.restore()).outbox,own=rows.filter(r=>r.kind==='SESSION_FINISH'&&r.target===`session/${plan.session_id}`);
+ expect(own).toHaveLength(1);expect(own[0].op_id).not.toBe(older.op_id);
+ expect(rows.find(r=>r.op_id===older.op_id)?.payload).toBe(JSON.stringify(older.payload));
 });
 
 test('un refus persisté est relu au démarrage même lorsque le réseau ne répond plus', async () => {

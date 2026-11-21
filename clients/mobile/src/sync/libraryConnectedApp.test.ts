@@ -189,3 +189,19 @@ test.each([
  expect(node('plan-v3-read-sources')).toBeDefined();expect(node('library-tab-today')).toBeUndefined();
  expect(requests.filter(r=>r.method!=='GET'&&!r.path.startsWith('/auth/'))).toHaveLength(0);
 });
+
+test('actual file SQLite restart retains an acknowledged close UUID and time without another finish POST',async()=>{
+ await mount();await choose();
+ const db=[...mockConnections.values()].find(db=>{try{return !!db.prepare('SELECT snapshot FROM active_session WHERE id=1').get();}catch{return false;}})!;
+ const saved=JSON.parse((db.prepare('SELECT snapshot FROM active_session WHERE id=1').get() as any).snapshot);
+ saved.phase='COMPLETE';saved.completedMs=Date.now();saved.cursorSetId=null;saved.rest=null;
+ db.prepare('UPDATE active_session SET snapshot=? WHERE id=1').run(JSON.stringify(saved));
+ const target=`session/${witness.created.execution.session_id}`,payload=JSON.stringify({session_id:witness.created.execution.session_id,at:'2026-11-01T12:00:00.000Z'});
+ db.prepare('INSERT INTO outbox(op_id,kind,target,payload,created_at_ms,attempts,state) VALUES(?,?,?,?,?,?,?)').run('original-native-close','SESSION_FINISH',target,payload,Date.now(),1,'acked');
+ await relaunch();
+ expect(root.container.queryAll((n:any)=>n.props.children==='Séance terminée').length).toBeGreaterThan(0);
+ expect(snapshots()).toContainEqual(expect.objectContaining({phase:'COMPLETE',plan:expect.objectContaining({session_id:witness.created.execution.session_id})}));
+ const rows=[...mockConnections.values()].flatMap(db=>{try{return db.prepare("SELECT op_id,payload FROM outbox WHERE kind='SESSION_FINISH' AND target=?").all(target);}catch{return[];}});
+ expect(rows).toEqual([{op_id:'original-native-close',payload}]);
+ expect(requests.filter(r=>r.method==='POST'&&r.path.endsWith('/finish'))).toHaveLength(0);
+});

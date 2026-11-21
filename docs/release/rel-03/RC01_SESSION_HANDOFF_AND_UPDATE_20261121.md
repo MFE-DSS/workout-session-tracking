@@ -41,8 +41,9 @@ separately from all source/test-harness results.
 
 ## Verification and review
 
-check_scope ISOLATED. Final local: 127 mobile suites / 1473 tests PASS and
-TypeScript PASS; 257 targeted release/pipeline/inventory/visual tests PASS.
+check_scope ISOLATED. Final local: 127 mobile suites / 1480 tests PASS and
+TypeScript PASS; 257 targeted release/pipeline/inventory/visual tests PASS on the prior patch;
+no backend/pipeline/visual source changed in the close-guard addition.
 Ruff259≤548, specification protocol and OpenSpec strict28/28 PASS. No full backend
 local sweep for this tier. CI remains required on the exact commit before merge.
 
@@ -62,3 +63,28 @@ only on refocus. Final independent source review has no Critical/Important.
 No new UI geometry, native module, lock, schema, science, infrastructure, secret,
 threshold or visual baseline changed. Visual gate NOT_APPLICABLE for these
 behavioral corrections; existing pilot visual decisions remain in force.
+
+## Additional native recovery finding — before completion correction
+
+A real native journal read found two distinct SESSION_FINISH commands for session3,
+each acknowledged, timestamps71.519seconds apart after restart. One session and
+one18kg-entered/9-repetition fact were recovered. The deployed backend returns an
+unapplied duplicate close and preserves its initial ended_at; the raw HTTP bodies
+were not stored, so no specific response body is claimed. Independent SQLite/WAL
+review confirms command duplication, not data corruption.
+
+Options: changing the server would not fix the local intent trace; modifying the
+storage implementation would conservatively change its release fingerprint.
+Chosen bounded correction: hydrate the process close guard from the existing full
+owner-bound journal restore before exposing its COMPLETE snapshot. A persisted
+FINISH or ABANDON for that exact session retains its original UUID/time, including
+ACKs and explicit refusals. The first-close enqueue and closeBilan ordering remain
+unchanged. An initial asynchronous completion lookup was rejected in review
+because it introduced a gap before first-close persistence; it is not delivered.
+Pending/ACK/failed/resolved and abandonment witnesses cover restart, while a
+foreign session close cannot suppress a first finish. A file-SQLite restart
+asserts the actual completed screen/session and exact acknowledged payload with
+zero new finish POST. Final hydration consumer campaign:83/83 PASS. Independent
+review: no Critical/Important. No new UI/science/storage/native/schema change.
+Fresh exact-HEAD CI is required after this correction; CI44895211084 on the prior
+8b0b299 revision succeeded but does not attest this additional diff.

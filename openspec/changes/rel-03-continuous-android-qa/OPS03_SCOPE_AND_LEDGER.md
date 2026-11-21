@@ -83,5 +83,12 @@ keeps BODY/NUT tab-owned and separates durable adoption from focused presentatio
 without discarding later account forms. The candidate pins the actual native3bd
 only for compatible UPDATE preparation; default BUILD_APK still derives its own
 source. No publication, installed corrected JS, rollback or physical acceptance
-is inferred. Local final1473 mobile/TS and257 broad tests pass; current exact HEAD
+is inferred. Local1480 mobile/TS pass;257 prior broad tests pass; current exact HEAD
 CI remains to acquire before merge. No new geometry or baseline.
+
+A further actual native restart exposed two close UUIDs for one completed session,
+without duplicated server facts. The existing full journal restore now hydrates
+the exact-session close guard before presenting COMPLETE. First-close durability
+ordering is unchanged. Restart/ACK/refusal and real file-SQLite witnesses pass;
+review rejected an asynchronous alternative before delivery. The source3bd APK
+still contains the defect until an approved compatible JS update is installed.

@@ -490,6 +490,10 @@ export default function ConnectedApp() {
     }, (status) => { if (active()) onStatus(status); }, (row, response) => { if (active()) onAck(row, response); });
     const r = await j.restore();
     if (!active()) return false;
+    // Hydrate the process guard before restoring COMPLETE: even ACKs/refusals
+    // retain their original close UUID and decision time across a restart.
+    const closedSession=r.snapshot?.plan?.session_id;
+    closedRef.current=closedSession&&r.outbox.some(row=>row.target===`session/${closedSession}`&&(row.kind==='SESSION_FINISH'||row.kind==='SESSION_ABANDON'))?closedSession:null;
     legacyStartUnknownRef.current=hasLegacyStart(r.snapshot);
     closePendingRef.current=r.outbox.some(row=>!['acked','resolved'].includes(row.state)&&(row.kind==='SESSION_FINISH'||row.kind==='SESSION_ABANDON'));
     setServerSets(serverStateFromOutbox(r.outbox));
