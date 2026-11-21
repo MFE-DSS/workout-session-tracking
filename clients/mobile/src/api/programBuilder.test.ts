@@ -64,3 +64,25 @@ test('known pre-effect lifecycle refusal rejects initial submit but cannot settl
  expect(await f.client.submit(p)).toEqual({state:'rejected',status:409,code:'domain_refused'});
  expect(await f.client.status(p)).toEqual({state:'unknown'});
 });
+
+test.each(['no-store, no-store','NO-STORE, no-store',' no-store , no-store ','no-store,\tNO-STORE'])('combined no-store directives confirm owner reads and exact receipt without another POST: %s',async cache=>{
+ const empty={contract_version:BUILDER_VERSION,owner_id:7,items:[],next_cursor:null};
+ const wire=jest.fn(async()=>response(empty,200,{'Cache-Control':cache})),f=await fixture(wire),p=await prepare();
+ expect(await f.client.programs()).toEqual({state:'confirmed',value:empty});
+ wire.mockImplementation(async()=>response(await receipt(),200,{'Cache-Control':cache}));
+ expect(await f.client.submit(p)).toEqual({state:'confirmed',value:await receipt()});
+ expect(await f.client.status(p)).toEqual({state:'confirmed',value:await receipt()});
+ expect(wire.mock.calls.map(call=>(call as any)[1].method)).toEqual(['GET','POST','GET']);
+ expect((wire.mock.calls[1] as any)[1].body).toBe(p.payload_json);
+});
+test.each(['','public','no-store, public','no-store, max-age=0','no-store, no-cache','no-store,','no-store=1','no-store; no-store','no-store,\u00a0no-store','no-store\n'])('unsafe or malformed cache directives preserve command uncertainty without retry: %s',async cache=>{
+ const wire=jest.fn(async()=>response(await receipt(),200,{'Cache-Control':cache})),f=await fixture(wire),p=await prepare();
+ expect(await f.client.submit(p)).toEqual({state:'unknown'});
+ expect(wire).toHaveBeenCalledTimes(1);expect(f.refreshes()).toBe(0);
+});
+test('missing cache policy preserves command uncertainty',async()=>{
+ const value=await receipt(),raw=response(value),get=raw.headers.get;
+ raw.headers.get=(key:string)=>key==='Cache-Control'?null:get(key);
+ const wire=jest.fn(async()=>raw),f=await fixture(wire);
+ expect(await f.client.submit(await prepare())).toEqual({state:'unknown'});expect(wire).toHaveBeenCalledTimes(1);
+});

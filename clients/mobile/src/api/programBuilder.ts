@@ -33,7 +33,8 @@ export function createProgramBuilderTransport(baseUrl:string,fetchImpl:typeof fe
   const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),10000);
   try{
    const response=await fetchImpl(scope+'/api/mobile/v1'+path,{method:body===undefined?'GET':'POST',headers,body,signal:controller.signal,redirect:'error'});
-   if(response.headers.get('X-Auren-Program-Builder')!==BUILDER_VERSION||response.headers.get('Cache-Control')?.toLowerCase()!=='no-store'||!/^application\/json(?:\s*;|$)/i.test(response.headers.get('Content-Type')??''))throw new ApiFailure('http',502,'builder_response_unknown');
+   const cacheDirectives=response.headers.get('Cache-Control')?.split(',')??[];
+   if(response.headers.get('X-Auren-Program-Builder')!==BUILDER_VERSION||!cacheDirectives.length||cacheDirectives.some(value=>value.replace(/^[ \t]+|[ \t]+$/g,'').toLowerCase()!=='no-store')||!/^application\/json(?:\s*;|$)/i.test(response.headers.get('Content-Type')??''))throw new ApiFailure('http',502,'builder_response_unknown');
    const length=response.headers.get('Content-Length');if(length!==null&&(!/^[0-9]+$/.test(length)||Number(length)>BUILDER_MAX_BYTES))throw new ApiFailure('http',502,'builder_response_unknown');
    const text=await response.text();if(builderByteLength(text)>BUILDER_MAX_BYTES)throw new ApiFailure('http',502,'builder_response_unknown');
    let value:unknown;try{value=JSON.parse(text);}catch{throw new ApiFailure('http',502,'builder_response_unknown');}
