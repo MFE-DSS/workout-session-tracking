@@ -77,7 +77,8 @@ export function PlanV3ExecutionScreen(p:{controller:FirstUseV3Controller;serverN
     <PrimaryAction label="Garder cette saisie" onPress={()=>setEdit(null)}/>
    </Sheet>
    {load.trim()&&reps.trim()&&Number.isFinite(Number(load.replace(',','.')))&&Number(load.replace(',','.'))>=0&&Number.isSafeInteger(Number(reps))&&Number(reps)>=0?action(state.phase==='ACTIVE'&&permission.state==='WORK'?'Valider la série':'Enregistrer un fait déjà réalisé',async()=>{
-    await c.recordFact(position.set.set_id,Number(load.replace(',','.')),Number(reps),new Date(p.serverNowMs||Date.now()).toISOString(),!Number.isFinite(p.serverNowMs));
+    const at=c.eventTime();
+    await c.recordFact(position.set.set_id,Number(load.replace(',','.')),Number(reps),new Date(at.epochMs).toISOString(),at.estimated);
     await p.onSync();await c.refreshExecution();
    },'plan-v3-record-set',state.phase==='ACTIVE'&&permission.state==='WORK'):null}
   </View>:action('Terminer la séance',async()=>{await c.close('SESSION_FINISH');await p.onSync();await c.refreshExecution();})}

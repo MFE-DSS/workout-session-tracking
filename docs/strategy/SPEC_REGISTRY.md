@@ -324,6 +324,13 @@ Code [#406](https://github.com/MFE-DSS/workout-session-tracking/pull/406) fusion
 
 ## 1quater. Cycle Body Intelligence — Manual Body Profile → providers later (actif)
 
+TIME-01 — `time01-temporal-provenance` : mandat opérateur du22nov2026,
+investigation et correction minimale après preuve. Base dff03f3 ; incident
+original classé F/UNKNOWN, défaut A reproduit séparément dans l'APK signée.
+Ancre éphémère et prélèvement au clic en vérification, aucun contrat SCI ou
+historique réécrit, aucune publication OTA déduite. [Rapport](../pilot/time01/REPORT.md),
+[provenance](../pilot/time01/PROVENANCE.md), [scope](../../openspec/changes/time01-temporal-provenance/proposal.md).
+
 **Specs :** `docs/strategy/SPIGNOS_BODY_SIGNAL_MODEL_BRAINSTORMING.md`, `SPIGNOS_BODY_INTELLIGENCE_ROADMAP.md`, `SPIGNOS_BODY_SIGNAL_MODEL_SPEC.md`, `SPIGNOS_BODY_PRIVACY_AND_CONSENT_SPEC.md`, `SPIGNOS_BODY_MANUAL_PROFILE_BUILD_SPEC.md`.
 **Hard contracts spécifiques :** non médical, non discriminatoire, « morphotype » jamais vérité primaire ; privacy-by-design (consentement granulaire, hard-delete, minimisation) ; providers (MediaPipe/Bodygram) derrière interfaces, flags OFF par défaut ; **une seule migration Body en vol** ; ADD COLUMN ONLY.
 
