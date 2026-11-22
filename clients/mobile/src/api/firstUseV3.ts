@@ -20,10 +20,33 @@ export class FirstUseV3Controller {
  private interactionRevision=0;
  private draftPending:Record<string,unknown>|null=null;
  private draftWriting:Promise<void>|null=null;
+ /** Process-local link acquired from a confirmed execution read, never SQLite. */
+ private executionAnchor:{sessionId:number;serverMs:number;monoMs:number}|null=null;
+ private foreground=true;
  constructor(private readonly ports:Ports,private readonly changed:()=>void=()=>undefined){}
  get active(){return this.ports.current();}
+ setForeground(active:boolean){
+  if(this.foreground===active)return;
+  this.foreground=active;this.executionAnchor=null;this.interactionRevision+=1;
+  this.traceTime(active?'LIFECYCLE_ACTIVE':'LIFECYCLE_INACTIVE');this.changed();
+ }
+ /** QA opt-in only, action/read boundaries only; never log DTOs or credentials. */
+ private traceTime(event:string,detail:Record<string,string|number|boolean|null>={}){
+  if(process.env.EXPO_PUBLIC_QA_DELIVERY!=='1')return;
+  console.info('AUREN_QA_TIME',JSON.stringify({schemaVersion:'qa-temporal-observation/1.0.0',event,
+   wall_ms:Date.now(),mono_ms:performance.now(),generation:this.interactionRevision,
+   anchor:this.executionAnchor?{server_ms:this.executionAnchor.serverMs,mono_ms:this.executionAnchor.monoMs}:null,detail}));
+ }
+ executionNowMs(){
+  const a=this.executionAnchor,mono=performance.now();
+  return this.active&&this.foreground&&a&&a.sessionId===this.state?.execution?.session_id&&Number.isFinite(a.serverMs)&&Number.isFinite(mono)&&mono>=a.monoMs
+   ?a.serverMs+mono-a.monoMs:NaN;
+ }
+ /** D11 fallback is an explicitly estimated claim, not verified event time. */
+ eventTime(){const epochMs=this.executionNowMs(),at=Number.isFinite(epochMs)?{epochMs,estimated:false}:{epochMs:Date.now(),estimated:true};this.traceTime('SET_ACTION_TIME',{epoch_ms:at.epochMs,estimated:at.estimated});return at;}
  private async persist(state:PlanV3Stored){if(!this.active)return;await this.ports.journal.save(state,()=>this.active);if(!this.active)return;this.state=await this.ports.journal.read();if(this.active)this.changed();}
  async restore(){
+  this.executionAnchor=null;this.interactionRevision+=1;this.traceTime('RESTORE');
   const state=await this.ports.journal.read();if(!this.active)return;
   if(state){
    if(state.owner_id!==this.ports.ownerId)throw Error('journal_owner_mismatch');
@@ -264,9 +287,9 @@ export class FirstUseV3Controller {
  async beginNext(){await this.exclusive(async()=>{
   const id=this.state?.execution?.session_id,interaction=this.interactionRevision;if(!id||this.state?.phase==='COMPLETE')return;await this.readExecutionInternal(id);
   if(!this.state?.execution||!this.active||interaction!==this.interactionRevision)return;
-  if(workPermissionV3(this.state,Date.parse(this.state.execution.server_now)).state==='WORK')await this.persist({...this.state,phase:'ACTIVE'});
+  if(workPermissionV3(this.state,this.executionNowMs()).state==='WORK')await this.persist({...this.state,phase:'ACTIVE'});
  });}
- async pause(){this.interactionRevision+=1;if(this.encounter)this.encounter={...this.encounter,result:null,authority:null,allowed_actions:[],unavailable_reason:'REVALIDATION_REQUIRED'};if(!this.state)return;await this.persist({...this.state,phase:this.state.phase==='COMPLETE'||this.state.execution?.status==='completed'?'COMPLETE':'PAUSED',execution:this.state.execution?{...this.state.execution,applicability:{...this.state.execution.applicability,state:'UNKNOWN',reason:'REVALIDATION_REQUIRED'},observation_only:true,allowed_actions:this.state.execution.allowed_actions.filter(a=>a!=='NEXT_WORK_SET')}:null});}
+ async pause(){this.executionAnchor=null;this.interactionRevision+=1;this.traceTime('PAUSE');if(this.encounter)this.encounter={...this.encounter,result:null,authority:null,allowed_actions:[],unavailable_reason:'REVALIDATION_REQUIRED'};if(!this.state)return;await this.persist({...this.state,phase:this.state.phase==='COMPLETE'||this.state.execution?.status==='completed'?'COMPLETE':'PAUSED',execution:this.state.execution?{...this.state.execution,applicability:{...this.state.execution.applicability,state:'UNKNOWN',reason:'REVALIDATION_REQUIRED'},observation_only:true,allowed_actions:this.state.execution.allowed_actions.filter(a=>a!=='NEXT_WORK_SET')}:null});}
  async confirmSetup(){if(!this.state)return;const position=workPositionV3(this.state);if(!position)return;await this.persist({...this.state,source:{...this.state.source,setup_confirmed_for:position.set.set_id}});await this.refreshExecution();}
  async recordFact(setId:number,setting:number,reps:number|null,performedAt:string,estimated:boolean,completed=true){await this.exclusive(async()=>{
   if(!this.state?.execution||!Number.isFinite(setting)||setting<0||(reps!==null&&(!Number.isSafeInteger(reps)||reps<0))||(completed&&reps===null)||!Number.isFinite(Date.parse(performedAt)))return;
@@ -275,8 +298,10 @@ export class FirstUseV3Controller {
   const fact={context:exercise.prescription.context,setting:{...exercise.prescription.setting,value:setting},reps,completed,performed_at:performedAt,performed_at_estimated:estimated};
   const revision=Math.max(prior?.local_revision??0,...this.localOperations.filter(row=>row.session_id===this.state!.execution!.session_id&&row.set_id===setId).map(row=>row.local_revision))+1,expected=prior&&prior.sync!=='acked'&&prior.sync!=='resolved'?prior.expected_server_revision+1:Math.max(set.revision,prior?.sync==='acked'?prior.expected_server_revision+1:0);
   const next={...this.state,phase:this.state.execution.status==='completed'?'COMPLETE' as const:'PAUSED' as const,local_facts:{...this.state.local_facts,[String(setId)]:{op_id:opId,fact,local_revision:revision,expected_server_revision:expected,sync:'saved_local' as const}}};
-  await this.ports.journal.commitSet({owner_id:this.ports.ownerId,op_id:opId,session_id:this.state.execution.session_id,se_id:exercise.se_id,set_id:setId,local_revision:revision,expected_server_revision:expected,fact,performed_at_estimated:estimated,recorded_at_ms:Date.now()},
+  const recordedAtMs=Date.now();
+  await this.ports.journal.commitSet({owner_id:this.ports.ownerId,op_id:opId,session_id:this.state.execution.session_id,se_id:exercise.se_id,set_id:setId,local_revision:revision,expected_server_revision:expected,fact,performed_at_estimated:estimated,recorded_at_ms:recordedAtMs},
    {op_id:opId,kind:'PLAN_V3_SET',target:`set/${setId}`,payload:{session_id:this.state.execution.session_id,set_id:setId,op_id:opId,expected_set_revision:expected,observation:fact}},next,()=>this.active);
+  this.traceTime('SET_LOCAL_COMMITTED',{op_id:opId,performed_epoch_ms:Date.parse(performedAt),estimated,recorded_at_ms:recordedAtMs});
   if(this.active){this.state=await this.ports.journal.read();await this.readLocalHistory();this.changed();}
  });}
  async close(kind:'SESSION_FINISH'|'SESSION_ABANDON'){await this.exclusive(async()=>{
@@ -295,9 +320,15 @@ export class FirstUseV3Controller {
   await this.ports.journal.resolveRefusal(setId,this.state.execution,()=>this.active);
   if(this.active){this.state=await this.ports.journal.read();await this.readLocalHistory();this.notice='Version serveur retenue. Le refus et les faits locaux restent conservés.';this.changed();}
  });}
- private async readExecutionInternal(id:number){const interaction=this.interactionRevision,current=()=>this.active&&interaction===this.interactionRevision;const result=await this.ports.sessions.execution(id,current);if(!current()||!this.state)return;
-  if(result.state==='confirmed'){await this.persist({...this.state,phase:result.value.status==='completed'||this.state.phase==='COMPLETE'?'COMPLETE':'PAUSED',execution:result.value});await this.readLocalHistory();return true;}
-  else if(this.state.execution)await this.persist({...this.state,phase:'PAUSED',execution:{...this.state.execution,applicability:{...this.state.execution.applicability,state:'UNKNOWN',reason:'REVALIDATION_REQUIRED'},observation_only:true,allowed_actions:this.state.execution.allowed_actions.filter(a=>a!=='NEXT_WORK_SET')}});
+ private async readExecutionInternal(id:number){this.executionAnchor=null;const interaction=this.interactionRevision,current=()=>this.active&&interaction===this.interactionRevision,start=performance.now();this.traceTime('EXECUTION_READ_START');const result=await this.ports.sessions.execution(id,current);if(!current()||!this.state){this.traceTime('EXECUTION_READ_STALE');return;}
+  if(result.state==='confirmed'){
+   const anchor={sessionId:id,serverMs:Date.parse(result.value.server_now),monoMs:performance.now()};
+   await this.persist({...this.state,phase:result.value.status==='completed'||this.state.phase==='COMPLETE'?'COMPLETE':'PAUSED',execution:result.value});
+   if(!current())return;
+   if(this.foreground)this.executionAnchor=anchor;
+   this.traceTime('EXECUTION_READ_CONFIRMED',{server_epoch_ms:Number.isFinite(anchor.serverMs)?anchor.serverMs:null,elapsed_ms:anchor.monoMs-start});await this.readLocalHistory();return true;
+  }
+  else if(this.state.execution){this.traceTime('EXECUTION_READ_UNAVAILABLE');await this.persist({...this.state,phase:this.state.phase==='COMPLETE'||this.state.execution.status==='completed'?'COMPLETE':'PAUSED',execution:{...this.state.execution,applicability:{...this.state.execution.applicability,state:'UNKNOWN',reason:'REVALIDATION_REQUIRED'},observation_only:true,allowed_actions:this.state.execution.allowed_actions.filter(a=>a!=='NEXT_WORK_SET')}});}
  }
  async refreshExecution(){await this.exclusive(async()=>{const id=this.state?.execution?.session_id??this.state?.intent?.receipt?.session_id;if(id)await this.readExecutionInternal(id);});}
 }
