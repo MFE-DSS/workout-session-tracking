@@ -6,7 +6,7 @@
 ## 2. Vérification
 - [x] 2.1 Classer le diff C exact et terminer les vérifications locales requises sur son arbre.
 - [x] 2.2 Revue indépendante entière, correctifs importants RED→GREEN, réserves et preuve native réellement qualifiée.
-- [ ] 2.3 Vérifier le HEAD final, son contenu C seul et la CI protégée réelle.
+- [x] 2.3 Vérifier le HEAD final, son contenu C seul et la CI protégée réelle.
 
 ## 3. Livraison
 - [ ] 3.1 Fusion gardée, CI canonique et conservation des reçus.
