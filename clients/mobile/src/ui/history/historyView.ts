@@ -26,3 +26,14 @@ export function weightGeometry(rows:WeightEntry[],width:number,height:number){
  const loT=Math.min(...times),hiT=Math.max(...times),loV=Math.min(...values),hiV=Math.max(...values),pad=10;
  return points.map(e=>({id:e.measurement_id,x:hiT===loT?width/2:pad+(Date.parse(e.measured_at)-loT)/(hiT-loT)*(width-pad*2),y:hiV===loV?height/2:height-pad-(e.value!-loV)/(hiV-loV)*(height-pad*2)}));
 }
+
+/** Disambiguates only received rows; no occurrence or time is inferred. */
+export function memoryDateLabel<T extends { started_at: string; session_id: number; name: string | null; status: string; se_id?: number }>(entry: T, entries: T[], timeZone: string) {
+ const date=dateLabel(entry.started_at,timeZone);
+ const same=entries.filter(e=>dateLabel(e.started_at,timeZone)===date&&e.name===entry.name&&e.status===entry.status);
+ if(same.length<2)return date;
+ let time=entry.started_at;
+ try{time=new Intl.DateTimeFormat('fr-FR',{hour:'2-digit',minute:'2-digit',second:'2-digit',timeZone,timeZoneName:'short'}).format(new Date(entry.started_at));}catch{}
+ const slot=entry.se_id!==undefined&&same.some(e=>e!==entry&&e.session_id===entry.session_id&&Date.parse(e.started_at)===Date.parse(entry.started_at))?` · occurrence #${entry.se_id}`:'';
+ return `${date} · ${time} · séance #${entry.session_id}${slot}`;
+}

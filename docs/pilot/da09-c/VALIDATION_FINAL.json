@@ -1,0 +1,64 @@
+{
+  "canonical_parent": "aae7bce5fae32a4df0ac939e203ea8f8f0af60d7",
+  "tested_index_tree_before_delivery_doc_updates": "4ea17c4f6758d9861625d8583ffe8aaafa1f5b9c",
+  "scope": "ISOLATED; no full local backend sweep",
+  "export": "plain export of C-only Git index, not another worktree or combined source; subsequent changes are delivery documents only",
+  "product_sources_match_accepted_packet": 9,
+  "mobile": {
+    "suites": 139,
+    "tests": 1576,
+    "status": "PASS"
+  },
+  "typescript": "PASS",
+  "backend_and_visual_governance_guards": {
+    "tests": 129,
+    "status": "PASS",
+    "warning": "existing Starlette TestClient deprecation"
+  },
+  "ruff_budget": {
+    "current": 259,
+    "baseline": 548,
+    "status": "PASS",
+    "new_python_sources": 0,
+    "environment_note": "First invocation lacked ruff on PATH. Reused the existing operator venv executable; no dependency or repository change."
+  },
+  "openspec_all": {
+    "pass": 32,
+    "fail": 0
+  },
+  "spec_protocol": "PASS",
+  "gitleaks": {
+    "scope": "all staged C source and delivery files",
+    "status": "PASS",
+    "whole_tree_finding": "One historical generic-api-key match is the key of a Sonar issue JSON record, docs/SONAR_AUDIT_01_REPORT.md:197. File byte-identical to canonical aae7bce5; issue identifier, not credential. No ignore, threshold or scanner changed."
+  },
+  "logs": [
+    {
+      "name": "C_EXACT_MOBILE.log",
+      "sha256": "493f6b02388f732b2b88b62a7badb5bcac7310eb121a9938df6d8afd195ab66e"
+    },
+    {
+      "name": "C_EXACT_TS.log",
+      "sha256": "7e4b571cd9291fd44f9645396bd00600ed6f381e7d9740c58ef78f05d2576aa8"
+    },
+    {
+      "name": "C_EXACT_BACKEND_GUARDS.log",
+      "sha256": "c02dafbd117582a789604ccd9b5780967d99a98b3e12c6d15d3fd0d8579bb1d9"
+    },
+    {
+      "name": "C_EXACT_RUFF_BUDGET.log",
+      "sha256": "53fa86e4681016a7fe8a44c124946a0b53dc57a8ecb4180171be2972bdbe3b45"
+    },
+    {
+      "name": "C_OPENSPEC_ALL.log",
+      "sha256": "1f468b1d82908c17131be55e15a92cc62ed02238c5809cbf364f8604a0f19abc"
+    },
+    {
+      "name": "C_SCOPE_GITLEAKS.log",
+      "sha256": "bfb9a10d92a2a126f3f7e1cb7cb1b0c8fa0eddd3a5e9cc528498bcd62f4b32db"
+    }
+  ],
+  "native": "accepted eleven boards / 27 actual local Android ConnectedApp screens; see VISUAL_ACCEPTANCE and REVIEW_AND_VALIDATION",
+  "ci": "NOT_YET_RUN; no old CI reused",
+  "ota": "NOT_AUTHORIZED"
+}

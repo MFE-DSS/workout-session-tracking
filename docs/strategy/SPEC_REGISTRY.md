@@ -1075,3 +1075,8 @@ UX11-C — décision opérateur du 24 novembre : **ACCEPTED pour le consommateur
 ### UX11-C — code accepté et fusionné, 24 novembre2026
 
 PR436 HEAD `dfc1f65`, merge `f0a010948e241ab257469c83d821870a2e4a4091`, arbre identique. CI PR45386072355 success, CI canonique45389826580 completed/success, quatre checks protégés passants ; Sonar ERROR consultatif documenté. Closeout documentaire et nettoyage encore suivis par reçus vivants. Acceptation pixels UX11-C limitée au consommateur autorisé, aucun OTA/DATA. Archive CLI de `ux11-contextual-training-instrument`, trois exigences canoniques, sans assimilation de DA09-B/C encore en attente de pixels.
+
+
+### DA09-C — extraction de livraison de la mémoire native, 24 novembre 2026
+
+[Change C seul](../../openspec/changes/da09-c-training-memory/proposal.md), issu du scope DA09/G1 déjà autorisé. Parent `aae7bce5`. Décision opérateur : **« Valider les pixels finaux DA09-C du 24 novembre 2026 »**. Onze planches /27 rendus Android locaux acceptés, sources conservées à l’identique. Semaines factuelles bornées, sélection neutre, poids daté et lecture accessible atomique ; aucun nouveau domaine, calcul physiologique ou mutation historique. [Livraison et contrôles](../pilot/da09-c/DELIVERY_REPORT.md). Vérifications C seul :139suites/1576mobiles+TS,129backend/gardes ; CI et merge encore à réaliser à cet instant. B reste indépendant et non accepté ; DA09 global n’est pas archivé. Gestes TalkBack tactiles, D4 agrandi, physique et OTA non qualifiés/autorisés par cette décision.
