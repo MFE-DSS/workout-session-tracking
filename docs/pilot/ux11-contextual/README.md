@@ -15,3 +15,7 @@ Les pixels UX11 sont NOT_ACCEPTED ; leurs sources et preuves sont conservées. L
 138 suites / 1 549 tests mobiles et TypeScript passent ; 90 tests ciblés backend, historique et contrat visuel passent. Les cinq Important de la revue indépendante ont leurs correctifs RED→GREEN. Le focus et la provenance accessible sont également vérifiés. Contrôleur, SCI, temps, SQLite et primitives verrouillées restent inchangés.
 
 La décision du 24 novembre accepte les pixels UX11-C pour ce consommateur. Livraison de code en cours ; aucune acceptation universelle de DA ou de release. [Composition et limites](../../../openspec/changes/ux11-contextual-training-instrument/UX11_C_COMPOSITION.md).
+
+## Livraison du 24 novembre
+
+Produit fusionné par [#436](https://github.com/MFE-DSS/workout-session-tracking/pull/436), HEAD `dfc1f65`, merge `f0a010948e241ab257469c83d821870a2e4a4091`. CI PR45386072355 success. CI canonique45389826580 completed/success, quatre checks requis passants ; Sonar consultatif ERROR détaillé dans DELIVERY_REPORT.md. Publication de closeout et nettoyage encore en suivi. Aucun OTA. L'acceptation exacte est conservée dans l'archive OpenSpec du24novembre.

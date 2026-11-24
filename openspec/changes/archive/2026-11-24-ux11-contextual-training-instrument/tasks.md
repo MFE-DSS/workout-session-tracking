@@ -14,7 +14,7 @@
 
 ## 3. Livraison conditionnelle
 - [x] Revue indépendante finale, vérifications scope/visuel/sécurité/TS/Jest.
-- [ ] PR/CI HEAD exact/merge gardé GOV-MERGE-01, canonique, closeout réel.
+- [x] PR436 HEAD `dfc1f65`, CI45386072355 success, merge gardé `f0a0109` ; CI canonique45389826580 completed/success, 11jobs et quatre checks protégés passants.
 - [x] Aucun APK/OTA, collecte ou déploiement par la préparation.
 
 ## 4. Correction UX11-C après refus des pixels
@@ -22,4 +22,5 @@
 - [x] Référence secondaire, objetS2stable, contrôlessitués,IMEetgrande fonte360/480dp.
 - [x] Revue indépendante/RED→GREEN/contrôleslocaux et paire native mêmefaits.
 - [x] Décision pixels UX11-C explicite (24 novembre).
-- [ ] PR/CI/merge et closeout sur HEAD exact.
+- [x] PR/CI/merge produit sur HEAD exact, arbre HEAD/merge identique.
+- [ ] Publication du closeout documentaire et nettoyage : suivi par reçu vivant après sa CI et son merge.
