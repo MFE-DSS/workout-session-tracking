@@ -1,0 +1,71 @@
+{
+  "source": "full Android ConnectedApp, existing review client, isolated synthetic QA copy",
+  "backend": "http://127.0.0.1:8717",
+  "start_transports": [
+    {
+      "at": "2026-11-24T12:11:39.473971+00:00",
+      "method": "POST",
+      "path": "/api/mobile/v1/me/library/start",
+      "status": 503,
+      "server_status": 201,
+      "deliberate_local_response_loss": true
+    }
+  ],
+  "automatic_post_replay": false,
+  "post_count_after_cold_restore_and_verify": 1,
+  "old_rows_unchanged": {
+    "workout_sessions": true,
+    "session_exercises": true,
+    "set_logs": true,
+    "body_measurements": true
+  },
+  "sessions": [
+    [
+      1,
+      1,
+      "completed"
+    ],
+    [
+      2,
+      1,
+      "completed"
+    ],
+    [
+      3,
+      1,
+      "in_progress"
+    ]
+  ],
+  "QA_package_untouched": true,
+  "SET_or_FINISH_sent": false,
+  "persisted_before_cold_restore": [
+    {
+      "owner_id": 1,
+      "backend_scope": "http://127.0.0.1:8717",
+      "local_id": "b799339f-25ee-4456-9765-5fc6183ce47b",
+      "method": "POST",
+      "path": "/me/library/start",
+      "digest": "51419d78354d7f61ea0a2d31226c6291451af5ab52e1ee265426c984aadfa84f",
+      "created_at_ms": 1795522299033,
+      "state": "SENT_UNKNOWN",
+      "resolution_kind": null,
+      "creation_outcome": "UNKNOWN",
+      "session_id": null,
+      "session_profile": null
+    }
+  ],
+  "final_source_pending_replay": {
+    "method": "restore the exact real SQLite SENT_UNKNOWN image into only the dedicated review client, previous read-only data backed up; original UUID unchanged",
+    "local_id": "b799339f-25ee-4456-9765-5fc6183ce47b",
+    "post_count_before_after_final_replay": 1,
+    "explicit_owner_readback": 3,
+    "new_SET_or_FINISH": false,
+    "candidate_source_manifest": "FINAL_NATIVE_SOURCE_SHA256.json"
+  },
+  "final_old_rows_unchanged": {
+    "workout_sessions": true,
+    "session_exercises": true,
+    "set_logs": true,
+    "body_measurements": true
+  }
+}

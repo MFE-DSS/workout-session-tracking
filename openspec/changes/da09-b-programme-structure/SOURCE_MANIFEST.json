@@ -1,0 +1,23 @@
+{
+  "parent": "14543965d8b7d8e932ae226e6641d7e9d96c4d7e",
+  "scope": "B only / existing GO_BUILD + G1 retained / PIXELS_PENDING",
+  "sources": [
+    {
+      "path": "clients/mobile/src/ui/library/LibraryScreen.tsx",
+      "sha256": "1a3b1e07cef41417214630ef9b6b8280c7ee69148ea943049d7288c2dbd2ebb0"
+    },
+    {
+      "path": "clients/mobile/src/ui/library/LibraryScreen.test.ts",
+      "sha256": "cdcde47d764892121eeadb901887acb1dd80999a717df994e19cb3936a0b303f"
+    },
+    {
+      "path": "clients/mobile/src/ui/cockpit/LibraryStructure.tsx",
+      "sha256": "695787b1a074fc7814692d96c8375a4b3327a7ffa602ad124148c3a83660d082"
+    }
+  ],
+  "source_patch_sha256": "0ef62a0d463d812df024bdb91bbc903b8be92c77d7380d76cc109eab0476ddf0",
+  "C": "already merged and archived, no source copied back",
+  "main_and_other_worktrees": "preserved",
+  "no_UI_commit": true,
+  "no_OTA": true
+}

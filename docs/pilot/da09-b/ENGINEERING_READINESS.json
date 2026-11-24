@@ -1,0 +1,113 @@
+{
+  "date": "2026-11-24",
+  "canonical_parent": "14543965d8b7d8e932ae226e6641d7e9d96c4d7e",
+  "tested_tree": "75bfc254a3e591ec66e3dc23e2c61dad192dc9a1",
+  "tier": "ISOLATED",
+  "checks": {
+    "MOBILE": {
+      "exit_code": 0,
+      "suites": 139,
+      "tests": 1598,
+      "result": "PASS",
+      "log": "/Users/martinfeldmann/auren-review/da09-b-final-20261124/MOBILE.log",
+      "log_sha256": "161f5f1fb074ed2d84928a508822e5175bfc1dce9c67dd6836a397cb8c1f6104"
+    },
+    "TYPESCRIPT": {
+      "exit_code": 0,
+      "result": "PASS",
+      "log": "/Users/martinfeldmann/auren-review/da09-b-final-20261124/TYPESCRIPT.log",
+      "log_sha256": "7e4b571cd9291fd44f9645396bd00600ed6f381e7d9740c58ef78f05d2576aa8"
+    },
+    "BACKEND_CONSUMERS": {
+      "exit_code": 0,
+      "tests": 28,
+      "result": "PASS",
+      "log": "/Users/martinfeldmann/auren-review/da09-b-final-20261124/BACKEND_CONSUMERS.log",
+      "log_sha256": "df4106f50be852a07249da9bf5b7a37b2f27c1f129bbac567f8c1a622e9d8e38"
+    },
+    "BROAD_AND_GUARDS": {
+      "exit_code": 0,
+      "tests": 133,
+      "result": "PASS",
+      "log": "/Users/martinfeldmann/auren-review/da09-b-final-20261124/BROAD_AND_GUARDS.log",
+      "log_sha256": "40d725659c3b8f901ead5cbfa6fa672a080fd11213ca9b036f1ca82d244e8c85"
+    },
+    "VISUAL_CONTRACT": {
+      "exit_code": 0,
+      "tests": 77,
+      "result": "PASS",
+      "mode": "compare only; pinned CI Docker image; no baseline update",
+      "log": "/Users/martinfeldmann/auren-review/da09-b-final-20261124/VISUAL_CONTRACT.log",
+      "log_sha256": "6ef285633488d555134e1b70b0ccb5f1a25c78c66b0a0adc7523f34bb72f03aa"
+    },
+    "RUFF_BUDGET": {
+      "exit_code": 0,
+      "warnings": 259,
+      "baseline": 548,
+      "result": "PASS",
+      "log": "/Users/martinfeldmann/auren-review/da09-b-final-20261124/RUFF_BUDGET.log",
+      "log_sha256": "53fa86e4681016a7fe8a44c124946a0b53dc57a8ecb4180171be2972bdbe3b45"
+    },
+    "SPEC_PROTOCOL": {
+      "exit_code": 0,
+      "result": "PASS",
+      "log": "/Users/martinfeldmann/auren-review/da09-b-final-20261124/SPEC_PROTOCOL.log",
+      "log_sha256": "e3f6676fb1269a927d289a8749a48548b425896256e0f706687240fae9fdb2e8"
+    },
+    "OPENSPEC": {
+      "exit_code": 0,
+      "items": 31,
+      "result": "PASS",
+      "log": "/Users/martinfeldmann/auren-review/da09-b-final-20261124/OPENSPEC.log",
+      "log_sha256": "bbc8463a255123c8916834cca5cebd7b1a2fff68a59c45c7057a60e16ab47aef"
+    },
+    "GITLEAKS": {
+      "exit_code": 0,
+      "result": "PASS",
+      "coverage": "exact candidate changed files; not full history",
+      "log": "/Users/martinfeldmann/auren-review/da09-b-final-20261124/GITLEAKS.log",
+      "log_sha256": "2b36816282e164a185d7c66d0ce1b7aa4544b2b5456aa8270cc583f8bd564677"
+    },
+    "KIT_GITLEAKS": {
+      "exit_code": 0,
+      "result": "PASS",
+      "coverage": "B-only public decision kit",
+      "log": "/Users/martinfeldmann/auren-review/da09-b-final-20261124/KIT_GITLEAKS.log",
+      "log_sha256": "2ee7725212d648823fd134750da307865b4acc50bf3540130060e52eea593503"
+    },
+    "RUFF_NEW_FILES": {
+      "result": "NOT_APPLICABLE",
+      "reason": "No new or changed Python source"
+    }
+  },
+  "product_sources": [
+    {
+      "path": "clients/mobile/src/ui/library/LibraryScreen.tsx",
+      "sha256": "1a3b1e07cef41417214630ef9b6b8280c7ee69148ea943049d7288c2dbd2ebb0"
+    },
+    {
+      "path": "clients/mobile/src/ui/library/LibraryScreen.test.ts",
+      "sha256": "cdcde47d764892121eeadb901887acb1dd80999a717df994e19cb3936a0b303f"
+    },
+    {
+      "path": "clients/mobile/src/ui/cockpit/LibraryStructure.tsx",
+      "sha256": "695787b1a074fc7814692d96c8375a4b3327a7ffa602ad124148c3a83660d082"
+    }
+  ],
+  "product_sources_unchanged_since_submitted_native_board": true,
+  "review": "Existing whole B/C independent review preserved; B-I1/B-M2 RED-to-GREEN historical fixes; no second review claimed",
+  "native": "Original ConnectedApp Android 360/480dp, normal/178.6%; UNKNOWN/relaunch/readback receipts retained. Additional read-only Programmes navigation on emulator-5592; no new SET/FINISH or start campaign.",
+  "limits": [
+    "D4 truncation at enlarged font",
+    "Exhaustive TalkBack touch gestures not qualified for B",
+    "Physical Android acceptance open"
+  ],
+  "pixel_decision": "PENDING_B_ONLY",
+  "actual_index": "UNCHANGED_EMPTY",
+  "ui_commit": false,
+  "new_pr": false,
+  "github_ci": "NOT_RUN_FOR_UNCOMMITTED_B",
+  "merge": false,
+  "ota": false,
+  "next_required_action": "Operator pixel decision on existing B composition"
+}
