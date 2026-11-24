@@ -25,7 +25,7 @@ test('resolved refusal must release stale saved fact and allow work to continue'
 test('effective server removal of completion must stop presenting old completed values',async()=>{
  const root=await renderFact('server-uncompleted');
  const old=root.container.queryAll(n=>n.props.testID==='context-recorded-value');
- 
+
  expect(old).toHaveLength(0);
  await act(async()=>root.unmount());
 });
@@ -38,7 +38,7 @@ test('canonical reread changing the source revision must invalidate the earlier 
  expect(output.read.reference.value).toBe(17.5);
  f.exercise.sets[0].revision=2;f.exercise.sets[0].observation!.setting!.value=20;
  await act(async()=>{root.render(React.createElement(V));await flush();});
- 
+
  expect(output.read?.reference?.revision).not.toBe(1);
  await act(async()=>root.unmount());
 });

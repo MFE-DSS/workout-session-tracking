@@ -26,7 +26,7 @@ Les résultats techniques sont solides : 1 522 tests mobiles passent, une répon
 
 Hevy — Minimiser l'effort de journalisation
 
-L'application expose les performances précédentes, permet de répéter rapidement les séries et lance automatiquement le repos. Son objectif est de réduire les manipulations pendant l'entraînement, pas seulement de les rendre élégantes. 
+L'application expose les performances précédentes, permet de répéter rapidement les séries et lance automatiquement le repos. Son objectif est de réduire les manipulations pendant l'entraînement, pas seulement de les rendre élégantes.
 Hevy Help Centre (English+1
 
 
@@ -44,7 +44,7 @@ Hevy Help Centre (English+1
 
 Fitbod — Relier historique et prochaine action
 
-L'exercice rassemble instructions, mouvement, séries, répétitions, réglages proposés, historique et repos. Les recommandations sont alimentées par les performances et préférences, avec des limites propres au modèle Fitbod. 
+L'exercice rassemble instructions, mouvement, séries, répétitions, réglages proposés, historique et repos. Les recommandations sont alimentées par les performances et préférences, avec des limites propres au modèle Fitbod.
 Fitbod's Help Center+1
 
 
@@ -62,7 +62,7 @@ Fitbod's Help Center+1
 
 Tonal — Faire de l'outil de réglage le cœur de l'expérience
 
-Charge, rythme, progression et transitions sont intégrés au contrôle de l'entraînement. Le système propose notamment des réglages et modes dynamiques, rendus possibles par son matériel connecté. 
+Charge, rythme, progression et transitions sont intégrés au contrôle de l'entraînement. Le système propose notamment des réglages et modes dynamiques, rendus possibles par son matériel connecté.
 Tonal Support+1
 
 
@@ -80,7 +80,7 @@ Tonal Support+1
 
 MacroFactor — Automatiser l'acquisition, puis faire confirmer
 
-Photo et texte deviennent des entrées alimentaires éditables avant validation. La valeur n'est pas dans une plus jolie grille de macros : elle est dans la réduction du travail nécessaire pour renseigner ces macros. 
+Photo et texte deviennent des entrées alimentaires éditables avant validation. La valeur n'est pas dans une plus jolie grille de macros : elle est dans la réduction du travail nécessaire pour renseigner ces macros.
 MacroFactor+1
 
 
@@ -131,7 +131,7 @@ Les captures 13 à 18 sont importantes : à 1,786×, les valeurs deviennent des 
 
 Ce n'est pas nécessairement un défaut d'accessibilité si les contrôles restent atteignables, mais c'est une dégradation de l'expérience instrumentale.
 
-Android demande précisément que les mises en page s'adaptent aux tailles d'écran et que les zones tactiles ne soient pas masquées par d'autres éléments. 
+Android demande précisément que les mises en page s'adaptent aux tailles d'écran et que les zones tactiles ne soient pas masquées par d'autres éléments.
 developer.android.com
 
 4. Le vrai saut d'expérience que je propose
