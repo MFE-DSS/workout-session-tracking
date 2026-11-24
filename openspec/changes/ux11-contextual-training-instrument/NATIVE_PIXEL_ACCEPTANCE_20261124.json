@@ -1,0 +1,125 @@
+{
+  "date": "2026-11-24",
+  "decision": "ACCEPTED_FOR_SCOPED_CONSUMER",
+  "operator_title": "UX11-C ACCEPTANCE & CRITICAL PATH CONTINUATION",
+  "operator_verbatim": "UX11-C native Action composition: ACCEPTED for its scoped consumer.",
+  "accepted": [
+    "Compact prior-set reference separate from performed facts",
+    "Two numeric readouts in the same Action instrument",
+    "Native keyboard editing",
+    "Stable set identity ready/editing/uncertain/server-readback",
+    "Exact provenance, units, current-value independence and recovery"
+  ],
+  "not_granted": [
+    "universal AUREN visual master",
+    "production distribution",
+    "OTA",
+    "new DATA collection"
+  ],
+  "canonical_parent": "9dd90ac777d21291939bdf6b03d9a4b43ca59d21",
+  "evidence_zip_sha256": "f6e0f378d35f4cca1ab93bf083caaabdee60be4952cc762fdc72d7fd66d7e492",
+  "product_sources": [
+    {
+      "path": "sources/clients/mobile/ConnectedApp.tsx",
+      "bytes": 76527,
+      "sha256": "8180e30b474e13f8a7f74ee432f1f9553a9d21bec3d04628be8e24cfb816415d"
+    },
+    {
+      "path": "sources/clients/mobile/src/ui/contextual/ContextualInstrument.test.ts",
+      "bytes": 4194,
+      "sha256": "c55dae9e7194688c03de512260650f62c4dcad0b1e5b292fd0fb69852fd9eae0"
+    },
+    {
+      "path": "sources/clients/mobile/src/ui/contextual/ContextualInstrument.tsx",
+      "bytes": 15813,
+      "sha256": "fff7d59d7e5d6db5edfbe8a3505db31bef28d902a6ff4e13580963510d4da45d"
+    },
+    {
+      "path": "sources/clients/mobile/src/ui/contextual/ContextualPrimitives.tsx",
+      "bytes": 2769,
+      "sha256": "17102f34b01c3dcaba60b93ef5000d4d0b473f267fbda98c8e8bed65f3167498"
+    },
+    {
+      "path": "sources/clients/mobile/src/ui/contextual/authorityTransitions.test.ts",
+      "bytes": 7285,
+      "sha256": "b10f4e79279fe5b9d333b4fe7c91a62574826fa3e9602b569364b6577f84fe22"
+    },
+    {
+      "path": "sources/clients/mobile/src/ui/contextual/compositionContinuity.test.ts",
+      "bytes": 4572,
+      "sha256": "03fdc594d5de9731fe13ba7bd0ed2b17b63fa980f74ab4d5fb171d46bc5553e3"
+    },
+    {
+      "path": "sources/clients/mobile/src/ui/contextual/contextualIntegration.test.ts",
+      "bytes": 4218,
+      "sha256": "40ee2cb1bdcb94029f3bfbc3f08ded06836955595f9a956ab41e4731c8ee490f"
+    },
+    {
+      "path": "sources/clients/mobile/src/ui/contextual/referenceModel.test.ts",
+      "bytes": 2942,
+      "sha256": "c6f3877b64f77d8ab36deaba43460c01ee825bec9cc2a7df4b05fd08e8f9b0c5"
+    },
+    {
+      "path": "sources/clients/mobile/src/ui/contextual/referenceModel.ts",
+      "bytes": 3584,
+      "sha256": "1f953de9222179d8d23a66db11b9a06ad5186bc75b5987f850430188bfcf418f"
+    },
+    {
+      "path": "sources/clients/mobile/src/ui/contextual/referenceRead.test.ts",
+      "bytes": 2739,
+      "sha256": "2355cb8b08a44d9ae90ef31d68373e59d6f4324984b80a413a8fa9f0da3e74a8"
+    },
+    {
+      "path": "sources/clients/mobile/src/ui/contextual/referenceRead.ts",
+      "bytes": 2520,
+      "sha256": "380cf971f439024b96d8f2c3ba51ce1cdec95260ee90835a252468026ccec822"
+    },
+    {
+      "path": "sources/clients/mobile/src/ui/contextual/resolvedRevision.test.ts",
+      "bytes": 1831,
+      "sha256": "2c2f30ff9316b848f78ef9cb821561e14e3def03be53e917d71b0ceb1f30dea1"
+    },
+    {
+      "path": "sources/clients/mobile/src/ui/contextual/reviewRegressions.test.ts",
+      "bytes": 3561,
+      "sha256": "4fe75c54d2232652fd6a2613a13de0a77b2ab70c6af7dcb82783b01ed7d6771d"
+    },
+    {
+      "path": "sources/clients/mobile/src/ui/contextual/useContextRead.test.ts",
+      "bytes": 1904,
+      "sha256": "83af75a00bc7fed252977aadde966bfc6d8013555549c4f0ad8bbd018f1fe8e3"
+    },
+    {
+      "path": "sources/clients/mobile/src/ui/contextual/useContextRead.ts",
+      "bytes": 1502,
+      "sha256": "c7c7537614f89eb003787f0ab36a204bad81a6495b3bc957253ec0bf87cb2c92"
+    },
+    {
+      "path": "sources/clients/mobile/src/ui/plan/PlanV3ExecutionScreen.tsx",
+      "bytes": 11751,
+      "sha256": "d368715111bd18e7b5dc2fb933916b01e874752efafe3af5f2728626724cb176"
+    },
+    {
+      "path": "sources/clients/mobile/src/ui/plan/PlanV3Host.tsx",
+      "bytes": 1188,
+      "sha256": "9cb469aeca3d486263b2d78f3314796860cd6e1d021e7766894c76834a90609b"
+    },
+    {
+      "path": "sources/clients/mobile/test/contextualHarness.ts",
+      "bytes": 1061,
+      "sha256": "d36dbfb74e0163dc66d997e836cdd778a4805ce42802bdacf4c37c71c37ad70a"
+    }
+  ],
+  "viewports": [
+    "Android360dp font1 IME",
+    "Android480dp font1 IME",
+    "Android360dp font1.786 IME"
+  ],
+  "limitations": [
+    "emulator, no physical acceptance",
+    "TalkBack exhaustive unavailable",
+    "inactive window scrollable at large text/IME",
+    "pre-existing stale_identity on font reconfiguration; canonical reproduction retained"
+  ],
+  "review": "Five Important repaired with RED→GREEN and full mobile suite; no second independent rereview claimed"
+}

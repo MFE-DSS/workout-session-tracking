@@ -1,0 +1,33 @@
+{
+  "canonical_parent": "9dd90ac777d21291939bdf6b03d9a4b43ca59d21",
+  "operator_source": "OPERATOR_REQUEST.md",
+  "status": "AUTHORIZED_IN_EXECUTION",
+  "go_build": "ACCEPTED_BY_OPERATOR_CONTINUATION",
+  "g1": "ACCEPTED_BY_OPERATOR_CONTINUATION",
+  "display_policy_amendment": "ACCEPTED_BY_OPERATOR_CONTINUATION",
+  "pixels": "ACCEPTED_UX11_C_SCOPED_CONSUMER",
+  "ux10_pixels": "NOT_ACCEPTED",
+  "ux10_preservation": "PRESERVED_UNCOMMITTED_NO_FALSE_CLOSEOUT",
+  "science_review": "source-contract review only, not new admission",
+  "ota": false,
+  "apk": false,
+  "decision_date": "2026-11-24",
+  "operator_reply_verbatim": "Ok, très bien. Donc là dans le rapport, je vois que j'ai rien à troncher, de ce que j'ai compris, c'est des choses que t'as enregistrées, donc continue sur ton secret.",
+  "interpretation": "Accord de poursuivre après exposition du scope/amendement/G1 concrets ; aucun pixel ou release accepté. Accusé explicite en commentaire avant code.",
+  "ux11_c": {
+    "authority": "OPERATOR_TARGETED_COMPOSITION_CORRECTION_2026_11_24",
+    "go": "AUTHORIZED_BOUNDED_UI_CORRECTION",
+    "g1_source": "operator precise request per AUREN_UI_ITERATION_PROTOCOL G1",
+    "pixels": "ACCEPTED",
+    "primitive_amendment": false,
+    "acceptance": {
+      "date": "2026-11-24",
+      "operator_verbatim": "UX11-C native Action composition: ACCEPTED for its scoped consumer.",
+      "scope": "UX11 contextual Action consumer only; not a universal visual master or distribution approval",
+      "evidence_zip_sha256": "f6e0f378d35f4cca1ab93bf083caaabdee60be4952cc762fdc72d7fd66d7e492",
+      "product_source_manifest": "NATIVE_PIXEL_ACCEPTANCE_20261124.json",
+      "release_approval": false
+    }
+  },
+  "prior_ux11_pixels": "NOT_ACCEPTED"
+}

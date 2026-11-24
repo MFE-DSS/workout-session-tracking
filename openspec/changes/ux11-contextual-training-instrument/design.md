@@ -1,0 +1,27 @@
+# UX11 — une référence dans l’action, une seule tranche V3
+
+## Brainstorming / Options / Risques / Choix retenu
+A — Continuer Legacy/adduction : son historique ne qualifie ni matériel ni sémantique ; la référence resterait indisponible, donc pas de démonstration du bénéfice principal. B — Comparer les séances historiques par nom/clé : NON_COMPARABLE et contexte actuel non démontré ; nouveau contrat producteur plus large, exclu ici. C — Série précédente de la même occurrence V3 : identité/contexte/révision déjà conservés, aucune API neuve ; portée limitée, mais preuve positive possible sans moteur nouveau. Proposition de l’agent : C, à approuver explicitement. Ce n’est pas une décision déjà reçue.
+
+## Source précise et limite
+Un cas synthétique existe : propriétaire3, occurrence6, exercice18 `leg-extensions-assises`, série40/S1 réalisée à17,5kg affichés/9, révision1 ; série41/S2 non réalisée. Contexte complet bilatéral, appareil/réalisation précis dans SOURCE_FEASIBILITY.json. Lecture SQLite en préparation seulement : pas une preuve native UX11 ni une permission actuelle de travail. Après GO, employer une copie synthétique distincte et les vraies API/gates, sans altérer ces originaux ou le QA public. Avant/après sur les mêmes données et sur cette surface V3 ; UX10-01 n’a pas recomposé V3. Ne jamais comparer son AdductionLegacy avec un V3 différent comme si c’était une paire identique.
+
+## Une seule autorité de référence
+Le client TrainingHistoryClient existant lit des pages propriétaires bornées puis le détail de la même occurrence, dispatché vers le vrai V3 et strictement validé. Nouveau resource de présentation : maximum5pages×100, génération/auth-révision/backend/séance/exercice/série liés ; pas de writer ni cache persistant. Les occurrences de l’index ne sont jamais promues depuis NON_COMPARABLE. Seule une observation d’une autre série de la même occurrence est éligible selon COMPARATIVE_SOURCE_CONTRACT.md. Erreur, référence changée, révision incohérente, contexte inconnu ou scan incomplet : aucun nombre présenté comme référence comparable. La référence n’autorise jamais le travail.
+
+Un abonnement AppState propre au resource, strictement read-only et sans toucher les handlers canoniques, invalide sur arrière-plan, compte/backend/sélection/cursor ou opérations pertinentes modifiés et après soumission ; une nouvelle lecture est nécessaire. Il ne lit ni ne remplace l’ancre de temps. Détail consultable : source/identités/révision/heure déclarée et sa précision ; server_now de la lecture SCI distinct des read_id/rows_read_at de l’index. Pas d’op_id inventé dans un DTO qui ne le fournit pas. La version est celle observée par la lecture, pas une garantie d’absence de modification concurrente ultérieure.
+
+## Un instrument stable
+Un seul chassis, exercice et série courante, réglage/répétitions directement éditables, bande mémoire secondaire intégrée à sa structure. La prescription existante garde son rôle ; le fait antérieur reste explicitement un fait, jamais un réglage à employer. Aucun bouton Copier ni préremplissage depuis historique. Champs actuels vides à l’entrée/changement de série, comme le V3 canonique. Date/ID/source seulement à la demande, sans les cacher au besoin.
+
+Après l’action délibérée, le focus visuel retient le setId soumis et montre ses valeurs depuis les faits canoniques locaux et l’état de synchronisation. Le curseur du contrôleur peut avancer ; cela ne démarre pas le travail suivant. Aucun écran de résultat supplémentaire. ACK distinct du fait relu ; brouillon/local durable, acquitté, refusé et incertitude d’envoi distincts. La projection actuelle ne permet pas de distinguer une attente jamais tentée d’un résultat de transport inconnu : les deux portent « Envoi à vérifier », sans prétendre connaître si le serveur a exécuté la commande. Cette limite est soumise explicitement avec le GO, sans modification de sync pour la masquer. Garder les permissions REST/WAIT_SYNC/SETUP/OBSERVATION_ONLY et la revalidation actuelle. Le passage à la suite utilise les actions existantes ; pas de contournement du repos ou setup. À l’exercice suivant non couvert, revenir au consommateur canonique.
+
+## Autorités inchangées
+recordFact/eventTime/refreshExecution, UUID et révisions, AppState/TIME-01, outbox/journal/refus/ownership restent intacts. Le composite reçoit les callbacks canoniques ; aucun effet autonome ne crée un SET/FINISH. La resource ne transmet jamais allowed_actions ou une admission à l’UI de travail. Même sans référence, l’acquisition selon les permissions existantes reste utilisable.
+
+## Validation attendue après GO
+Un avant/après Android réel, mêmes faits et même occurrence V3 ; états référence absente, attente, refus, grande fonte/IME/Retour. Comptages : inspection de référence, saisie+validation, transitions ; aucun gain annoncé avant mesure. Les campagnes UX10 sont conservées comme acquis, seules les frontières affectées sont rejouées. G1 puis pixels avant commit, CI exacte/merge sous GOV-MERGE-01. Aucun OTA.
+
+
+## Cas de fin de série / changement de curseur
+Le pin de présentation du set soumis est évalué avant le routage COMPLETE ou celui de l’exercice suivant. Si workPositionV3 passe à un exercice hors scope ou devient nul, le feedback du set d’origine ne disparaît pas. Aucun second SET pour le maintenir. À la demande explicite de suite/sortie, le pin est relâché et les écrans/actions canoniques reprennent, permissions inchangées. Tester aussi refus/lecture échouée dans ce cas.
