@@ -22,10 +22,6 @@
     "new_python_sources": 0,
     "environment_note": "First invocation lacked ruff on PATH. Reused the existing operator venv executable; no dependency or repository change."
   },
-  "openspec_all": {
-    "pass": 32,
-    "fail": 0
-  },
   "spec_protocol": "PASS",
   "gitleaks": {
     "scope": "all staged C source and delivery files",
@@ -59,6 +55,33 @@
     }
   ],
   "native": "accepted eleven boards / 27 actual local Android ConnectedApp screens; see VISUAL_ACCEPTANCE and REVIEW_AND_VALIDATION",
-  "ci": "NOT_YET_RUN; no old CI reused",
-  "ota": "NOT_AUTHORIZED"
+  "ci": {
+    "code_pr": 438,
+    "head": "d8d36238ae803125c6d858a8ecdc88a6ff5b7168",
+    "run": 45448557145,
+    "status": "completed/success",
+    "jobs": 11,
+    "backend_pass": 8896,
+    "backend_skip": 3,
+    "mobile_suites": 139,
+    "mobile_tests": 1576,
+    "typescript": "PASS",
+    "visual": 77,
+    "sonar_pr": "OK / 0 new issues / 0 hotspots",
+    "merge": "113e817f6625f0e1b0d93c27d05cef4d649e9d6c",
+    "merge_tree_equals_tested_head": true,
+    "canonical_run": 45451534428,
+    "canonical_status_at_publication": "IN_PROGRESS; resolved by final live receipts"
+  },
+  "ota": "NOT_AUTHORIZED",
+  "openspec_preserved_working_tree": {
+    "pass": 32,
+    "fail": 0,
+    "note": "Includes the uncommitted broader DA09 proposal; not the C-only tree."
+  },
+  "openspec_C_only": {
+    "pass": 31,
+    "fail": 0,
+    "log_sha256": "eed7a5e524a2b923836704218f6037468cb95bb4b65095d57ac548b6b469b53a"
+  }
 }
