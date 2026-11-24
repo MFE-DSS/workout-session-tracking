@@ -1,0 +1,41 @@
+{
+  "comparison": "complete rows versus synthetic snapshot; timestamps included",
+  "tables": [
+    {
+      "table": "session_exercises",
+      "unchanged_rows": 9,
+      "sha256": "f65f52b9ee0aec4a632934321427b5a396c67e0c237844a906f755514f4dd39c"
+    },
+    {
+      "table": "set_logs",
+      "unchanged_rows": 21,
+      "sha256": "0172bd515db252e1bb7a35a96fb1d44b11e5a2694a7a39ad6d887708bdf0c046"
+    },
+    {
+      "table": "workout_sessions",
+      "unchanged_rows": 3,
+      "sha256": "fbbfdf52270205da052e128a66808fbed2c326db04e7067bfe1541bf8da22a2e"
+    },
+    {
+      "table": "squad_shared_sessions",
+      "unchanged_rows": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "table": "user_program_sessions",
+      "unchanged_rows": 5,
+      "sha256": "59bb1bbd865c8cb1a7ece87738e4c76a7a4468ab74b4550a22b46a0fba92de72"
+    },
+    {
+      "table": "first_plan_execution_bindings",
+      "unchanged_rows": 1,
+      "sha256": "fffd649eb1dd58bc3737a911cf96d2174354b46edec9f007b78f35ed5eb97d93"
+    },
+    {
+      "table": "first_session_requests",
+      "unchanged_rows": 1,
+      "sha256": "21f089c5b2ee00025c0bc4584f85e4fb42916b999baf4b5cfcaa3f28277d8fd6"
+    }
+  ],
+  "auth_excluded": "device_sessions legitimately changes on real login/logout; first overly broad name match detected this and was narrowed to training facts, not suppressed"
+}

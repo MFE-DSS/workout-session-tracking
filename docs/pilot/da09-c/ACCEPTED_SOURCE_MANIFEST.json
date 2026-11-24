@@ -1,0 +1,52 @@
+{
+  "parent": "aae7bce5fae32a4df0ac939e203ea8f8f0af60d7",
+  "stage": "nine accepted C sources, identical in staged delivery and exact test export",
+  "source_packet_manifest_sha256": "f207f4564537ff7fb7ccb6c1c38ff24cab193dfe9d41d40f1ee3c9c7c4c335b2",
+  "files": [
+    {
+      "path": "clients/mobile/src/ui/history/ExerciseHistoryScreen.tsx",
+      "file": "sources/ExerciseHistoryScreen.tsx",
+      "sha256": "39c9a791325a4d7a40a3f5ec9a502a7debfb4f61d656bd688d609bd1ec48a8a5"
+    },
+    {
+      "path": "clients/mobile/src/ui/history/HistoricalFactsInstrument.tsx",
+      "file": "sources/HistoricalFactsInstrument.tsx",
+      "sha256": "033cfba45d7a784663f63e5f3bd16c7ba0faa9bcf62c9f2b80cf00169ff6c0fe"
+    },
+    {
+      "path": "clients/mobile/src/ui/history/SessionFactsScreen.tsx",
+      "file": "sources/SessionFactsScreen.tsx",
+      "sha256": "b012cd2fbe3dd1266ba8ca2dea6122b78a364a76389e3f8b60680b25628a76b0"
+    },
+    {
+      "path": "clients/mobile/src/ui/history/TrainingHistoryScreen.tsx",
+      "file": "sources/TrainingHistoryScreen.tsx",
+      "sha256": "606e6f515f19acaea046297f962a66b8ef2cae8b7d134cb07e165a00c3dc50ed"
+    },
+    {
+      "path": "clients/mobile/src/ui/history/WeightTrend.tsx",
+      "file": "sources/WeightTrend.tsx",
+      "sha256": "a70d33dcc693a4836f1794ac70d37ce6405d6c0af579751be5206107dfb09a4e"
+    },
+    {
+      "path": "clients/mobile/src/ui/history/historyView.ts",
+      "file": "sources/historyView.ts",
+      "sha256": "4156ef2be8ac28d8e6b005272d860332c5398f89845e9cd62153ab3cbe0111d2"
+    },
+    {
+      "path": "clients/mobile/src/ui/history/SessionFactsScreen.test.ts",
+      "file": "sources/SessionFactsScreen.test.ts",
+      "sha256": "927824b8e16f356f7c8f3d87787189267ee10fb9a26751a49c40bef6c7ffe9b4"
+    },
+    {
+      "path": "clients/mobile/src/ui/history/TrainingHistoryScreen.test.ts",
+      "file": "sources/TrainingHistoryScreen.test.ts",
+      "sha256": "6c339cff9f99fea96b84c90e5fcbb6315c3129703877d85d41e8f7c55067968c"
+    },
+    {
+      "path": "clients/mobile/src/ui/history/WeightTrend.test.ts",
+      "file": "sources/WeightTrend.test.ts",
+      "sha256": "02458d6c935fbd4e964b4117b89009e09be967c72f01b6874f922597018fb9a4"
+    }
+  ]
+}

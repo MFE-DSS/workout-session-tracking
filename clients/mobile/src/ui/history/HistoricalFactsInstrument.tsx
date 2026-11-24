@@ -1,50 +1,130 @@
-/** Local historical composition; locked instruments and tokens remain unchanged. */
-import React,{useState} from 'react';
-import {ScrollView,Text,View,useWindowDimensions} from 'react-native';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {AurenMark} from '../brand/AurenMark';
-import {CalibrationLink} from '../plan/calibrationControls';
-import {InstrumentFrameC} from '../instrument/InstrumentFrame';
-import {RecessedWindow} from '../instrument/RecessedWindow';
-import {NumericReadout} from '../instrument/NumericReadout';
-import {frameGeometry} from '../instrument/frameGeometry';
-import {densityFor,UNIT} from '../calibration/layout';
-import {color,space,type} from '../theme';
-import {numeric} from './historyView';
+import React, { useState } from 'react';
+import { Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { AurenMark } from '../brand/AurenMark';
+import { CalibrationLink } from '../plan/calibrationControls';
+import { color, space, type } from '../theme';
+import { numeric } from './historyView';
 
-export function HistoricalFactsFrame(p:{name:string;status:string;onBack:()=>void;previous?:boolean;children:React.ReactNode}){
- const insets=useSafeAreaInsets();
- return <ScrollView style={{flex:1,backgroundColor:color.field}} contentInsetAdjustmentBehavior="never" contentContainerStyle={{paddingHorizontal:space.gutter,paddingTop:insets.top+12,paddingBottom:insets.bottom+12,gap:12}}>
-  <View style={{flexDirection:'row',justifyContent:'space-between',alignItems:'center',gap:8,flexWrap:'wrap'}}>
-   <CalibrationLink testID="account-back" label="Retour" onPress={p.onBack}/>
-   <View style={{flexDirection:'row',alignItems:'center',gap:8}}><AurenMark size={20} color={color.ink}/><Text style={type.eyebrow}>AUREN</Text></View>
-   <Text style={type.small}>Historique</Text>
-  </View>
-  <View style={{gap:4}}><Text testID="history-session-title" selectable accessibilityRole="header" style={type.bodyStrong}>{p.name}</Text><Text selectable style={type.small}>{p.status}</Text>{p.previous?<Text accessibilityLiveRegion="polite" style={type.small}>Lecture précédente</Text>:null}</View>
-  {p.children}
- </ScrollView>;
+export function HistoricalFactsFrame(p: { name: string; status?: string; onBack?: () => void; previous?: boolean; children: React.ReactNode }) {
+  const insets = useSafeAreaInsets();
+  return <View style={[styles.screen, { paddingTop: insets.top }]}><ScrollView
+    style={styles.screen}
+    contentInsetAdjustmentBehavior="never"
+    contentContainerStyle={{ paddingHorizontal: space.gutter, paddingTop: 12, paddingBottom: insets.bottom + 12, gap: 12 }}
+  >
+    <View style={styles.masthead}>
+      {p.onBack ? <View style={styles.back}><CalibrationLink testID="account-back" label="Retour" onPress={p.onBack} /></View> : null}
+      <View style={styles.brand}><AurenMark size={20} color={color.ink} /><Text style={type.eyebrow}>AUREN</Text></View>
+    </View>
+    <View style={styles.heading}>
+      <Text testID={p.status === undefined ? undefined : 'history-session-title'} selectable accessibilityRole="header"
+        style={p.status === undefined ? styles.title : type.bodyStrong}>{p.name}</Text>
+      {p.status ? <Text selectable style={type.small}>{p.status}</Text> : null}
+      {p.previous ? <Text accessibilityLiveRegion="polite" style={type.small}>Lecture précédente</Text> : null}
+    </View>
+    {p.children}
+  </ScrollView></View>;
 }
-export function HistoricalExerciseInstrument(p:{name:string;context:string;seId:number;selected:boolean;children:(width:number,u:number)=>React.ReactNode}){
- const {width}=useWindowDimensions(),w=width-2*space.gutter,u=UNIT[densityFor(w)],[height,setHeight]=useState(180),contentWidth=frameGeometry('rail',w,height,u).content.w;
- return <InstrumentFrameC width={w} height={height} u={u} testID={`history-instrument-${p.seId}`}>
-  <View onLayout={e=>{const next=Math.ceil(e.nativeEvent.layout.height)+7*u;if(Math.abs(next-height)>1)setHeight(next);}} style={{gap:8}}>
-   {p.selected?<Text testID={`history-selected-exercise-${p.seId}`} style={type.small}>Exercice sélectionné</Text>:null}
-   <Text selectable accessibilityRole="header" style={type.bodyStrong}>{p.name}</Text>
-   <Text testID={`history-context-${p.seId}`} style={type.small}>{p.context}</Text>
-   {p.children(contentWidth,u)}
-  </View>
- </InstrumentFrameC>;
+
+export function HistoricalEntryRow(p: { title: string; status: string; date?: string; onPress: () => void; disabled: boolean; testID?: string }) {
+  return <Pressable testID={p.testID} accessibilityRole="button" accessibilityLabel={`${p.date ? `${p.date}, ` : ''}${p.title}, ${p.status}`}
+    accessibilityState={{ disabled: p.disabled }} disabled={p.disabled} onPress={p.onPress}
+    style={({ pressed }) => [styles.entry, { opacity: p.disabled ? 0.5 : pressed ? 0.6 : 1 }]}>
+    <View importantForAccessibility="no-hide-descendants" style={{ width: 8, alignSelf: 'stretch', alignItems: 'center' }}>
+      <View style={{ width: 1, flex: 1, backgroundColor: color.line }} />
+      <View style={{ width: 5, height: 5, backgroundColor: color.ink3 }} />
+      <View style={{ width: 1, flex: 1, backgroundColor: color.line }} />
+    </View>
+    <View style={styles.entryText}>
+      {p.date ? <Text style={type.small}>{p.date}</Text> : null}
+      <Text style={type.bodyStrong}>{p.title}</Text>
+      <Text style={type.small}>{p.status}</Text>
+    </View>
+    <Text accessible={false} importantForAccessibility="no" style={type.bodyStrong}>›</Text>
+  </Pressable>;
 }
-export function HistoricalSetWindow(p:{width:number;u:number;set:{set_id:number;kind:string;set_index:number;completed:boolean;reps:number|null;raw_reps_repr?:string|null};load:number|null;unit:string;rawLoad?:string|null;hasObservation?:boolean}){
- const [contentHeight,setContentHeight]=useState(0),s=p.set,h=Math.max(92,contentHeight+4.5*p.u);
- const empty=!p.hasObservation&&!s.completed&&s.reps===null&&p.load===null&&p.rawLoad==null&&s.raw_reps_repr==null;
- return <RecessedWindow width={p.width} height={h} u={p.u} testID={`history-set-${s.set_id}`}>
-  <View onLayout={e=>setContentHeight(Math.ceil(e.nativeEvent.layout.height))} style={{gap:6}}>
-   <Text style={type.small}>{s.kind==='work'?'Série':'Préparation'} {s.set_index} · {empty?'Aucun fait enregistré':s.completed?'Complétée':'Non complétée'}</Text>
-   <View style={{flexDirection:'row',flexWrap:'wrap',alignItems:'flex-start',gap:8}}>
-    <View style={{minWidth:146,maxWidth:'100%'}}>{p.rawLoad!=null?<Text style={type.bodyStrong}>Charge invalide</Text>:p.load===null?<Text style={type.body}>Charge inconnue</Text>:<NumericReadout testID={`history-load-${s.set_id}`} role={type.figure} value={numeric(p.load)} unit={p.unit}/>}</View>
-    <View style={{minWidth:80,maxWidth:'100%'}}>{s.raw_reps_repr!=null?<Text style={type.bodyStrong}>Répétitions invalides</Text>:s.reps===null?<Text style={type.body}>Répétitions inconnues</Text>:<NumericReadout testID={`history-reps-${s.set_id}`} role={type.figure} value={String(s.reps)} unit="rép."/>}</View>
-   </View>
-  </View>
- </RecessedWindow>;
+
+export type HistoricalSetFact = {
+  set: { set_id: number; kind: string; set_index: number; completed: boolean; reps: number | null; completed_at: string | null; raw_reps_repr?: string | null };
+  load: number | null;
+  unit: string;
+  rawLoad?: string | null;
+  hasObservation?: boolean;
+  approximate?: boolean;
+};
+
+function emptyFact({ set, load, rawLoad, hasObservation }: HistoricalSetFact) {
+  return !hasObservation && !set.completed && set.completed_at === null && set.reps === null && load === null && rawLoad == null && set.raw_reps_repr == null;
 }
+
+export function HistoricalExerciseInstrument(p: {
+  name: string; context?: string; seId: number; selected: boolean; facts: HistoricalSetFact[]; children: React.ReactNode;
+}) {
+  const [preparationsOpen, setPreparationsOpen] = useState(false);
+  const isEmptyPreparation = (fact: HistoricalSetFact) => fact.set.kind === 'warmup' && emptyFact(fact);
+  const preparations = p.facts.filter(isEmptyPreparation);
+  return <View testID={`history-instrument-${p.seId}`} style={styles.exercise}>
+    <View style={styles.heading}>
+      <Text selectable accessibilityRole="header" style={type.bodyStrong}>{p.name}</Text>
+      {p.selected ? <Text testID={`history-selected-exercise-${p.seId}`} style={type.small}>Exercice sélectionné</Text> : null}
+      {p.context ? <Text testID={`history-context-${p.seId}`} style={type.small}>{p.context}</Text> : null}
+    </View>
+    <View style={styles.ledger}>
+      {p.facts.filter(fact => !isEmptyPreparation(fact)).map(fact => <HistoricalSetRow key={fact.set.set_id} fact={fact} />)}
+      {preparations.length ? <>
+        <CalibrationLink testID={`history-preparations-${p.seId}`} expanded={preparationsOpen}
+          label={`${preparations.length} ${preparations.length === 1 ? 'préparation' : 'préparations'} · aucun fait enregistré`}
+          onPress={() => setPreparationsOpen(open => !open)} />
+        {preparationsOpen ? preparations.map(fact => <HistoricalSetRow key={fact.set.set_id} fact={fact} />) : null}
+      </> : null}
+    </View>
+    {p.children}
+  </View>;
+}
+
+function HistoricalSetRow({ fact }: { fact: HistoricalSetFact }) {
+  const { fontScale } = useWindowDimensions();
+  const { set, load, unit, rawLoad, hasObservation, approximate } = fact;
+  const empty = emptyFact(fact);
+  const incomplete = hasObservation && (load === null || set.reps === null);
+  return <View testID={`history-set-${set.set_id}`} style={[styles.fact, fontScale > 1 ? styles.stacked : null]}>
+    <View style={styles.factIndex}>
+      <Text style={type.eyebrow}>{`${set.kind === 'warmup' ? 'Préparation' : 'Série'} ${set.set_index}`}</Text>
+    </View>
+    {!empty ? <>
+      <Text testID={`history-load-${set.set_id}`} selectable={load !== null}
+        accessibilityLabel={rawLoad == null && load === null ? 'Charge inconnue' : undefined} style={styles.value}>
+        {rawLoad != null ? 'Charge invalide' : load === null ? '—' : `${numeric(load)} ${unit}`}
+      </Text>
+      <Text testID={`history-reps-${set.set_id}`} selectable={set.reps !== null}
+        accessibilityLabel={set.raw_reps_repr == null && set.reps === null ? 'Répétitions inconnues' : undefined} style={styles.value}>
+        {set.raw_reps_repr != null ? 'Répétitions invalides' : set.reps === null ? '—' : `${set.reps} rép.`}
+      </Text>
+    </> : null}
+    <Text style={type.small}>
+      {empty ? 'Aucun fait enregistré' : set.completed ? 'Complétée' : 'Non complétée'}
+      {incomplete ? ' · Observation incomplète' : ''}
+      {approximate ? ' · Heure approximative' : ''}
+    </Text>
+  </View>;
+}
+
+const styles = StyleSheet.create({
+  screen: { flex: 1, backgroundColor: color.field },
+  masthead: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
+  back: { minWidth: 48 },
+  brand: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  heading: { gap: 4 },
+  title: { ...type.title, fontSize: 22, lineHeight: 28 },
+  entry: { minHeight: 48, flexDirection: 'row', alignItems: 'center', gap: 8, borderBottomColor: color.line,
+    borderBottomWidth: StyleSheet.hairlineWidth, paddingVertical: 8 },
+  entryText: { flex: 1, gap: 4 },
+  exercise: { gap: 8, borderTopColor: color.line, borderTopWidth: StyleSheet.hairlineWidth, paddingTop: 12 },
+  ledger: { backgroundColor: color.plate, paddingHorizontal: 12, paddingVertical: 4 },
+  fact: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between',
+    columnGap: 8, rowGap: 4, paddingVertical: 8, borderBottomColor: color.line, borderBottomWidth: StyleSheet.hairlineWidth },
+  factIndex: { minWidth: 48, borderLeftWidth: 2, borderLeftColor: color.ink3, paddingLeft: 8, gap: 2 },
+  stacked: { flexDirection: 'column', alignItems: 'stretch' },
+  value: { ...type.bodyStrong, ...type.tabular, fontSize: 22, lineHeight: 28, flexShrink: 1 },
+});

@@ -1,0 +1,28 @@
+{
+  "change": "da09-c-training-memory",
+  "delivery_extraction_from": "da09-android-product-polish / C only",
+  "canonical_parent": "aae7bce5fae32a4df0ac939e203ea8f8f0af60d7",
+  "scope_approved": true,
+  "g1_approved": true,
+  "g1_decision": "Autoriser DA‑09 et valider G1 A/B/C",
+  "pixel_approved": true,
+  "operator_decision": "Valider les pixels finaux DA09-C du 24 novembre 2026",
+  "operator_source": "direct user mandate AUREN — DA09-C : ACCEPTATION OPÉRATEUR ET CLOSEOUT",
+  "B_decision": "INDEPENDENT_PENDING",
+  "A": "EXCLUDED",
+  "physical_acceptance": false,
+  "OTA_authorized": false,
+  "standing_merge_authorization": "GOV-MERGE-01",
+  "submitted_packet_receipt": {
+    "packet": "/Users/martinfeldmann/Downloads/AUREN_DA09_C_DELTA_FINAL_2026-11-24",
+    "zip": "/Users/martinfeldmann/Downloads/AUREN_DA09_C_DELTA_FINAL_2026-11-24.zip",
+    "bytes": 3833985,
+    "sha256": "2140fd87671ffa0924d66fbc5775e60874fbe3024c0f60a58010e91893def5f4",
+    "images": 11,
+    "native_screens": 27,
+    "C_pixels": "PENDING",
+    "B": "INDEPENDENT_PENDING",
+    "canonical": "aae7bce5fae32a4df0ac939e203ea8f8f0af60d7"
+  },
+  "packet_status_note": "The immutable packet receipt records its submission-time PENDING status. The operator decision above subsequently accepts C only."
+}
