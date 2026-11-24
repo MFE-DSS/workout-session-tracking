@@ -1083,3 +1083,8 @@ PR436 HEAD `dfc1f65`, merge `f0a010948e241ab257469c83d821870a2e4a4091`, arbre id
 
 
 DA09-C — code438 fusionné le24novembre, HEADd8d36238/merge113e817f, CI PR45448557145 success11jobs (8896backend/3ignorés,1576mobiles+TS,77visuels). Archive CLI `2026-11-24-da09-c-training-memory`,3exigences ajoutées au contrat training-history. [Closeout](../pilot/da09-c/CLOSEOUT.md) et [passation](../pilot/da09-c/AGENT_HANDOFF.md). CI canonique45451534428 et publication/nettoyage encore suivis par reçus vivants, aucun PASS anticipé. B reste indépendant, physique/DATA/OTA ouverts.
+
+
+### DA09-B — Programmes comme instrument structurel (24 novembre 2026)
+
+Extraction de livraison du seul consommateur B déjà autorisé ; C est fusionné/archivé au14543965. [Change B](../../openspec/changes/da09-b-programme-structure/proposal.md), [acceptation native](../../openspec/changes/da09-b-programme-structure/PIXEL_ACCEPTANCE.json) : **GO/G1 ACQUIS / PIXELS_ACCEPTED_SCOPED / CI_MERGE_PENDING**. Décision : « Valider les pixels DA09-B Programmes présentés le 24 novembre 2026 ». Séances et prescriptions réelles, catalogue distinct, UNKNOWN et adoption propriétaire conservés. Trois sources inchangées depuis le paquet Android360/480dp et grande fonte. Aucun backend, DTO, TIME01, SQLite, primitive LOCKED ou baseline modifié ; aucune OTA. Physique, TalkBack exhaustif, D4 très grande fonte et maturité globale restent réservés. [Revue/gates](../pilot/da09-b/ACCEPTANCE_AND_GATE.md).

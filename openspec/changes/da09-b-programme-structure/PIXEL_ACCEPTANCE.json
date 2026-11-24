@@ -1,0 +1,51 @@
+{
+  "decision": "Valider les pixels DA09-B Programmes présentés le 24 novembre 2026",
+  "received_date": "2026-11-24",
+  "scope": "DA09-B Programmes controlled native consumer only",
+  "canonical_parent": "14543965d8b7d8e932ae226e6641d7e9d96c4d7e",
+  "sources": [
+    {
+      "path": "clients/mobile/src/ui/library/LibraryScreen.tsx",
+      "sha256": "1a3b1e07cef41417214630ef9b6b8280c7ee69148ea943049d7288c2dbd2ebb0"
+    },
+    {
+      "path": "clients/mobile/src/ui/library/LibraryScreen.test.ts",
+      "sha256": "cdcde47d764892121eeadb901887acb1dd80999a717df994e19cb3936a0b303f"
+    },
+    {
+      "path": "clients/mobile/src/ui/cockpit/LibraryStructure.tsx",
+      "sha256": "695787b1a074fc7814692d96c8375a4b3327a7ffa602ad124148c3a83660d082"
+    }
+  ],
+  "kit": {
+    "zip": "/Users/martinfeldmann/Downloads/AUREN_DA09_B_DECISION_2026-11-24.zip",
+    "bytes": 2495712,
+    "sha256": "bb7fa701e051f70b50907545d713d5cefdba1bba11c33c229bc8bcf167369899",
+    "images": 10,
+    "sources": 3,
+    "status": "B_PIXELS_PENDING",
+    "new_ui_commit": false
+  },
+  "covered": [
+    "Ordered owned programme sessions",
+    "Exact exercise/repetition/set attachment",
+    "Owned programme versus canonical template catalogue",
+    "PUBLISHED / VALIDATED / UNKNOWN / owner-found occurrence distinction",
+    "Verification without automatic POST",
+    "Documented 360/480dp and enlarged text"
+  ],
+  "not_granted": [
+    "New APK",
+    "OTA",
+    "Deployment",
+    "Physical-device certification",
+    "Global visual master",
+    "LOCKED primitive changes"
+  ],
+  "reservations": [
+    "Physical device acceptance open",
+    "Exhaustive TalkBack qualification open",
+    "D4 labels at very large text",
+    "Global artistic maturity"
+  ]
+}

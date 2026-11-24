@@ -1,0 +1,25 @@
+{
+  "change": "da09-b-programme-structure",
+  "delivery_extraction_from": "DA09 / B only, existing authorized scope",
+  "canonical_parent": "14543965d8b7d8e932ae226e6641d7e9d96c4d7e",
+  "scope_approved": true,
+  "g1_approved": true,
+  "operator_G1_decision": "Autoriser DA‑09 et valider G1 A/B/C",
+  "authority_source": "../da09-android-product-polish/AUTHORIZATION.json and original operator mandate; preserved outside this delivery",
+  "pixel_approved": true,
+  "pixel_status": "ACCEPTED_SCOPED_NATIVE",
+  "C": "merged/archived at14543965, not reopened",
+  "latest_continue_instruction_is_not_pixel_acceptance": true,
+  "standing_merge": "GOV-MERGE-01 after all required gates and actual B acceptance",
+  "OTA_authorized": false,
+  "physical_acceptance": false,
+  "operator_pixel_decision": "Valider les pixels DA09-B Programmes présentés le 24 novembre 2026",
+  "operator_pixel_date": "2026-11-24",
+  "acceptance_source": "Explicit operator DA09-B acceptance and delivery mandate, subsequent to the earlier continuation instruction.",
+  "reservations": [
+    "Physical device acceptance open",
+    "Exhaustive TalkBack qualification open",
+    "D4 labels at very large text",
+    "Global artistic maturity"
+  ]
+}
