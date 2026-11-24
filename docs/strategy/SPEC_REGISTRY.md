@@ -1071,3 +1071,7 @@ Parent348dc8c3 après maintenance#422. Le mandat OPS-02 autorise transport image
 UX11-C24novembre : pixelsUX11refusés, capacités conservées ; correctioninstrumentale bornée sousdemandeprécise(G1 protocole), mêmechange/mêmebranche.138suites/1549mobiles+TS et90backend/visuels ciblés ; revueindépendanteetcorrectifsRED→GREEN. BancConnectedAppAndroid360/480dp,IME,178,6% etpending→kill→relecture mêmeUUID/révision1. NouveauxpixelsPENDING ;aucuncommit/PR/CI/OTA/mergeoufausseclôture.
 
 UX11-C — décision opérateur du 24 novembre : **ACCEPTED pour le consommateur Action borné**, selon NATIVE_PIXEL_ACCEPTANCE_20261124.json. Sources produit vérifiées identiques au paquet accepté. Préparation commit/PR/CI/merge sous GOV-MERGE-01 ; aucune OTA ou nouvelle admission DATA par cette décision. Les refus UX10/UX11 antérieurs restent historiques.
+
+### UX11-C — code accepté et fusionné, 24 novembre2026
+
+PR436 HEAD `dfc1f65`, merge `f0a010948e241ab257469c83d821870a2e4a4091`, arbre identique. CI PR45386072355 success, CI canonique45389826580 completed/success, quatre checks protégés passants ; Sonar ERROR consultatif documenté. Closeout documentaire et nettoyage encore suivis par reçus vivants. Acceptation pixels UX11-C limitée au consommateur autorisé, aucun OTA/DATA. Archive CLI de `ux11-contextual-training-instrument`, trois exigences canoniques, sans assimilation de DA09-B/C encore en attente de pixels.

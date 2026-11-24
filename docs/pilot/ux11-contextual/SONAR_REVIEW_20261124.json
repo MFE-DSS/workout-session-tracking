@@ -1,0 +1,138 @@
+[
+  {
+    "type": "BUG",
+    "rule": "pythonbugs:S2259",
+    "file": "app/services/program_builder_commands.py",
+    "line": 42,
+    "message": "Fix this call that leads to a attribute access on a value that can be 'None'.",
+    "same_as_9dd": true
+  },
+  {
+    "type": "VULNERABILITY",
+    "rule": "external_bandit:B404",
+    "file": "app/services/plan_v3/packaging.py",
+    "line": 7,
+    "message": "Consider possible security implications associated with the subprocess module.",
+    "same_as_9dd": true
+  },
+  {
+    "type": "VULNERABILITY",
+    "rule": "external_bandit:B603",
+    "file": "app/services/plan_v3/packaging.py",
+    "line": 54,
+    "message": "subprocess call - check for execution of untrusted input.",
+    "same_as_9dd": true
+  },
+  {
+    "type": "BUG",
+    "rule": "Web:ItemTagNotWithinContainerTagCheck",
+    "file": "app/templates/_partials/body_intelligence_zone_card.html",
+    "line": 15,
+    "message": "Surround this <li> item tag by a <ul>, <ol> or <menu> container one.",
+    "same_as_9dd": true
+  },
+  {
+    "type": "VULNERABILITY",
+    "rule": "external_bandit:B112",
+    "file": "app/services/body_intelligence_inputs.py",
+    "line": 90,
+    "message": "Try, Except, Continue detected.",
+    "same_as_9dd": true
+  },
+  {
+    "type": "VULNERABILITY",
+    "rule": "external_bandit:B112",
+    "file": "app/services/body_intelligence_inputs.py",
+    "line": 108,
+    "message": "Try, Except, Continue detected.",
+    "same_as_9dd": true
+  },
+  {
+    "type": "VULNERABILITY",
+    "rule": "external_bandit:B110",
+    "file": "app/services/home.py",
+    "line": 64,
+    "message": "Try, Except, Pass detected.",
+    "same_as_9dd": true
+  },
+  {
+    "type": "VULNERABILITY",
+    "rule": "external_bandit:B110",
+    "file": "app/services/session_review.py",
+    "line": 72,
+    "message": "Try, Except, Pass detected.",
+    "same_as_9dd": true
+  },
+  {
+    "type": "VULNERABILITY",
+    "rule": "external_bandit:B110",
+    "file": "app/services/weekly_loop.py",
+    "line": 62,
+    "message": "Try, Except, Pass detected.",
+    "same_as_9dd": true
+  },
+  {
+    "type": "VULNERABILITY",
+    "rule": "external_bandit:B112",
+    "file": "app/services/weekly_loop.py",
+    "line": 272,
+    "message": "Try, Except, Continue detected.",
+    "same_as_9dd": true
+  },
+  {
+    "type": "BUG",
+    "rule": "Web:InputWithoutLabelCheck",
+    "file": "app/templates/session_detail.html",
+    "line": 134,
+    "message": "Add an \"id\" attribute to this input field and associate it with a label.",
+    "same_as_9dd": true
+  },
+  {
+    "type": "BUG",
+    "rule": "Web:InputWithoutLabelCheck",
+    "file": "app/templates/session_detail.html",
+    "line": 141,
+    "message": "Add an \"id\" attribute to this input field and associate it with a label.",
+    "same_as_9dd": true
+  },
+  {
+    "type": "BUG",
+    "rule": "Web:InputWithoutLabelCheck",
+    "file": "app/templates/session_detail.html",
+    "line": 159,
+    "message": "Add an \"id\" attribute to this input field and associate it with a label.",
+    "same_as_9dd": true
+  },
+  {
+    "type": "BUG",
+    "rule": "Web:InputWithoutLabelCheck",
+    "file": "app/templates/session_detail.html",
+    "line": 192,
+    "message": "Add an \"id\" attribute to this input field and associate it with a label.",
+    "same_as_9dd": true
+  },
+  {
+    "type": "BUG",
+    "rule": "Web:InputWithoutLabelCheck",
+    "file": "app/templates/session_detail.html",
+    "line": 205,
+    "message": "Add an \"id\" attribute to this input field and associate it with a label.",
+    "same_as_9dd": true
+  },
+  {
+    "type": "BUG",
+    "rule": "css:S9424",
+    "file": "app/static/css/app.css",
+    "line": 989,
+    "message": "Unknown value \"7\" for property \"r\"",
+    "same_as_9dd": true
+  },
+  {
+    "type": "BUG",
+    "rule": "css:S9424",
+    "file": "app/static/css/app.css",
+    "line": 997,
+    "message": "Unknown value \"7\" for property \"r\"",
+    "same_as_9dd": true
+  }
+]

@@ -1,0 +1,34 @@
+{
+  "code_pr": 436,
+  "tested_head": "dfc1f65e252fe9865df5cbda3cc91966485a3c29",
+  "merge": "f0a010948e241ab257469c83d821870a2e4a4091",
+  "head_merge_tree_identical": true,
+  "pr_ci": {
+    "id": 45386072355,
+    "status": "completed",
+    "conclusion": "success",
+    "backend_passed": 8896,
+    "backend_skipped": 3,
+    "mobile_suites": 138,
+    "mobile_tests": 1549,
+    "visuals": 77
+  },
+  "canonical_ci": {
+    "id": 45389826580,
+    "status": "completed",
+    "conclusion": "success"
+  },
+  "sonar_pr": "OK, zero issue, app coverage92.2; new unavailable",
+  "sonar_canonical": {
+    "analysis": "3b805b95-3de5-48a4-909a-f224aabcd1d0",
+    "revision": "f0a010948e241ab257469c83d821870a2e4a4091",
+    "gate": "ERROR_ADVISORY",
+    "bugs": 9,
+    "smells": 659,
+    "external_bandit_entries": 8,
+    "hotspots": 0,
+    "all_17_reviewed_file_bytes_unchanged_from_9dd": true
+  },
+  "archive_followup": "Only documentary publication/CI/merge/cleanup remains unchecked in historical tasks; final live receipt follows reality.",
+  "no_OTA_or_physical_acceptance": true
+}
