@@ -9,9 +9,14 @@ import {workPositionV3,workPermissionV3,currentSetFactV3} from '../../domain/pla
 import {AccountField,AccountLink,AccountMessage} from '../account/AccountFrame';
 import {ExerciseRail,IconButton,PrimaryAction,RestRing,ValueDial,Sheet} from '../components';
 import {color,space,type} from '../theme';
-export function PlanV3ExecutionScreen(p:{controller:FirstUseV3Controller;serverNowMs:number;onSync:()=>Promise<void>;onExit:()=>void}){
+import {ContextualInstrument} from '../contextual/ContextualInstrument';
+import {contextTarget} from '../contextual/referenceModel';
+import type {ContextReader} from '../contextual/referenceRead';
+export type ContextualPorts={reader:ContextReader;revision:number;current:()=>boolean};
+export function PlanV3ExecutionScreen(p:{controller:FirstUseV3Controller;contextual?:ContextualPorts;serverNowMs:number;onSync:()=>Promise<void>;onExit:()=>void}){
  const c=p.controller,state=c.state!,ex=state.execution!,position=workPositionV3(state),insets=useSafeAreaInsets();
  const [history,setHistory]=useState(false),[load,setLoad]=useState(''),[reps,setReps]=useState(''),[menu,setMenu]=useState(false),[edit,setEdit]=useState<'load'|'reps'|null>(null),[message,setMessage]=useState<string|null>(null);
+ const [submitted,setSubmitted]=useState<{owner:number;session:number;set:number}|null>(null);
  useEffect(()=>{setLoad('');setReps('');},[position?.set.set_id]);
  const run=(task:()=>Promise<unknown>)=>{void task().catch(()=>setMessage('Enregistrement à vérifier. Le journal reste conservé.'));};
  const permission=workPermissionV3(state,p.serverNowMs),resting=permission.state==='REST';
@@ -19,7 +24,14 @@ export function PlanV3ExecutionScreen(p:{controller:FirstUseV3Controller;serverN
  const link=(label:string,task:()=>void)=><AccountLink label={label} onPress={task} disabled={c.loading}/>;
  const exercise=position?.exercise,unit=exercise?.prescription.context.load_semantics==='PER_IMPLEMENT'?'kg par élément':exercise?.prescription.context.load_semantics==='MACHINE_DISPLAY_KG'?'kg affichés par l’appareil':'kg au total';
  const name=c.capabilities?.supported_realizations?.find(x=>x.candidate_id===exercise?.canonical_exercise_id)?.display_name??exercise?.canonical_exercise_id;
+ const unresolved=(c.localOperations??[]).filter(r=>r.owner_id===state.owner_id&&r.session_id===ex.session_id&&r.state!=='acked'&&r.state!=='resolved');
+ const blocked=[...new Set([...unresolved.map(r=>r.set_id),...Object.entries(state.local_facts).filter(([,f])=>f.sync==='saved_local'||f.sync==='failed').map(([id])=>Number(id))])].sort((a,b)=>a-b);
+ const recovery=unresolved.find(r=>contextTarget(state,r.set_id));
+ const focused=submitted&&submitted.owner===state.owner_id&&submitted.session===ex.session_id?submitted.set:recovery?.set_id??position?.set.set_id;
+ const target=focused===undefined?null:contextTarget(state,focused,blocked);
+ useEffect(()=>{if(p.contextual&&recovery)setSubmitted(pin=>pin&&pin.owner===state.owner_id&&pin.session===ex.session_id?pin:{owner:state.owner_id,session:ex.session_id,set:recovery.set_id});},[state.owner_id,ex.session_id,recovery?.set_id,p.contextual?.revision]);
  if(history)return <PlanV3JournalScreen controller={c} onBack={()=>setHistory(false)} onSync={p.onSync}/>;
+ if(p.contextual&&target&&!menu&&state.phase!=='COMPLETE'&&ex.status!=='completed')return <ContextualInstrument key={`${p.contextual.revision}:${state.owner_id}:${ex.session_id}:${target.setId}`} controller={c} target={target} {...p.contextual} serverNowMs={p.serverNowMs} onSync={p.onSync} onExit={()=>setMenu(true)} onJournal={()=>setMenu(true)} onSubmitted={id=>setSubmitted({owner:state.owner_id,session:ex.session_id,set:id})} onContinue={()=>setSubmitted(null)}/>;
  if(state.phase==='COMPLETE'||ex.status==='completed')return <ScrollView style={{flex:1,backgroundColor:color.field}} contentContainerStyle={{padding:space.gutter,paddingTop:insets.top+30,gap:24}}>
   <Text style={type.title}>{ex.status==='completed'?'Séance terminée':'Fin enregistrée sur l’appareil'}</Text>
   <AccountMessage text={`${ex.exercises.flatMap(e=>e.sets).filter(s=>currentSetFactV3(state,s).completed).length} séries réellement faites conservées. Aucun score de réussite n’est calculé pour cette séance.`}/>

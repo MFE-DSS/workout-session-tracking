@@ -28,6 +28,7 @@ import {FirstSessionV3Client} from './src/api/firstSessionV3';
 import {FirstUseV3Controller} from './src/api/firstUseV3';
 import {sendPlanV3Outbox} from './src/sync/planV3Sync';
 import {PlanV3Host} from './src/ui/plan/PlanV3Host';
+import {TrainingHistoryClient} from './src/api/trainingHistory';
 import {MissionActionClient,createMissionActionTransport,type MissionAction} from './src/api/missionAction';
 import {MissionActionResource} from './src/api/missionActionResource';
 import {localOpeningState,missionActionCurrent,hasLegacyStart,legacyStartMarker,markLegacyStart,clearLegacyStart,restoreExistingV3,blockLegacyResume,legacyResumeBlocked,clearLegacyResumeBlock} from './src/api/missionOpening';
@@ -231,6 +232,7 @@ export default function ConnectedApp() {
 
   const missionResource=useMemo(()=>new MissionActionResource(auth,new MissionActionClient(auth,transport,createMissionActionTransport(API_URL))),[auth]);
   const historicalSessions=useMemo(()=>new FirstSessionV3Client(new RuntimeV3Client(auth,transport,createV3Transport(API_URL,fetch,{calibrationInventory:'plan-calibration-inventory/2.0.0'}))),[auth]);
+  const contextualHistory=useMemo(()=>new TrainingHistoryClient(auth,transport,historicalSessions),[auth,historicalSessions]);
   const currentOpening=()=>libraryBlocked.current?{kind:'START' as const}:localOpeningState({legacyStartUnknown:legacyStartUnknownRef.current,closePending:closePendingRef.current,v3:planV3Ref.current?.state??null});
 
   const apply = useCallback((event: Event): WorkoutState => {
@@ -1114,7 +1116,7 @@ export default function ConnectedApp() {
   // BODY/NUT remain tab-owned selections; adopting a workout never promotes
   // an unfocused tab into an overlay or discards a later account-form draft.
   const accountOverlay = screen !== 'APP' ? null : accountView === 'first-use'
-    ? planV3?.active ? <PlanV3Host controller={planV3} onExit={()=>{setPlanV3Open(false);leaveAccountView();}} onPreferences={()=>setAccountView('first-use-preferences')} onSync={async()=>{await engineRef.current?.kick();}}/> : <FirstUseScreen key={auth.revision} controller={firstUse} onPreferences={() => setAccountView('first-use-preferences')} onToday={leaveAccountView} onBack={leaveAccountView} />
+    ? planV3?.active ? <PlanV3Host controller={planV3} contextual={{reader:contextualHistory,revision:auth.revision,current:()=>appAlive.current&&auth.signedIn&&planV3.active}} onExit={()=>{setPlanV3Open(false);leaveAccountView();}} onPreferences={()=>setAccountView('first-use-preferences')} onSync={async()=>{await engineRef.current?.kick();}}/> : <FirstUseScreen key={auth.revision} controller={firstUse} onPreferences={() => setAccountView('first-use-preferences')} onToday={leaveAccountView} onBack={leaveAccountView} />
     : accountView === 'preferences' || accountView === 'first-use-preferences'
     ? <TrainingPreferencesScreen key={auth.revision} client={preferencesClient} onClose={accountView === 'first-use-preferences' ? () => setAccountView('first-use') : leaveAccountView}
       onReconnect={reconnectAccount} registerExit={registerPreferencesExit} onWebProfile={API_URL ? () => openWeb('/profile') : undefined} />
@@ -1135,7 +1137,7 @@ export default function ConnectedApp() {
       onCreateAccount={() => { setAccountOutcome(null); setAccountView('signup'); }}
       onRecover={API_URL ? () => openWeb('/forgot-password') : undefined} onPrivacy={privacy} />;
   } else if (screen === 'APP' && planV3?.active && planV3Open && !accountOverlay && state.phase!=='SET' && state.phase!=='REST') {
-    body = <PlanV3Host controller={planV3} onExit={()=>setPlanV3Open(false)} onPreferences={()=>setAccountView('preferences')} onSync={async()=>{await engineRef.current?.kick();}}/>;
+    body = <PlanV3Host controller={planV3} contextual={{reader:contextualHistory,revision:auth.revision,current:()=>appAlive.current&&auth.signedIn&&planV3.active}} onExit={()=>setPlanV3Open(false)} onPreferences={()=>setAccountView('preferences')} onSync={async()=>{await engineRef.current?.kick();}}/>;
   } else if (screen === 'APP') {
     const inWorkout = !libraryAtToday && (state.phase === 'SET' || state.phase === 'REST');
     if (inWorkout && paused && state.plan) {

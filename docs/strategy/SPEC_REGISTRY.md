@@ -1062,3 +1062,12 @@ Le statut NO_APPLY de la proposition précédente est historique : « Autoriser 
 ### REL-03 OPS-02 — raccordement local explicite,17novembre2026
 
 Parent348dc8c3 après maintenance#422. Le mandat OPS-02 autorise transport image privé explicite, initialisation synthétique neuve et isolation/routage propres au VPS partagé ; [amendement et ledger](../../openspec/changes/rel-03-continuous-android-qa/OPS02_SCOPE_AND_LEDGER.md). **ENGINEERING_IN_VERIFICATION / NO_OPERATIONAL_GO / ANDROID_NOT_READY.** Le [paquet opérationnel unique](../release/rel-03/ops02/OPERATIONAL_DECISION.md) reste à autoriser après livraison du code. Aucun service distant, secret, DNS/TLS ou binaire changé ; les features fusionnées et leurs pixels acceptés restent conservés. REL03 actif, pas de clôture de la pipeline installée.
+
+
+### UX11 — Contextual Training Instrument,23novembre2026
+
+[Scope proposé](../../openspec/changes/ux11-contextual-training-instrument/BUILD_SCOPE.md), [source bornée](../../openspec/changes/ux11-contextual-training-instrument/COMPARATIVE_SOURCE_CONTRACT.md), [G1](../../openspec/changes/ux11-contextual-training-instrument/UX_BOARD.md). Parent9dd90ac, GO_BUILD/G1 acquis par continuation opérateur24novembre2026, PIXELS_PENDING. Une série précédente de la même occurrence V3 leg-extensions-assises ; pas de comparaison historique inter-occurrences ni de prescription. UX10-01 conservé non committé, pixelsNOT_ACCEPTED, pas de fauxcloseout. Composite ConnectedApp Android implémenté non committé ;1535tests mobiles/TS et90backend/visuels ciblés passants. SCI/contrôleurs/temps/SQLite et QA inchangés. Paquet natif compact en attente de pixels ; aucune PR/CI/OTA revendiquée.
+
+UX11-C24novembre : pixelsUX11refusés, capacités conservées ; correctioninstrumentale bornée sousdemandeprécise(G1 protocole), mêmechange/mêmebranche.138suites/1549mobiles+TS et90backend/visuels ciblés ; revueindépendanteetcorrectifsRED→GREEN. BancConnectedAppAndroid360/480dp,IME,178,6% etpending→kill→relecture mêmeUUID/révision1. NouveauxpixelsPENDING ;aucuncommit/PR/CI/OTA/mergeoufausseclôture.
+
+UX11-C — décision opérateur du 24 novembre : **ACCEPTED pour le consommateur Action borné**, selon NATIVE_PIXEL_ACCEPTANCE_20261124.json. Sources produit vérifiées identiques au paquet accepté. Préparation commit/PR/CI/merge sous GOV-MERGE-01 ; aucune OTA ou nouvelle admission DATA par cette décision. Les refus UX10/UX11 antérieurs restent historiques.

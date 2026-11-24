@@ -1,0 +1,178 @@
+{
+  "scope": "synthetic local ConnectedApp Android UX11-C; not physical QA acceptance",
+  "canonical_parent": "9dd90ac777d21291939bdf6b03d9a4b43ca59d21",
+  "owner": 7,
+  "session": 13,
+  "source_set": 84,
+  "current_set": 85,
+  "operation": "14a2de56-f74c-4fa2-b4a5-12710cba6c21",
+  "event_fact": {
+    "context": {
+      "canonical_exercise_id": "leg-extensions-assises",
+      "context_ref": "DA09 synthetic qualification",
+      "equipment_ref": "DA09 synthetic device 0",
+      "load_semantics": "MACHINE_DISPLAY_KG",
+      "realization_ref": "initial-candidate-realisation/1.0.0@c05c6596f8f5578bad0b322db8644ebd8f37e319e733d8099a1f4ea18934bdda",
+      "side": "BILATERAL"
+    },
+    "setting": {
+      "kind": "MASS_KG",
+      "unit": "kg",
+      "value": 18.5
+    },
+    "reps": 8,
+    "completed": true,
+    "performed_at": "2026-11-24T10:23:32.927Z",
+    "performed_at_estimated": false
+  },
+  "local_recorded_at_ms": 1795515812810,
+  "server_recorded_at": "2026-11-24 10:23:33",
+  "pending_outbox_state": "pending",
+  "after_outbox_state": "acked",
+  "stable_local_fact_and_intent": true,
+  "stable_payload_sha256": "4c69963fb708c93306f9399ba7df7dc1b0cded004153b6c0e670622965c54ea8",
+  "applied_server_observations": 1,
+  "applied_revision": 1,
+  "transport_attempts_same_op": 9,
+  "existing_sender_retries": true,
+  "new_manual_submit_actions": 1,
+  "transport": [
+    {
+      "at": "2026-11-24T10:23:33.878522+00:00",
+      "method": "PUT",
+      "path": "/api/mobile/v3/sessions/13/sets/85",
+      "status": 503,
+      "server_status": 200,
+      "deliberate_local_response_loss": true,
+      "op_id": "14a2de56-f74c-4fa2-b4a5-12710cba6c21",
+      "payload_sha256": "af8936c1258c8e1070cbcff66827984fd0503848626e8c90d4c10da7388ded63",
+      "performed_at": null
+    },
+    {
+      "at": "2026-11-24T10:23:34.951986+00:00",
+      "method": "PUT",
+      "path": "/api/mobile/v3/sessions/13/sets/85",
+      "status": 503,
+      "server_status": null,
+      "deliberate_local_response_loss": false,
+      "op_id": "14a2de56-f74c-4fa2-b4a5-12710cba6c21",
+      "payload_sha256": "af8936c1258c8e1070cbcff66827984fd0503848626e8c90d4c10da7388ded63",
+      "performed_at": null
+    },
+    {
+      "at": "2026-11-24T10:23:37.024115+00:00",
+      "method": "PUT",
+      "path": "/api/mobile/v3/sessions/13/sets/85",
+      "status": 503,
+      "server_status": null,
+      "deliberate_local_response_loss": false,
+      "op_id": "14a2de56-f74c-4fa2-b4a5-12710cba6c21",
+      "payload_sha256": "af8936c1258c8e1070cbcff66827984fd0503848626e8c90d4c10da7388ded63",
+      "performed_at": null
+    },
+    {
+      "at": "2026-11-24T10:23:41.119096+00:00",
+      "method": "PUT",
+      "path": "/api/mobile/v3/sessions/13/sets/85",
+      "status": 503,
+      "server_status": null,
+      "deliberate_local_response_loss": false,
+      "op_id": "14a2de56-f74c-4fa2-b4a5-12710cba6c21",
+      "payload_sha256": "af8936c1258c8e1070cbcff66827984fd0503848626e8c90d4c10da7388ded63",
+      "performed_at": null
+    },
+    {
+      "at": "2026-11-24T10:23:49.254141+00:00",
+      "method": "PUT",
+      "path": "/api/mobile/v3/sessions/13/sets/85",
+      "status": 503,
+      "server_status": null,
+      "deliberate_local_response_loss": false,
+      "op_id": "14a2de56-f74c-4fa2-b4a5-12710cba6c21",
+      "payload_sha256": "af8936c1258c8e1070cbcff66827984fd0503848626e8c90d4c10da7388ded63",
+      "performed_at": null
+    },
+    {
+      "at": "2026-11-24T10:24:05.438227+00:00",
+      "method": "PUT",
+      "path": "/api/mobile/v3/sessions/13/sets/85",
+      "status": 503,
+      "server_status": null,
+      "deliberate_local_response_loss": false,
+      "op_id": "14a2de56-f74c-4fa2-b4a5-12710cba6c21",
+      "payload_sha256": "af8936c1258c8e1070cbcff66827984fd0503848626e8c90d4c10da7388ded63",
+      "performed_at": null
+    },
+    {
+      "at": "2026-11-24T10:24:21.289001+00:00",
+      "method": "PUT",
+      "path": "/api/mobile/v3/sessions/13/sets/85",
+      "status": 503,
+      "server_status": null,
+      "deliberate_local_response_loss": false,
+      "op_id": "14a2de56-f74c-4fa2-b4a5-12710cba6c21",
+      "payload_sha256": "af8936c1258c8e1070cbcff66827984fd0503848626e8c90d4c10da7388ded63",
+      "performed_at": null
+    },
+    {
+      "at": "2026-11-24T10:25:07.720866+00:00",
+      "method": "PUT",
+      "path": "/api/mobile/v3/sessions/13/sets/85",
+      "status": 503,
+      "server_status": null,
+      "deliberate_local_response_loss": false,
+      "op_id": "14a2de56-f74c-4fa2-b4a5-12710cba6c21",
+      "payload_sha256": "af8936c1258c8e1070cbcff66827984fd0503848626e8c90d4c10da7388ded63",
+      "performed_at": null
+    },
+    {
+      "at": "2026-11-24T10:25:20.327062+00:00",
+      "method": "PUT",
+      "path": "/api/mobile/v3/sessions/13/sets/85",
+      "status": 200,
+      "server_status": 200,
+      "deliberate_local_response_loss": false,
+      "op_id": "14a2de56-f74c-4fa2-b4a5-12710cba6c21",
+      "payload_sha256": "af8936c1258c8e1070cbcff66827984fd0503848626e8c90d4c10da7388ded63",
+      "performed_at": null
+    }
+  ],
+  "typed_mass_in_legacy_weight_kg": null,
+  "unchanged_prior_observations": 6,
+  "prior_observations_sha256": "ed576b2469025b4f864a7fee7f07279c1411a4a88f36bd50227a40790ea0aad3",
+  "finish_calls": 0,
+  "device": {
+    "package": "dev.auren.da09.review",
+    "serial": "emulator-5592",
+    "api": 36,
+    "physical_acceptance": false,
+    "connected_app": true,
+    "qa_package_untouched": "dev.auren.releaseqa02"
+  },
+  "render_conditions": [
+    {
+      "width_dp": 360,
+      "height_dp": 800,
+      "font_scale": 1.0,
+      "system_ime": true
+    },
+    {
+      "width_dp": 480,
+      "height_dp": 1066.67,
+      "font_scale": 1.0,
+      "system_ime": true
+    },
+    {
+      "width_dp": 360,
+      "height_dp": 800,
+      "font_scale": 1.786,
+      "system_ime": true
+    }
+  ],
+  "limitations": [
+    "No TalkBack exhaustive campaign",
+    "QA binary and OTA unchanged",
+    "stale_identity once after font reconfiguration, also reproduced in canonical baseline; original cause not fixed here",
+    "Transient history409 after SET then reference confirmed on explicit verification; no stale cached reference fabricated"
+  ]
+}

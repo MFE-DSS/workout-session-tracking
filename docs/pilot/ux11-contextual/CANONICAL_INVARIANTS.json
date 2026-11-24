@@ -1,0 +1,52 @@
+[
+  {
+    "path": "clients/mobile/src/api/firstUseV3.ts",
+    "equal_canonical": true,
+    "sha256": "dcd80e0fddcdb700f2522f0b8320016c73ddc800553384810f0e9580d8e640c4"
+  },
+  {
+    "path": "clients/mobile/src/sync/planV3Sync.ts",
+    "equal_canonical": true,
+    "sha256": "80b7ecd694ae7added971dfe7fca974aaf7ef1607a98b9f4c4c0471cd5941a35"
+  },
+  {
+    "path": "clients/mobile/src/storage/journal.ts",
+    "equal_canonical": true,
+    "sha256": "1c1ad8acc76e9968e1c02d10234e2fcb924bb830816b5df338f3ef85e48dee01"
+  },
+  {
+    "path": "clients/mobile/src/domain/planV3Workout.ts",
+    "equal_canonical": true,
+    "sha256": "d0979fddc7451bd17321839a7c35b41b4a96279d0352696457ecd2e1ac1413bd"
+  },
+  {
+    "path": "clients/mobile/src/ui/instrument/InstrumentFrame.tsx",
+    "equal_canonical": true,
+    "sha256": "c4d4bfd4fb082bfa0174ccc471ff47479f3406897a6cf311fd87b2f79952f930"
+  },
+  {
+    "path": "clients/mobile/src/ui/instrument/frameGeometry.ts",
+    "equal_canonical": true,
+    "sha256": "950f750be7664d306ebde05ef3ec0a93c2d55368071b8f2336f9931b9f21f88f"
+  },
+  {
+    "path": "clients/mobile/src/ui/instrument/RecessedWindow.tsx",
+    "equal_canonical": true,
+    "sha256": "53918f5e841528cec09e8a340a5e8fa5fa657b2314cf9e11e03df7e8a0cadb33"
+  },
+  {
+    "path": "clients/mobile/src/ui/instrument/recessedWindowGeometry.ts",
+    "equal_canonical": true,
+    "sha256": "165e4e84f231d82b43f51e8d8ffd92527d7e6b65bc63b09084b63ebd10ac9c5d"
+  },
+  {
+    "path": "clients/mobile/src/ui/instrument/NumericReadout.tsx",
+    "equal_canonical": true,
+    "sha256": "66e3bd622ec6450e53780432cbbe00963f07c8b5783779a6021bebabe0f5f67e"
+  },
+  {
+    "path": "clients/mobile/src/ui/theme.ts",
+    "equal_canonical": true,
+    "sha256": "01076056d877718b3fb05b2c1090e7727e747a024ef65524b5e8a229d98e8efe"
+  }
+]

@@ -1,0 +1,41 @@
+{
+  "source": "read-only observation of existing isolated synthetic DB8687; no mutation and no current work permission implied",
+  "binding": {
+    "session_id": 6,
+    "owner_id": 3,
+    "binding_digest": "b816be254ead3ecb02a67f0824376910f77ed1af2e574b2044062bfb90cc18df"
+  },
+  "previous_server_source_row": {
+    "session_id": 6,
+    "session_exercise_id": 18,
+    "set_id": 40,
+    "applied_revision": 1,
+    "observation": {
+      "completed": true,
+      "context": {
+        "canonical_exercise_id": "leg-extensions-assises",
+        "context_ref": "DA09 synthetic qualification",
+        "equipment_ref": "DA09 synthetic device 0",
+        "load_semantics": "MACHINE_DISPLAY_KG",
+        "realization_ref": "initial-candidate-realisation/1.0.0@c05c6596f8f5578bad0b322db8644ebd8f37e319e733d8099a1f4ea18934bdda",
+        "side": "BILATERAL"
+      },
+      "performed_at": "2026-11-23T13:31:46.664Z",
+      "performed_at_estimated": false,
+      "reps": 9,
+      "setting": {
+        "kind": "MASS_KG",
+        "unit": "kg",
+        "value": 17.5
+      }
+    }
+  },
+  "current_set_row": {
+    "id": 41,
+    "set_index": 2,
+    "completed": 0,
+    "reps": null,
+    "weight_kg": null
+  },
+  "status": "SOURCE_FEASIBLE_NOT_UX11_NATIVE_PROOF"
+}
