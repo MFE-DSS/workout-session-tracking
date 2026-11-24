@@ -10,5 +10,5 @@
 - [x] 2.4 Recevoir la décision opérateur sur les pixels B existants ou réparer une anomalie concrète démontrée.
 
 ## 3. Livraison après acceptation
-- [ ] 3.1 Commit/PR B seule, contrôles protégés sur le HEAD réel, merge gardé sous GOV-MERGE-01.
+- [x] 3.1 Commit/PR B seule, contrôles protégés sur le HEAD réel, merge gardé sous GOV-MERGE-01.
 - [ ] 3.2 CI canonique, archive et closeout B ; candidat QA consolidé préparé séparément sans publication.
