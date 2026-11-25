@@ -1,7 +1,7 @@
 ## MODIFIED Requirements
 
 ### Requirement: Composition et commandes conservées
-Les cartes historiques V1 LOCKED, leurs quatre références et leurs primitives SHALL être conservées. Un nouveau consommateur cockpit Today/MISSION MAY les remplacer dans le seul chemin approuvé après amendement visuel borné, croquis puis vrais pixels acceptés. La trace exacte du moteur, les zones serveur et les commandes canoniques SHALL rester inchangées. Le libellé de nouveauté MAY être contextualisé comme absence de passage terminé retrouvé pour le modèle de séance, en conservant son suffixe d’incertitude et sa trace brute accessible ; les métadonnées de provenance/horizon SHALL décrire leur véritable portée sans inventer de récupération ; une action dominante MUST NOT masquer une action obligatoire.
+Les cartes historiques V1 LOCKED, leurs quatre références, primitives, zones serveur et commandes canoniques SHALL être conservées. Leur remplacement dans le seul chemin Today/MISSION approuvé SHALL exiger un amendement borné, G1 puis vrais pixels acceptés. La nouveauté et la provenance MAY être contextualisées selon les scénarios ci-dessous, sans inventer de récupération ni masquer une action obligatoire.
 
 #### Scenario: Projet de nouvelle carte
 - **WHEN** une orientation visible nouvelle est proposée
@@ -27,3 +27,9 @@ Le consommateur SHALL déplier la préparation dans le même objet et conserver 
 - **WHEN** l’utilisateur ouvre ou ferme la préparation
 - **THEN** seules les données déjà reçues sont révélées et aucun POST n’est émis
 - **AND** l’action de démarrage demeure soumise aux gardes canoniques existantes
+
+
+#### Scenario: Portée de la provenance historique
+- **WHEN** la provenance ou l’horizon reçus sont affichés
+- **THEN** ils décrivent leur véritable portée historique, sans inventer de récupération ni de borne datée absente
+- **AND** la trace exacte du moteur reste accessible et une action dominante ne masque aucune action obligatoire

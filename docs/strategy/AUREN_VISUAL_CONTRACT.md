@@ -527,7 +527,7 @@ Pourquoi trois dessins : une fente d'un pixel centrée tombe sur un demi-pixel. 
 
 ### Amendement consommateur — `TODAY-MISSION-COCKPIT-01` (25 novembre 2026)
 
-**Autorité explicite** : « Autoriser le scope, l’amendement et G1 » (24novembre), puis **« ACCEPT des pixels MISSION corrigés présentés le 25 novembre 2026 pour le périmètre sémantique et la composition native Android examinés. »** Reçu exact : `openspec/changes/today-mission-cockpit/PIXEL_ACCEPTANCE_20261125.json` (puis archive de ce change).
+**Autorité explicite** : « Autoriser le scope, l’amendement et G1 » (24novembre), puis **« ACCEPT des pixels MISSION corrigés présentés le 25 novembre 2026 pour le périmètre sémantique et la composition native Android examinés. »** Reçu exact : `openspec/changes/archive/2026-11-25-today-mission-cockpit/PIXEL_ACCEPTANCE_20261125.json` (puis archive de ce change).
 
 Le seul chemin Today de ConnectedApp MAY employer `MissionCockpitScreen` et le châssis présentatif `MissionCockpitFrame`, avec préparation dépliée dans le même objet et commande applicable visible. `MissionActionHost` conserve les priorités, handlers et gardes. Le consommateur V1, ses quatre baselines et toutes les primitives LOCKED ci-dessus restent conservés à l’octet ; aucune rebaseline ni cinquième onglet.
 

@@ -7,4 +7,4 @@
 ## 2. Apply après autorisation
 - [x] 2.1 Réaliser le composite unique sans changer autorité métier ni LOCKED.
 - [x] 2.2 Exécuter tests/consommateurs et vraie preuve native.
-- [ ] 2.3 Obtenir pixels et revue indépendants, puis CI/merge/closeout autorisés.
+- [x] 2.3 Obtenir pixels et revue indépendants, puis CI/merge/closeout autorisés.
