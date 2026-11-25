@@ -1094,3 +1094,7 @@ DA09-B — code440 fusionné,24novembre2026 : HEADf584601/merge07167010, CI PR45
 ### SCI-READINESS-00 — audit demandé,25novembre2026
 
 [Décision](SCI_READINESS_00_DECISION.md), [change distinct](../../openspec/changes/sci-readiness-00/proposal.md). Parent224ea54. Audit du code historique actif, taxonomies11/15zones, temps/exécution et sixétudes humaines primaires ; **AUDIT_ONLY / NO_RUNTIME / NO_VISUAL_BASELINE**. Le défaut d’explication à historique vide et la différence exerciceprésent/sérieréalisée sont documentés, pas corrigés dans le moteur. READINESS-01/02 et toute géométrie conservent leurs autorisations propres. MISSION/pixels restent séparés.
+
+### Today/MISSION — cockpit et préparation située,25novembre2026
+
+[Change](../../openspec/changes/today-mission-cockpit/proposal.md), [reçu pixels exact](../../openspec/changes/today-mission-cockpit/PIXEL_ACCEPTANCE_20261125.json). GO scope/amendement/G1 acquis le24 ; pixels corrigés ACCEPTED_SCOPED le25. Parent de livraison0d4fcfa après auditSCI00 distinct ; produit identique aux pixels acceptés. Préparation sans POST, priorités propriétaires et commande existante ; BodyMap source, V1/baselines/LOCKED conservés. Qualification des libellés historiques, aucune disponibilité musculaire nouvelle. CI/merge encore à réaliser ; réserves grandefonte/TalkBack/physique et aucune OTA.

@@ -1,0 +1,89 @@
+{
+  "canonical_parent": "224ea54f25f4ff40ee7e35a4a53efc852fb5dcd6",
+  "canonical_parent_ci": 45489781273,
+  "branch": "spec/today-mission-cockpit",
+  "scope_amendment_g1": "APPROVED",
+  "pixels": "ACCEPTED_SCOPED_20261125",
+  "UI_commit": false,
+  "PR": null,
+  "CI_for_new_code": null,
+  "local_mobile": {
+    "suites": 140,
+    "tests": 1610,
+    "typescript": "PASS",
+    "log": "ACCEPTED_MOBILE.log"
+  },
+  "backend_targeted_broad": 107,
+  "guards": 55,
+  "visual_refs": 77,
+  "ruff_budget": "259 <=548",
+  "openspec_strict": "PASS",
+  "protocol": "PASS",
+  "independent_review": {
+    "Critical": 0,
+    "Important": 1,
+    "Minor": 0,
+    "important_fix": "Native RED→GREEN constrained header and wrap, no locked change",
+    "second_fix_review_claimed": false
+  },
+  "native": "Actual Android ConnectedApp emulator5592, dev.auren.da09.review; physical not qualified",
+  "remaining": [
+    "required final checks, exactHEAD protected CI, guarded merge, canonical CI, archive/closeout"
+  ],
+  "no_APK_OTA_deploy": true,
+  "native_coverage": {
+    "canonical_read_scenarios": [
+      "READY closed/open360/480,1.0/1.786",
+      "owner1 RESUME existing3 without adoption",
+      "original origin UNKNOWN and back/reopen",
+      "owner2 FIRST_USE"
+    ],
+    "synthetic_contract_counterexamples": [
+      "long name/counts native RED→GREEN",
+      "CONFLICT",
+      "UNAVAILABLE",
+      "READ_UNKNOWN503",
+      "NO_ZONES",
+      "one locally rejected403 start; not forwarded"
+    ],
+    "native_coverage_limits": [
+      "emulator only",
+      "no physical device acceptance",
+      "no exhaustive TalkBack gestures",
+      "D4 labels and locked BodyMap label boxes at1.786 remain limited"
+    ],
+    "authority": "Source contracts and existing controllers unchanged; no new backend API, no domain mutation, no APK/OTA"
+  },
+  "native_packet": "/Users/martinfeldmann/Downloads/AUREN_MISSION_SEMANTIQUE_2026-11-25",
+  "semantic_delta_20261125": {
+    "composition_direction": "APPROVED",
+    "pixels": "ACCEPTED_SCOPED",
+    "mobile_suites": 140,
+    "mobile_tests": 1610,
+    "typescript": "PASS",
+    "native_profiles": [
+      "360/100%",
+      "480/100%",
+      "360/178.6%",
+      "480/178.6%"
+    ],
+    "source": "SEMANTIC_NATIVE_SOURCE_HASHES.json",
+    "same_facts": "SEMANTIC_SAME_FACTS.json",
+    "UI_commit": false,
+    "packet": "/Users/martinfeldmann/Downloads/AUREN_MISSION_SEMANTIQUE_2026-11-25",
+    "audit": "https://github.com/MFE-DSS/workout-session-tracking/pull/442",
+    "original_packet_preserved": true
+  },
+  "delivery_parent": "0d4fcfa18165cef5ea2b79246a4327661c84efd5",
+  "fresh_delivery_checks": {
+    "backend_targeted_broad": 34,
+    "backend_log": "ACCEPTED_BACKEND.log",
+    "guards": 69,
+    "visual_refs": 77,
+    "ruff_budget": "259 <=548",
+    "protocol": "PASS",
+    "OpenSpec_all_strict": "33/33",
+    "security": "Gitleaks staged candidate PASS",
+    "tooling_correction": "Ruff executable absent from PATH; rerun with existing venv PATH PASS, no code/threshold change"
+  }
+}

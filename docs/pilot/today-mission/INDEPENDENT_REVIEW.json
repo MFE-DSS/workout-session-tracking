@@ -1,0 +1,46 @@
+{
+  "reviewer": "independent today_cockpit_final_review",
+  "base": "224ea54f25f4ff40ee7e35a4a53efc852fb5dcd6",
+  "reviewed": "whole uncommitted Today diff, not old DA09 notes",
+  "critical": 0,
+  "important": [
+    {
+      "id": "T-I1",
+      "finding": "Long normal-scale names and large counts can overflow unsized InstrumentSurface row",
+      "remedy": "constrained local header + wrapping scope; primitive unchanged",
+      "native_RED": "captures/EDGE_LONG_RED_360.png",
+      "native_GREEN": "captures/EDGE_LONG_GREEN_360.png"
+    }
+  ],
+  "minor": [],
+  "declined": [
+    "Visual balance/focus/scroll/insets: native evidence pending at review",
+    "Pixel approval: operator decision",
+    "Physical/signed QA device: not exercised",
+    "Muscle recovery/calendar/full composition: outside contract",
+    "Test rerun: no redundant sweep; communicated results not independently certified"
+  ],
+  "no_second_review_claimed": true,
+  "additional_semantic_review": {
+    "critical": 0,
+    "important": 1,
+    "minor": 1,
+    "finding": "canonical partial-reading suffix bypassed exact equality; alternative raw trace lost",
+    "resolution": "canonical prefix contextualized, suffix retained, raw alternative disclosed; RED→GREEN and whole mobile1610PASS",
+    "provenance_scope": "historique retenu",
+    "reviewer_excluded": [
+      "native art acceptance",
+      "engine correction",
+      "new physiological model"
+    ]
+  },
+  "delivery_final_review": {
+    "critical_product": 0,
+    "important_product": 0,
+    "minor_product": 0,
+    "important_governance": "acceptance receipts + Visual Contract§25 + SPEC_REGISTRY reconciled under existing GO",
+    "product_hashes_match_accepted_packet": true,
+    "reviewer": "mission_delivery_review",
+    "no_redundant_tests_by_reviewer": true
+  }
+}

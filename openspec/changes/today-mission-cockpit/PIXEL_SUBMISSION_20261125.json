@@ -1,0 +1,47 @@
+{
+  "status": "PIXELS_SUBMITTED_PENDING_OPERATOR",
+  "date": "2026-11-25",
+  "scope_amendment_g1": "APPROVED",
+  "operator_pixel_approval": false,
+  "canonical_parent": "224ea54f25f4ff40ee7e35a4a53efc852fb5dcd6",
+  "branch": "spec/today-mission-cockpit",
+  "packet": {
+    "path": "/Users/martinfeldmann/Downloads/AUREN_TODAY_MISSION_DECISION_2026-11-25.zip",
+    "bytes": 2928041,
+    "sha256": "9063c3d44b631c7d3caa97f59422f85225bd94fdc5793367f299c2b6f8845fe2",
+    "images": 13,
+    "boards": 7,
+    "pixels": "PENDING",
+    "private_credentials_databases_keys_excluded": true
+  },
+  "source_hashes": {
+    "clients/mobile/ConnectedApp.tsx": "ca8408dcee3426bf416f5ac66367a42590f839cc4bba3c4578dfd0ae19f60388",
+    "clients/mobile/src/ui/mission/MissionCockpitFrame.tsx": "24407f9f751fffe862ada4f3dfe967281ae94269bf766f8752c37466183a678a",
+    "clients/mobile/src/ui/mission/MissionCockpitScreen.tsx": "497e6e0de66a244b3eed330b08d1b140bb5baa1afc975488a8ed1ece53ec1380",
+    "clients/mobile/src/ui/mission/MissionActionHost.tsx": "a034d8b66c5990447c3710dbad30ad44697e1ed779518bc7251c811a52ac9933"
+  },
+  "native_primary_readout": "CANONICAL_READY_OWNER2.json",
+  "native_owner_read": "CANONICAL_RESUME_OWNER1.json",
+  "native_no_domain_mutation": "FINAL_NATIVE_NO_DOMAIN_MUTATION.json",
+  "local_checks": {
+    "mobile": 1607,
+    "suites": 140,
+    "typescript": "PASS",
+    "backend": 107,
+    "guards": 55,
+    "visual_refs": 77,
+    "OpenSpec": "strict PASS",
+    "protocol": "PASS",
+    "gitleaks": "candidate + decision packet PASS"
+  },
+  "limitations": [
+    "emulator only",
+    "TalkBack gestures not exhaustive",
+    "D4 and locked BodyMap visual large-font labels retain limits"
+  ],
+  "no_new_UI_commit_PR_CI_merge_APK_OTA": true,
+  "next_operation": "Wait operator pixel decision; then finalize required checks and exactHEAD delivery under GOV-MERGE-01",
+  "record_kind": "HISTORICAL_SUBMISSION_NOT_CURRENT_STATUS",
+  "superseded_by": "PIXEL_ACCEPTANCE_20261125.json",
+  "do_not_infer_acceptance_of_original_packet": true
+}

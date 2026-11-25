@@ -66,7 +66,7 @@ jest.mock('../ui/CompleteScreen', () => ({ CompleteScreen: (p: object) => mockRe
   ? require('react').createElement(jest.requireActual('../ui/CompleteScreen').CompleteScreen, p)
   : require('react').createElement('Complete', p) }));
 jest.mock('../ui/bodymap/BodyMapTriptych', () => ({ SessionBodyMap: () => null }));
-jest.mock('../ui/MissionScreen', () => ({ MissionScreen: (p: object) => require('react').createElement('Mission', p) }));
+jest.mock('../ui/mission/MissionCockpitScreen', () => ({ MissionCockpitScreen: (p: object) => require('react').createElement('Mission', p) }));
 jest.mock('../ui/QuietScreen', () => ({ QuietScreen: (p: object) => require('react').createElement('Quiet', p) }));
 jest.mock('../ui/LoginScreen', () => ({ LoginScreen: (p: object) => require('react').createElement('Login', p) }));
 jest.mock('../ui/account/AccountForms', () => ({

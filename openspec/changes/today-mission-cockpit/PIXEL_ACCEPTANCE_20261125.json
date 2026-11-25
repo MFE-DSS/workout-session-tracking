@@ -1,0 +1,45 @@
+{
+  "status": "PIXELS_ACCEPTED_SCOPED",
+  "date": "2026-11-25",
+  "operator_decision": "ACCEPT des pixels MISSION corrigés présentés le 25 novembre 2026 pour le périmètre sémantique et la composition native Android examinés.",
+  "scope": "today-mission-cockpit; semantic delta and native Android composition examined",
+  "packet": {
+    "folder": "/Users/martinfeldmann/Downloads/AUREN_MISSION_SEMANTIQUE_2026-11-25",
+    "zip": "/Users/martinfeldmann/Downloads/AUREN_MISSION_SEMANTIQUE_2026-11-25.zip",
+    "sha256": "dd9a74c1020b6e95e36d27a26e27f5b3c865765aaffe379a560ddd02deabf8d7",
+    "bytes": 3085213,
+    "png_count": 10,
+    "previous_packet_preserved": true,
+    "UI_commit": false
+  },
+  "product_source_hashes": {
+    "clients/mobile/ConnectedApp.tsx": "ca8408dcee3426bf416f5ac66367a42590f839cc4bba3c4578dfd0ae19f60388",
+    "clients/mobile/src/ui/mission/MissionCockpitFrame.tsx": "24407f9f751fffe862ada4f3dfe967281ae94269bf766f8752c37466183a678a",
+    "clients/mobile/src/ui/mission/MissionCockpitScreen.tsx": "8342b7ca6d898e0fa17ea9c83be58f4f827419a45df05e48c0c4735a7326ff1a",
+    "clients/mobile/src/ui/mission/MissionActionHost.tsx": "a034d8b66c5990447c3710dbad30ad44697e1ed779518bc7251c811a52ac9933"
+  },
+  "accepted": [
+    "novelty scoped to retained template history",
+    "template history distinct from muscular workload and unqualified recovery",
+    "canonical BodyMap",
+    "first movement and same-instrument Prepare/Start",
+    "progressive sources without invented availability",
+    "360/480dp composition"
+  ],
+  "reservations": [
+    "large font and LOCKED reflow do not establish global compliance",
+    "TalkBack exhaustive and physical device NOT_QUALIFIED",
+    "already well served is not admitted scientific truth",
+    "no recovery score, energy percentage or new recommendation accepted"
+  ],
+  "authority_exclusions": [
+    "SCI",
+    "TIME01",
+    "LOCKED primitives",
+    "release",
+    "APK",
+    "OTA"
+  ],
+  "new_universal_master": false,
+  "prior_submission": "PIXEL_SUBMISSION_20261125.json, historical earlier packet; superseded by this exact acceptance"
+}

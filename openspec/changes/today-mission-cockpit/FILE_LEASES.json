@@ -1,0 +1,25 @@
+{
+  "branch": "spec/today-mission-cockpit",
+  "parent": "224ea54f25f4ff40ee7e35a4a53efc852fb5dcd6",
+  "status": "accepted pixels; delivery in progress",
+  "paths": [
+    "clients/mobile/ConnectedApp.tsx",
+    "clients/mobile/src/sync/connectedApp.test.ts",
+    "clients/mobile/src/ui/mission/"
+  ],
+  "no_overlap_with_delivered_B_C": true,
+  "excluded": [
+    "backend",
+    "SCI",
+    "TIME01",
+    "auth",
+    "controllers",
+    "SQLite",
+    "DTO",
+    "locked primitives",
+    "MissionScreenV1",
+    "visual baselines"
+  ],
+  "unrelated_untracked_notes_preserved": 26,
+  "delivery_parent": "0d4fcfa18165cef5ea2b79246a4327661c84efd5"
+}

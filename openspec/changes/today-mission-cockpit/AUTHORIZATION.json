@@ -1,0 +1,28 @@
+{
+  "status": "GO_BUILD_AMENDMENT_G1_PIXELS_ACCEPTED_SCOPED",
+  "scope_approved": true,
+  "g1_approved": true,
+  "visual_amendment_approved": true,
+  "pixels_approved": true,
+  "operator_preparation_decision": "Préparation dans le même instrument",
+  "preparation_decision_is_not_GO_BUILD": true,
+  "source_parent": "224ea54f25f4ff40ee7e35a4a53efc852fb5dcd6",
+  "final_parent_reconciliation": "Final canonical224ea54 CI45489781273 success11, B closed/cleaned; Today files leased to this branch only",
+  "no_APK_OTA_deploy": true,
+  "operator_build_decision": "Autoriser le scope, l’amendement et G1",
+  "operator_build_received": "2026-11-24",
+  "applicable_scope": "BUILD_SCOPE.md + CONTRACT_RECONCILIATION.md + UX_BOARD.md; no backend/SCI/TIME01/SQLite/OTA",
+  "operator_semantic_review_20261125": {
+    "composition_direction": "APPROVED",
+    "final_pixels": "ACCEPTED_SCOPED_BY_LATER_EXPLICIT_DECISION",
+    "bounded_delta": [
+      "novelty belongs to the selected template, not its muscles",
+      "qualify inherited provenance and 14-day workload window",
+      "verify canonical delt_post mapping"
+    ],
+    "anatomy_reference": "3D radiographic references appreciated; not approved production assets; no generation"
+  },
+  "operator_pixel_decision": "ACCEPT des pixels MISSION corrigés présentés le 25 novembre 2026 pour le périmètre sémantique et la composition native Android examinés.",
+  "pixel_acceptance_receipt": "PIXEL_ACCEPTANCE_20261125.json",
+  "verified_canonical_parent": "0d4fcfa18165cef5ea2b79246a4327661c84efd5"
+}

@@ -525,6 +525,16 @@ Pourquoi trois dessins : une fente d'un pixel centrée tombe sur un demi-pixel. 
 **MUST PRESERVE** : les zones viennent du serveur, dérivées des exercices ; une zone une fois ; « Démarrer » toujours à l'écran ; la raison du moteur dans ses propres mots.
 **MUST NEVER** : un panneau composé par l'écran ; une zone devinée pour un exercice sans zone connue ; un panneau écrasé ; le nom de la séance répété dans l'action ; tout ce que §21 interdit.
 
+### Amendement consommateur — `TODAY-MISSION-COCKPIT-01` (25 novembre 2026)
+
+**Autorité explicite** : « Autoriser le scope, l’amendement et G1 » (24novembre), puis **« ACCEPT des pixels MISSION corrigés présentés le 25 novembre 2026 pour le périmètre sémantique et la composition native Android examinés. »** Reçu exact : `openspec/changes/today-mission-cockpit/PIXEL_ACCEPTANCE_20261125.json` (puis archive de ce change).
+
+Le seul chemin Today de ConnectedApp MAY employer `MissionCockpitScreen` et le châssis présentatif `MissionCockpitFrame`, avec préparation dépliée dans le même objet et commande applicable visible. `MissionActionHost` conserve les priorités, handlers et gardes. Le consommateur V1, ses quatre baselines et toutes les primitives LOCKED ci-dessus restent conservés à l’octet ; aucune rebaseline ni cinquième onglet.
+
+La nouveauté du modèle est contextualisée comme absence de passage terminé retrouvé dans l’historique retenu, sans conclure que ses muscles n’ont pas été entraînés. La trace du moteur demeure accessible, suffixes partiels conservés ; provenance et fenêtre historique sont explicitement bornées à leur portée réelle. La mention héritée « déjà bien servi » ne devient pas une affirmation scientifique autorisée. Zones uniquement issues du serveur, une fois chacune ; aucune jauge de récupération.
+
+Acceptation limitée aux pixels Android examinés à360/480dp. Grande fonte/reflow LOCKED ne certifient pas une conformité globale ; TalkBack exhaustif et physique non qualifiés. Aucun nouveau master universel, contrat SCI/TIME01, score, asset anatomique, permission DATA ou release n’est approuvé ici.
+
 ## 26. `COMPLETE-SCREEN-V1` — la fin de séance, avec les zones travaillées (2026-10-31)
 
 **Décision de l'opérateur** : sur la planche COMPLETE (« Séries par zone » en pastilles → le BodyMap de la séance) : « OK ».
