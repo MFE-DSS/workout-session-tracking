@@ -1,0 +1,30 @@
+# Design proposé — première lecture d’exposition documentée
+
+## Brainstorming / Options / Risques / Choix retenu pour la proposition
+- Réutiliser load_ledger/owned_binding : fenêtre started_at, eager reads et corps JSON non bornés ; incompatible sans changer leurs autorités. Écarté.
+- Lecteur dans le processus HTTP : simple, mais le parse et une limite mémoire dure ne sont pas isolés du serveur. Écarté pour cette proposition.
+- **Choix technique proposé** : endpoint mince + worker Python standard Linux jetable, connexion sqlite3 read-only dédiée et limites avant imports/parses. Réutiliser les identités et folds purs SCI, avec adaptateurs de lecture bornés, sans appeler les writers/locks. Le subprocess de packaging est un précédent de séparation, pas une fonction à réemployer : son timeout20s/capture complète ne fournit pas ces garanties.
+
+Le worker et ses limites sont une proposition d’architecture logicielle, pas une opération d’infrastructure ni un runtime qualifié. Pas de nouveau paquet natif/Python. Les constantes candidates ne sont pas des garanties mesurées.
+
+## Pipeline exact proposé
+1. Route négociée : ApiUser existant, paramètres stricts, no-store, aucun owner fourni par l’appelant. Une seule requête de lecture, aucun cursor/pagination ni cache réutilisé entre captures.
+2. Supervisor : slot non bloquant par processus HTTP ; chemin de worker fixe, -I sans shell ; demande interne bornée sans jeton ni mot de passe ; lecture stdout bornée et deadline. Worker lancé seulement si feature activée et profil runtime qualifié correspond au runtime réel.
+3. Worker : limites OS Linux appliquées avant imports lourds, manifeste de sources immutable/pinné, puis connexion mode=ro/query_only ; BEGIN explicite avant le premier SELECT. Établir as_of serveur juste avant l’ancrage de cette capture ; revalider until<=as_of. Pas de guard_owner, app.main, init_db, journal.record_first_plan_set ou exécution d’un producteur SCI.
+4. Parcours : sessions owner idASC, statut/exclusion inspectés ; exercices idASC par session ; work/completed idASC. S/E/W globaux inchangés, sentinelles non contributives. Lire les TEXT seulement après owner/IDs numériques et admission de bytes via blobopen ; aucun ORM object avec corps eager.
+5. V3 : binding ET évaluation capturée, profil explicite, graphes et doses/contexte, révision courante + préfixe des reçus, digests. Ajouter un budget G500 global de lignes scalaires de graphe (y compris sets incomplets/préparatoires) nécessaire au contrôle du graphe ; il ne relève pas W500 ni la couverture. Si un graphe complet ne peut être vérifié sous G/E/W : source UNKNOWN. Gardes pertinentes de owned_binding reproduites par l’adaptateur, jamais appel eager non borné.
+6. V3 : conserver catalogue effectif/source_roles/effective_roles du bundle dont l’autorité concorde exactement avec l’évaluation capturée. Vérifier les digests des sources immuables de l’artefact courant autorisé ; pas de téléchargement ni reconstruction d’un vieux bundle. Si la bonne version n’est pas disponible : UNKNOWN ; le catalogue statique courant ne remplace pas ce bundle. Un profil/binding/marker ambigu ne devient pas Legacy par défaut.
+7. Legacy : substitution sinon snapshot ; résolution exacte par index SCI puis alias DB borné dans la même capture et nom canonique. Réutiliser le résolveur pur avec db=None ; l’adaptateur fournit les éventuels lookups alias par index, sans ensure_exercise. Le catalogue courant pinné est annoncé comme classification descriptive Legacy de lecture, pas comme mapping historiquement capturé.
+8. Provenance : épisode d’origine et révision effective distincts ; exclure de l’appartenance datée NULL/futur/contradiction, préserver les flags originaux quand prouvés. Une date canonique Legacy exploitable peut rester PARTIAL_TIME. Les versions d’acquisition client non liées dans la DB restent UNKNOWN ; **last_qualified_observation peut rester NULL partout en V1**. Ne pas fabriquer une attestation à partir du contrat3.0.0 ou de la date de réception.
+9. Fold pur sur les seules clés effectives : preuve de rôles du sous-ensemble séparée du résultat de fenêtre. Contenu incertain gardé dans disclosures, exclu des contributions certaines du minimum. P07 conserve15dimensions et posterior union, aucun crédit scalaire.
+10. DTO validé et sérialisé sous plafond avant émission. Une interruption n’autorise PARTIAL qu’à une frontière de fait atomique entièrement validée, sans altérer une capture ; sinon UNAVAILABLE. Aucune émission HTTP/pipe progressive de faits non validés. Fermeture normale ou kill+wait du seul enfant.
+
+## Cohérence et identité
+Le snapshot doit couvrir facts, owner, alias DB, binding, évaluation et reçus. Les fichiers catalogue/politiques sont immuables, bornés et vérifiés par digest avant usage. Pas de mélange avec des identités ORM du parent, ni avec une source changée en dehors de la capture. Un résultat_digest couvre toutes les sources effectivement utilisées, bornes et qualité ; aucune révision globale du journal inventée. Des requêtes successives sont des captures distinctes et ne s’additionnent pas.
+
+## Ressources et activation
+RUNTIME_LIMITS.md est partie intégrante du scope. Runtime Linux/Python3.11.14 du Dockerfile canonique est un candidat, pas la preuve d’un déploiement actuel. Non-Linux/autre dialecte/profil manquant ->UNAVAILABLE, aucun fallback non borné. Flag serveur nouveau false par défaut, aucun réglage distant changé. Le profil qualifié inclut OS/Python/SQLite/source/pins/limites et les bornes de concurrence ; son enregistrement suit les preuves locales/CI, pas une déclaration de l’appelant.
+
+## Autorité et schéma complétés après revue
+
+SOURCE_AUTHORITY.md fixe le chemin exact manifeste→v3/v2/curation/pull→binding/évaluation, avec hashing/lecture bornés et distinction des sources historiques/checkout ; aucun loader eager réemployé comme lecteur. PROPOSED_RESPONSE.schema.json fixe27objets et WIRE_CONTRACT les invariants croisés. Les deux findings de construction ont des corrections documentaires ; aucun nouveau test produit.

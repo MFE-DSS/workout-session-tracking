@@ -270,7 +270,7 @@ def _imports(path: Path) -> set[str]:
 def test_no_product_module_consumes_the_scientific_layer():
     offenders = []
     for path in sorted((ROOT / "app").rglob("*.py")):
-        if path.stem in SCI_RUNTIME:
+        if path.stem in SCI_RUNTIME or path.relative_to(ROOT).as_posix() == "app/services/muscle_observed_load/projection.py":
             continue
         if any(m.startswith(f"app.services.{s}") for m in _imports(path) for s in SCI_RUNTIME):
             offenders.append(str(path.relative_to(ROOT)))

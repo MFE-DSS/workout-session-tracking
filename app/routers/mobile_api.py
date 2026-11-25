@@ -45,6 +45,7 @@ from app.routers.mobile_library import configured_library_runtime, create_librar
 from app.routers.mobile_mission import router as mission_action_router
 from app.routers.mobile_nutrition import router as nutrition_router
 from app.routers.mobile_training_history import router as training_history_router
+from app.routers.mobile_muscle_observed_load import router as muscle_observed_load_router
 from app.routers.mobile_training_preferences import read_declarations, replace_declarations
 from app.services import device_auth
 from app.services.account_lifecycle import AccountRejected, change_password, register_account
@@ -587,4 +588,5 @@ router.include_router(mission_action_router)
 
 # MOB-05A owned history reads; no writer or historical inference.
 router.include_router(training_history_router)
+router.include_router(muscle_observed_load_router)
 router.include_router(nutrition_router)

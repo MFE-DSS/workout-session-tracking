@@ -1,0 +1,40 @@
+{
+  "source_parent": "1f0122bf4f2d30f7c95d4975b5994d1453363bc5",
+  "operator_admission": "SCI-READINESS-01-ADMISSION-2026-11-25",
+  "go_build": "SCI-READINESS-01-BUILD-01-GO-2026-11-25",
+  "default_enabled": false,
+  "runtime_activation": "HOLD",
+  "local_precommit": {
+    "passed": 122,
+    "skipped": 2,
+    "skip_reason": "actual Linux required; host Darwin"
+  },
+  "prior_scoped_suite": {
+    "passed": 84,
+    "skipped": 2
+  },
+  "broad_campaigns": [
+    {
+      "passed": 150,
+      "stage": "initial shared consumer campaign"
+    },
+    {
+      "passed": 221,
+      "skipped": 2,
+      "stage": "post-review consumer campaign before last bounded guards"
+    }
+  ],
+  "checks": {
+    "ruff": "PASS_NEW_FILES",
+    "ruff_budget": "260<=548",
+    "protocol": "PASS",
+    "openspec_strict": "PASS",
+    "bandit": "0_ISSUES_NEW_APPLICATION_MODULES",
+    "gitleaks": "PASS_REDACTED_DIFF"
+  },
+  "ci": "PENDING_PUBLICATION",
+  "independent_review": "IMPORTANT_CORRECTED_AUTHOR_RED_GREEN_NO_SECOND_REVIEW_CLAIM",
+  "mapping_sha256": "72ae2e2411169653c0f496628ff2c0b31192c2f7f20fd5a27f5a09e9fce4ef8b",
+  "historical_spec_preserved": true,
+  "data_ops_release": false
+}

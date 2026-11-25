@@ -1,0 +1,22 @@
+{
+  "status": "SCI_ADMITTED_BUILD01_AUTHORIZED",
+  "date": "2026-11-25",
+  "source_canonical": "1f0122bf4f2d30f7c95d4975b5994d1453363bc5",
+  "preparation_parent": "0d4fcfa18165cef5ea2b79246a4327661c84efd5",
+  "operator_admission": {
+    "received": true,
+    "reference": "SCI-READINESS-01-ADMISSION-2026-11-25",
+    "source": "User message: AUREN — Décision SCI-READINESS-01 et GO BUILD-01",
+    "date": "2026-11-25"
+  },
+  "go_build": true,
+  "product_apply": true,
+  "commit_push_merge": "AUTHORIZED_WITH_MANDATORY_GATES_GOV_MERGE_01",
+  "native_ui": false,
+  "ops_data_release": false,
+  "mapping_and_policy_admission": "ADMITTED_D1_D5_SIX_D4_RULES_DESCRIPTIVE_ONLY",
+  "technical_proposal": "bounded_read_only_SQLite_Linux_worker",
+  "existing_artistic_g1": "DA_READINESS_01_ARTISTIC_ONLY_UNCHANGED",
+  "go_build_reference": "SCI-READINESS-01-BUILD-01-GO-2026-11-25",
+  "runtime_activation": "HOLD_NON_QUALIFIED_DEFAULT_DISABLED"
+}

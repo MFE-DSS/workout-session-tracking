@@ -24,6 +24,21 @@ excluded_routes:  # montés par FastAPI, pas des fonctions utilisateur (désacti
 
 features:
 
+  - id: documented-muscle-exposure
+    feature: Exposition musculaire documentée propriétaire
+    family: progres
+    routes: [GET /api/mobile/v1/me/muscle-observed-load]
+    legacy_location: "SCI-READINESS-01 BUILD-01, nouveau lecteur descriptif, désactivé par défaut"
+    domain_owner: [muscle_observed_load]
+    api: "muscle-observed-load/1.0.0 ; Bearer, X-Auren-Muscle-Observed-Load-Contract et no-store"
+    data: [workout_sessions, session_exercises, set_logs, first_plan_execution_bindings, first_plan_evaluations, first_plan_set_observations, first_plan_runtime_authorities]
+    user_actions: [consulter les faits documentés, consulter la provenance et les limites]
+    native_destination: "PROGRÈS — consommateur natif non implémenté, aucune parité qualifiée"
+    status: REWRITE_NATIVE
+    dependencies: [SCI-READINESS-01, qualification Linux, admission DATA et OPS distinctes]
+    visual_assets: []
+    migration_risk: "Lecture bornée et fail-closed ; aucune récupération physiologique, aucun moteur de recommandation, aucun writer"
+
   - id: manual-nutrition-core
     feature: Journal nutritionnel manuel et cibles déclarées
     family: progres

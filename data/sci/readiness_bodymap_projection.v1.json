@@ -1,0 +1,103 @@
+{
+  "status": "ADMITTED_DESCRIPTIVE_ONLY",
+  "mapping_version": "sci-p07-bodymap-projection/0.1.0",
+  "canonical_source": "1f0122bf4f2d30f7c95d4975b5994d1453363bc5",
+  "source_zone_model": "zones-15-v1",
+  "target_contract": "BODYMAP-ZONES-V1",
+  "entries": [
+    {
+      "zone": "pecs",
+      "bodymap_zone": "pecs",
+      "projection": "DIRECT_OR_EXPLICIT_RENAME"
+    },
+    {
+      "zone": "lats",
+      "bodymap_zone": "lats",
+      "projection": "DIRECT_OR_EXPLICIT_RENAME"
+    },
+    {
+      "zone": "upper_back",
+      "bodymap_zone": "upper_back",
+      "projection": "DIRECT_OR_EXPLICIT_RENAME"
+    },
+    {
+      "zone": "anterior_delts",
+      "bodymap_zone": null,
+      "projection": "NOT_REPRESENTED"
+    },
+    {
+      "zone": "lateral_delts",
+      "bodymap_zone": "delt_lat",
+      "projection": "DIRECT_OR_EXPLICIT_RENAME"
+    },
+    {
+      "zone": "rear_delts",
+      "bodymap_zone": "delt_post",
+      "projection": "DIRECT_OR_EXPLICIT_RENAME"
+    },
+    {
+      "zone": "biceps",
+      "bodymap_zone": "biceps",
+      "projection": "DIRECT_OR_EXPLICIT_RENAME"
+    },
+    {
+      "zone": "triceps",
+      "bodymap_zone": "triceps",
+      "projection": "DIRECT_OR_EXPLICIT_RENAME"
+    },
+    {
+      "zone": "quads",
+      "bodymap_zone": "quads",
+      "projection": "DIRECT_OR_EXPLICIT_RENAME"
+    },
+    {
+      "zone": "hamstrings",
+      "bodymap_zone": "posterior",
+      "projection": "COMPOSITE_COMPONENT"
+    },
+    {
+      "zone": "glutes",
+      "bodymap_zone": "posterior",
+      "projection": "COMPOSITE_COMPONENT"
+    },
+    {
+      "zone": "adductors",
+      "bodymap_zone": null,
+      "projection": "NOT_REPRESENTED"
+    },
+    {
+      "zone": "calves",
+      "bodymap_zone": "calves",
+      "projection": "DIRECT_OR_EXPLICIT_RENAME"
+    },
+    {
+      "zone": "abs",
+      "bodymap_zone": "core",
+      "projection": "DIRECT_OR_EXPLICIT_RENAME"
+    },
+    {
+      "zone": "hip_flexors",
+      "bodymap_zone": null,
+      "projection": "NOT_REPRESENTED"
+    }
+  ],
+  "posterior": {
+    "components": [
+      "hamstrings",
+      "glutes"
+    ],
+    "documented_sets": "UNION_DISTINCT_EFFECTIVE_SET_KEYS",
+    "resolved_credit": null,
+    "reason": "COMPOSITE_NO_CREDIT_AGGREGATION",
+    "role_counts": "COMPONENTS_ONLY",
+    "last_qualified_observation": "MAX_WITH_COMPONENT_ID_NOT_BOTH_LAST_DATES"
+  },
+  "unknown": "PRESERVE_NO_NUMERIC_FILL",
+  "non_additivity": [
+    "No sum of zone counters as globalworksettotal",
+    "No sum of hamstrings/glutes credit into posterior",
+    "No dominant role projection",
+    "No physiological interpretation"
+  ],
+  "admission_ref": "SCI-READINESS-01-ADMISSION-2026-11-25"
+}
