@@ -47,7 +47,10 @@
 - [x] One small native paired board plus editable sources and source map; ask operator pixel decision. No UI commit until accepted.
 
 ### Task 4: Delivery after accepted pixels
-- [ ] Final scope checks/security/visual contract and exactHEAD CI, guarded merge under GOV-MERGE-01, canonical CI/archive/closeout/bounded cleanup. No routine GO request or OTA.
+- [x] Final scope checks/security/visual contract and exactHEAD CI, guarded code merge under GOV-MERGE-01 and canonical code CI.
+- [ ] Publish/verify/merge documentary closeout and perform bounded cleanup; resolved by final live receipts after publication. No routine GO request or OTA.
 
 ## Pre-flight and rulings
 Task1 produces only presentation consumed by Task2; existing handlers remain owner. Frame shared by ready/orientation cannot own mutations. Ruling: existing dependencies and accepted AUREN controls override skill setup/install suggestions; cost of wrong call is unsupported control rendering, to be caught by existing native app proof. Ruling: operator autonomous GO covers this technical implementation plan; extra plan approval menu would repeat the authorization, while pixels remain a required distinct decision.
+
+Livraison code443/mergec2e4e4ec et CI PR45621652758/canon45624434270 vertes ; archive/closeout documentaire en cours, publication et nettoyage suivis par reçus vivants. Aucun verdict anticipé de cleanup.
