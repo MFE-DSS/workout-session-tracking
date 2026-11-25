@@ -62,3 +62,20 @@ test('an in-flight start disables verification and cannot issue another operatio
  await act(async()=>root.render(React.createElement(MissionActionHost,p)));
  expect(byId('mission-action-primary').accessibilityState.disabled).toBe(true);await press('mission-action-primary');expect(verify).not.toHaveBeenCalled();
 });
+test('resume preparation retains the exact owned occurrence and cannot dispatch until the primary action',async()=>{
+ const raw=resumed();raw.payload.position={exercise_index:1,exercise_total:3,sets_done:2,sets_total:9,exercise_name:'Mouvement reçu',set_index:1} as any;
+ const p=props(confirmed(raw)),actions:any[]=[];p.onAction=async a=>{actions.push(a);};
+ await act(async()=>root.render(React.createElement(MissionActionHost,p)));
+ await press('mission-action-details');
+ const text=root.container.queryAll((n:any)=>typeof n.props.children==='string').map((n:any)=>n.props.children).join(' ');
+ expect(text).toContain('Mouvement reçu');expect(text).toContain('19');expect(text).toContain('2 sur 9');expect(actions).toEqual([]);
+ await press('mission-action-primary');expect(actions[0].primary_action.session_id).toBe(19);
+});
+test('rapid verification presses share the existing single flight',async()=>{
+ let done!:()=>void;const waiting=new Promise<void>(resolve=>{done=resolve;});
+ const p=props({state:'unknown'});p.local={kind:'START'};p.onVerify=jest.fn(()=>waiting);
+ await act(async()=>root.render(React.createElement(MissionActionHost,p)));
+ const control=byId('mission-action-primary');
+ await act(async()=>{control.onClick({nativeEvent:{},stopPropagation(){}});control.onClick({nativeEvent:{},stopPropagation(){}});});
+ expect(p.onVerify).toHaveBeenCalledTimes(1);await act(async()=>{done();await waiting;});
+});

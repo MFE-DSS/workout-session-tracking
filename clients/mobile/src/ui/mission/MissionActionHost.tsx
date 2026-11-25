@@ -3,16 +3,19 @@ import React,{useRef,useState} from 'react';
 import {Text,View} from 'react-native';
 import type {MissionAction,MissionPath} from '../../api/missionAction';
 import type {MissionResourceState} from '../../api/missionActionResource';
-import {AccountFrame} from '../account/AccountFrame';
+import {InstrumentSurface} from '../body/InstrumentSurface';
+import {MissionCockpitFrame} from './MissionCockpitFrame';
 import {CalibrationAction,CalibrationLink} from '../plan/calibrationControls';
 import {type} from '../theme';
 
 export type MissionActionHostProps={
  read:MissionResourceState;path:MissionPath;checking?:boolean;refusal?:string|null;offline?:boolean;onReadOwned?:()=>Promise<void>;
  local:{kind:'START'|'CLOSE'|'SOURCE'}|null;
+ /** Existing source-specific instruction, presented inside the safe-area chassis. */
+ notice?:string;
  onAction:(action:MissionAction)=>Promise<void>;
  onVerify:()=>Promise<void>;onSelectPath:(path:MissionPath)=>void;onOpenJournal:()=>void;
- /** The unchanged MISSION consumer occupies its existing full layout. */
+ /** The selected historical consumer occupies its own full layout. */
  historical:React.ReactNode;
 };
 type Orientation={title:string;fact:string;label:string;detail:string;action:MissionAction|null;pending?:boolean};
@@ -44,7 +47,7 @@ function orientation(p:MissionActionHostProps):Orientation {
   detail:'Tu peux consulter ton journal. Une indisponibilité ne déclenche pas un autre parcours.',action:null};
 }
 export function MissionActionHost(p:MissionActionHostProps){
- // No wrapper changes the locked MISSION geometry, including its measured zones.
+ // Historical renderer selection stays a pure pass-through, without another command owner.
  if(!p.local&&!p.refusal&&p.read.state==='confirmed'&&p.read.value.state==='HISTORICAL_READY')return p.historical;
  return <MissionOrientation {...p}/>;
 }
@@ -56,14 +59,21 @@ function MissionOrientation(p:MissionActionHostProps){
   try{if(view.action)await p.onAction(view.action);else await p.onVerify();}
   finally{flight.current=false;setBusy(false);}
  };
- return <AccountFrame title={view.title} footer={<>
+ const owned=!p.local&&!p.refusal&&p.read.state==='confirmed'&&(p.read.value.state==='RESUME'||p.read.value.state==='FIRST_SESSION_HISTORY')?p.read.value.payload:null;
+ return <MissionCockpitFrame identity={p.notice?<Text testID="library-pending-today" style={type.small}>{p.notice}</Text>:null} footer={<>
   <CalibrationAction testID="mission-action-primary" label={view.label} busy={busy||view.pending||p.checking} onPress={()=>void submit()}/>
   {!p.local?<CalibrationLink testID="mission-action-other" label={p.path==='FIRST_USE'?'Autres parcours':'Premier parcours'} onPress={()=>p.onSelectPath(p.path==='FIRST_USE'?'HISTORICAL':'FIRST_USE')} disabled={busy}/>:null}
   {p.onReadOwned?<CalibrationLink testID="mission-action-read-owned" label="Lire la séance enregistrée" onPress={()=>void p.onReadOwned?.()}/>:null}
   <CalibrationLink testID="mission-action-journal" label="Journal" onPress={p.onOpenJournal}/>
  </>}>
-  <Text accessibilityLiveRegion="polite" style={type.bodyStrong}>{view.fact}</Text>
-  <CalibrationLink testID="mission-action-details" label="Détails" expanded={details} onPress={()=>setDetails(!details)}/>
-  {details?<View testID="mission-action-detail"><Text style={type.small}>{view.detail}</Text></View>:null}
- </AccountFrame>;
+  <InstrumentSurface label={view.title} state={p.local?'À vérifier':p.read.state==='confirmed'?'Lecture reçue':'Lecture à vérifier'}>
+   <Text accessibilityLiveRegion="polite" style={type.bodyStrong}>{view.fact}</Text>
+  </InstrumentSurface>
+  <CalibrationLink testID="mission-action-details" label={owned?'Préparer la reprise':'Détails'} expanded={details} onPress={()=>setDetails(!details)}/>
+  {details?<View testID="mission-action-detail" style={{gap:12}}>
+   {owned?<Text style={type.small}>{`Séance ${owned.session.id}`}</Text>:null}
+   {owned?.position?.exercise_name?<Text style={type.bodyStrong}>{owned.position.exercise_name}</Text>:null}
+   <Text style={type.small}>{view.detail}</Text>
+  </View>:null}
+ </MissionCockpitFrame>;
 }

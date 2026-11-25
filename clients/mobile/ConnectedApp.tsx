@@ -96,7 +96,7 @@ import { LoginScreen } from './src/ui/LoginScreen';
 import { SignupScreen, PasswordScreen } from './src/ui/account/AccountForms';
 import { AccountResultScreen, AccountSettingsScreen, JournalOwnershipScreen } from './src/ui/account/AccountPages';
 import { TrainingPreferencesScreen } from './src/ui/account/TrainingPreferencesScreen';
-import { MissionScreen } from './src/ui/MissionScreen';
+import { MissionCockpitScreen } from './src/ui/mission/MissionCockpitScreen';
 import { QuietScreen } from './src/ui/QuietScreen';
 import { ResumePosition, ResumeScreen } from './src/ui/ResumeScreen';
 import { color } from './src/ui/theme';
@@ -1200,9 +1200,9 @@ export default function ConnectedApp() {
       );
     } else {
       // MOB-01 — outside a workout the native shell is on screen; AUJOURD'HUI holds the MISSION or its quiet states
-      const historical=isStartable(mission)?<View style={{flex:1}}><MissionScreen mission={mission as unknown as Mission} busy={busy}
+      const historical=isStartable(mission)?<View style={{flex:1}}><MissionCockpitScreen mission={mission} busy={busy}
         onStart={slug=>void start(slug)} onOpenLab={()=>setMissionMenu(true)} onSecondaryOpened={()=>metric('SECONDARY-OPENED')}/></View>:null;
-      const today=<View style={{flex:1}}>{libraryBlocked.current?<Text testID="library-pending-today" style={{color:color.ink,padding:20}}>Départ Programmes à vérifier · ouvre la bibliothèque.</Text>:null}<MissionActionHost read={missionResource.state} path={missionResource.path} local={currentOpening()} checking={busy} refusal={missionRefusal} offline={offline} onReadOwned={planV3?.state?.execution?readCapturedV3:undefined}
+      const today=<View style={{flex:1,backgroundColor:color.field}}><MissionActionHost notice={libraryBlocked.current?'Départ Programmes à vérifier · ouvre la bibliothèque.':undefined} read={missionResource.state} path={missionResource.path} local={currentOpening()} checking={busy} refusal={missionRefusal} offline={offline} onReadOwned={planV3?.state?.execution?readCapturedV3:undefined}
         onAction={openMissionAction} onVerify={verifyMission} onSelectPath={path=>{setMissionRefusal(null);missionResource.selectPath(path);setMission(null);void loadMission();}}
         onOpenJournal={openJournalSheet} historical={historical}/></View>;
       body = (

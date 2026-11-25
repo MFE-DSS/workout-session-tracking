@@ -1,0 +1,23 @@
+{
+  "canonical_read_scenarios": [
+    "READY closed/open360/480,1.0/1.786",
+    "owner1 RESUME existing3 without adoption",
+    "original origin UNKNOWN and back/reopen",
+    "owner2 FIRST_USE"
+  ],
+  "synthetic_contract_counterexamples": [
+    "long name/counts native RED\u2192GREEN",
+    "CONFLICT",
+    "UNAVAILABLE",
+    "READ_UNKNOWN503",
+    "NO_ZONES",
+    "one locally rejected403 start; not forwarded"
+  ],
+  "native_coverage_limits": [
+    "emulator only",
+    "no physical device acceptance",
+    "no exhaustive TalkBack gestures",
+    "D4 labels and locked BodyMap label boxes at1.786 remain limited"
+  ],
+  "authority": "Source contracts and existing controllers unchanged; no new backend API, no domain mutation, no APK/OTA"
+}
