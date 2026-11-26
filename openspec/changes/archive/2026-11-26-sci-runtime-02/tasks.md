@@ -11,6 +11,8 @@
 - [x] Record exact GO, fresh canonical/leases and RED→GREEN regression.
 - [x] Apply only worker bootstrap and worker tests; actual readonly Linux/HTTP campaign.
 - [x] Complete relevant checks, broad tests and independent review.
-- [ ] Exact-HEAD protected CI, guarded merge, canonical checks, archive/closeout.
+- [x] Exact-HEAD protected code CI, guarded merge and canonical protected checks.
+- [x] Archive through OpenSpec and prepare scoped documentary closeout.
+- [ ] Publication/final canonical CI/owned cleanup: follow-up resolved by final live delivery receipt, without rewriting this archived checkpoint.
 
 Runtime and operational path trust HOLD; endpoint NOT_QUALIFIED/default disabled until proven.
