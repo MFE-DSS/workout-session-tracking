@@ -31,3 +31,13 @@ Aucun Critical signalé. Aucun Minor explicitement reporté par le reviewer. « 
 4. Le contrat SCI historique est byte-pinné par les loaders v2 : son addendum ne peut y être ajouté sans casser la validation. Octets historiques conservés ; acte/addendum descriptif dans ADMISSION et registre de dépendances. Coût : consulter la nouvelle admission pour la dérogation, aucun hash historique réécrit.
 
 Les logs RED/GREEN intégraux et la première revue sont conservés dans le dossier de preuves de ce seul build, sans DB personnelle ni identifiant réel. Les résultats finaux et liens CI sont dans le reçu de livraison ; une suite du reader n’est pas une acceptation native ou physique.
+
+## Amendement accepté et relu — 26 novembre 2026
+
+Acte `SCI-BUILD01-SCOPE-AMENDMENT-2026-11-26` : deux seuls fingerprints historiques de SOURCE_PINS au commit dc6b79f, puis normalisation des 112 pins en objets source_ref/sha256. Les 112 empreintes sont recalculées sur les octets Git de 1f0122bf, sans divergence. Scan de tout le range pertinent : zéro résultat après ces deux exceptions. Aucune règle désactivée.
+
+Revue indépendante fraîche de ce seul delta : aucun Critical, Important ou Minor. Hors avis : revue globale des correctifs backend, qualification opérationnelle et CI du futur HEAD. La revue ne remplace pas ces preuves.
+
+CI initiale 45704937761 : cinq shards backend et agrégat QA verts, 1 610 mobiles + TypeScript et 77 visuels verts ; lint rouge sur ces deux seuls résultats Gitleaks, Sonar skipped. Le shard Linux 4 exécute les témoins worker sans test ignoré ; il ne qualifie pas l’image/source Python cible. Les deux HOLD opérationnels restent distincts.
+
+Vérification locale après amendement : 122 PASS/2 témoins Linux ignorés sur Darwin ; Ruff neuf, budget260≤548, protocole et OpenSpec32/32 verts. Premier appel au budget sans Ruff dans PATH échoué ; relancé avec le binaire existant et vert, sans changement de dépendance.

@@ -35,3 +35,8 @@ Aucun écran/asset natif, palette, primitive, signature/APK/OTA, Dockerfile, wor
 Inventaire lu sur10worktrees AUREN existants : aucun diff observé sur mobile_api/config/importguard/inventaire au relevé ; plusieurs anciens worktrees ont des deltas de SPEC_REGISTRY.md, qui doivent être réconciliés append-only au parent réel. Aucune réservation de fichier n’est accordée par ce constat. Au GO : re-fetch, inspecter PR/branches et activité réelle, confirmer leases des deux fichiers produit partagés, de l’inventaire et des contrats/gardes ; si conflit, continuer les fichiers neufs indépendants sans PR concurrente. Aucun reset/stash/prune/force ou autre worktree modifié.
 
 La PR future ne doit pas transporter tout le diff de préparation SCI01 ni un autre change : elle contient BUILD01, son acte d’entrée exact et son mapping admis seulement. La préparation scientifique précédente reste préservée séparément ; aucun GO de publication documentaire ou d’implémentation n’est déduit de son état local.
+
+
+## Amendement borné accepté le26novembre2026
+
+Acte SCI-BUILD01-SCOPE-AMENDMENT-2026-11-26 : `.gitleaksignore` autorisé uniquement pour les deux fingerprints historiques de SOURCE_PINS.json lignes9/10 au commitdc6b79f. SourcePins normalisé en lignes source_ref/sha256,112empreintes et portée conservées. Aucun autre ignore, seuil ou règle. Vérification SHA source/fingerprints, scan de l’historique pertinent, revue indépendante du delta et CI finale obligatoires. Aucune activation, aucun élargissement métier.
