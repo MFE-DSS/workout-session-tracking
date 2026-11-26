@@ -6,7 +6,8 @@ import hashlib
 import json
 import os
 import stat
-from dataclasses import dataclass
+from copy import deepcopy
+from dataclasses import dataclass, replace
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -56,10 +57,69 @@ class SourceBudget:
     total: int = 0
 
 
+class CatalogueReadContext:
+    """Private parsing templates for one owned read; never an authority verdict."""
+
+    def __init__(self, owner_id, profile_digest):
+        self._scope = (owner_id, profile_digest)
+        self._valid = True
+        self._authority = None
+        self._templates = {}
+
+    def invalidate(self):
+        self._templates.clear()
+        self._authority = None
+
+    def check_scope(self, owner_id, profile_digest):
+        if not self._valid or self._scope != (owner_id, profile_digest):
+            self.invalidate()
+            self._valid = False
+            raise ValueError("catalogue_context_mismatch")
+
+    def bind_authority(self, authority):
+        identity = digest(authority)
+        if self._authority is not None and self._authority != identity:
+            self.invalidate()
+        self._authority = identity
+
+    def seed(self, admitted):
+        path = "data/sci/exercise_catalogue.json"
+        raw = admitted.read(path)
+        projection = admitted.catalogue_view()
+        expected = admitted.pins[path]
+        if hashlib.sha256(raw).hexdigest() != expected or projection.source_sha256 != expected:
+            self.invalidate()
+            raise ValueError("source_digest_mismatch")
+        if len(self._templates) < 2:
+            self._templates[(expected, admitted.limits)] = deepcopy(projection)
+
+    def catalogue(self, raw, expected, limits):
+        from .catalogue_source import project_catalogue
+
+        if not self._valid:
+            raise ValueError("catalogue_context_mismatch")
+        if hashlib.sha256(raw).hexdigest() != expected:
+            self.invalidate()
+            raise ValueError("source_digest_mismatch")
+        key = (expected, limits)
+        template = self._templates.get(key)
+        if template is not None:
+            if template.source_sha256 != expected:
+                self.invalidate()
+                raise ValueError("source_digest_mismatch")
+            return replace(template, document=deepcopy(template.document))
+        projection = project_catalogue(raw, expected, limits)
+        if len(self._templates) < 2:
+            self._templates[key] = deepcopy(projection)
+        return projection
+
+
 class SourceView:
     """Bounded immutable bytes. Bundle code is verified as bytes, never executed."""
 
-    def __init__(self, root, limits=ReadLimits(), expected=None, budget=None):
+    def __init__(
+        self, root, limits=ReadLimits(), expected=None, budget=None, catalogue_context=None
+    ):
         self.root = Path(root).resolve(strict=True)
         self.limits = limits
         self.expected = expected
@@ -68,6 +128,7 @@ class SourceView:
         self.budget = budget or SourceBudget()
         self.v3 = None
         self.bundle_root = None
+        self.catalogue_context = catalogue_context
 
     def read(self, relative, expected=None, *, cap=None):
         if relative in self.raw:
@@ -125,16 +186,45 @@ class SourceView:
         if not hasattr(self, "_catalogue_projection"):
             path = "data/sci/exercise_catalogue.json"
             raw = self.read(path)
-            self._catalogue_projection = project_catalogue(raw, self.pins[path], self.limits)
+            self._catalogue_projection = (
+                self.catalogue_context.catalogue(raw, self.pins[path], self.limits)
+                if self.catalogue_context is not None
+                else project_catalogue(raw, self.pins[path], self.limits)
+            )
         return self._catalogue_projection
 
     @classmethod
-    def local(cls, root=None, *, limits=ReadLimits(), expected=None):
-        return cls(root or Path(__file__).resolve().parents[3], limits, expected)
+    def local(cls, root=None, *, limits=ReadLimits(), expected=None, catalogue_context=None):
+        return cls(
+            root or Path(__file__).resolve().parents[3],
+            limits,
+            expected,
+            catalogue_context=catalogue_context,
+        )
 
     @classmethod
-    def bundle(cls, root, packaging_digest, *, limits=ReadLimits(), budget=None):
-        view = cls(root, limits, budget=budget)
+    def bundle(
+        cls,
+        root,
+        packaging_digest,
+        *,
+        limits=ReadLimits(),
+        budget=None,
+        catalogue_context=None,
+        authority=None,
+    ):
+        if catalogue_context is not None:
+            catalogue_context.bind_authority(authority or {"packaging_digest": packaging_digest})
+        try:
+            return cls._bundle(root, packaging_digest, limits, budget, catalogue_context)
+        except (OSError, ValueError, TypeError, KeyError):
+            if catalogue_context is not None:
+                catalogue_context.invalidate()
+            raise
+
+    @classmethod
+    def _bundle(cls, root, packaging_digest, limits, budget, catalogue_context):
+        view = cls(root, limits, budget=budget, catalogue_context=catalogue_context)
         manifest = view.json("packaging-manifest.v1.json", packaging_digest, cap=131072)
         if manifest["contract_version"] != "plan-v3-private-science-bundle/1.0.0" or manifest.get(
             "calibration_inventory_version"
@@ -235,9 +325,7 @@ def compose_effective(view):
         ROOT_PINS[BASE + "pull-exposure-01/overlay.v1.json"],
     )
     legacy = view.json(BASE + "v1/policy.json", ROOT_PINS[BASE + "v1/policy.json"])
-    records = {
-        r["exercise_id"]: r for r in view.catalogue_view().document["records"]
-    }
+    records = {r["exercise_id"]: r for r in view.catalogue_view().document["records"]}
     overlays = {r["candidate_id"]: r for r in pull["candidates"]}
     candidates = {}
     for row in curation["candidates"]:

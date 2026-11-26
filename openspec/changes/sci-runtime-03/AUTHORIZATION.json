@@ -1,0 +1,26 @@
+{
+  "mandate": "SCI-RUNTIME-03 OPERATOR_REQUEST.txt",
+  "analysis": "AUTHORIZED",
+  "native_lab": "AUTHORIZED",
+  "native_lab_decision": "Autoriser ce banc natif isolé",
+  "native_lab_reference": "call_c7d26b9a63444e668003141b1b5c9d04",
+  "date": "2026-11-26",
+  "scope": "NATIVE_TARGET_SCOPE.md",
+  "source_product_apply": "AUTHORIZED",
+  "resource_policy_change": "NOT_AUTHORIZED",
+  "qa_activation": false,
+  "data": false,
+  "release": false,
+  "source_product_decision": "Autoriser le correctif SCI-RUNTIME-03 décrit dans BUILD_AMENDMENT.md du 26 novembre 2026.",
+  "source_product_reference": "Operator message AUREN — SCI-RUNTIME-03 / GO BUILD AMENDMENT, 2026-11-26",
+  "approved_amendment_sha256": "8162c51576488096a9797c832e8233009daba5a6423208e1145d5400f832525c",
+  "native_requalification": "AUTHORIZED in a new disposable copy under the previously approved constraints",
+  "files": [
+    "app/services/muscle_observed_load/worker.py",
+    "app/services/muscle_observed_load/provenance.py",
+    "app/services/muscle_observed_load/projection.py",
+    "tests/test_muscle_observed_load_worker.py",
+    "tests/test_muscle_observed_load_provenance.py",
+    "tests/test_muscle_observed_load_projection.py"
+  ]
+}

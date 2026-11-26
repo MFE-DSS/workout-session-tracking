@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import hashlib
+import json
 from dataclasses import asdict, replace
 from datetime import UTC, datetime
 from types import MappingProxyType
@@ -73,16 +75,20 @@ class SourceView(ByteSourceView):
     def bundle_for(self, authority):
         if not self.bundle_root:
             raise ValueError("EFFECTIVE_CATALOGUE_UNAVAILABLE")
-        if (
-            self.v3 is None
-            or self.v3.pins["packaging-manifest.v1.json"] != authority["packaging_digest"]
-        ):
+        authority_key = digest(authority)
+        if self.catalogue_context is not None:
+            self.catalogue_context.bind_authority(authority)
+        if self.v3 is None or getattr(self, "_bundle_authority", None) != authority_key:
+            self.v3 = None
             self.v3 = ByteSourceView.bundle(
                 self.bundle_root,
                 authority["packaging_digest"],
                 limits=self.limits,
                 budget=self.budget,
+                catalogue_context=self.catalogue_context,
+                authority=authority,
             )
+            self._bundle_authority = authority_key
         return self.v3
 
     def v3_resolution(self, mapping, effective):
@@ -193,6 +199,8 @@ def _lines(facts):
 
 def project_capture(capture, query, sources, limits, *, as_of=None, runtime_profile_digest):
     as_of = as_of or datetime.now(UTC)
+    if sources.catalogue_context is not None:
+        sources.catalogue_context.check_scope(capture.owner_id, runtime_profile_digest)
     facts = []
     outside_count = 0
     for c in capture.candidates():
@@ -407,5 +415,22 @@ def project_capture(capture, query, sources, limits, *, as_of=None, runtime_prof
         ]
         + ([dict(reason="OUTSIDE_WINDOW", inspected_count=outside_count)] if outside_count else []),
     )
-    out["consistency"]["result_digest"] = digest(out)
-    return ObservedLoadResponse.model_validate(out)
+    return _normalized_response(out)
+
+
+def _normalized_response(out):
+    normalized = ObservedLoadResponse.model_validate(out).model_dump()
+    normalized["consistency"]["result_digest"] = digest(normalized)
+    response = ObservedLoadResponse.model_validate(normalized)
+    # Verify the final DTO independently from the producer's digest helper.
+    check = response.model_dump()
+    expected = check["consistency"]["result_digest"]
+    check["consistency"]["result_digest"] = "0" * 64
+    actual = hashlib.sha256(
+        json.dumps(
+            check, sort_keys=True, ensure_ascii=False, allow_nan=False, separators=(",", ":")
+        ).encode()
+    ).hexdigest()
+    if actual != expected:
+        raise ValueError("result_digest_mismatch")
+    return response

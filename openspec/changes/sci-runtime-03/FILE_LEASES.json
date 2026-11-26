@@ -1,0 +1,16 @@
+{
+  "scope": "sci-runtime-03",
+  "branch": "spec/sci-runtime-03",
+  "status": "ACTIVE",
+  "owner": "Codex current SCI-RUNTIME-03 execution",
+  "canonical_parent": "3d4c7577e5ffd39fb59de58d1aab3bded1936edb",
+  "files": [
+    "app/services/muscle_observed_load/worker.py",
+    "app/services/muscle_observed_load/provenance.py",
+    "app/services/muscle_observed_load/projection.py",
+    "tests/test_muscle_observed_load_worker.py",
+    "tests/test_muscle_observed_load_provenance.py",
+    "tests/test_muscle_observed_load_projection.py"
+  ],
+  "other_worktrees": "PRESERVED; no competing active lease found for these reader files"
+}
