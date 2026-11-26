@@ -1,6 +1,6 @@
 # SCI-RUNTIME-02 — amendement technique minimal à autoriser
 
-26 novembre2026 — Europe/Paris. **GO BUILD REÇU le 26 novembre2026**, `call_12d65838fae34f55aee3aee31ea82f69` : « Autoriser ce correctif SCI-RUNTIME-02 ». Parent frais c454af863278b0801a568437038eb4efb94db588. [Reçu des essais](../../../docs/science/sci-runtime-02/QUALIFICATION_RECEIPT.md).
+26 novembre2026 — Europe/Paris. **GO BUILD REÇU le 26 novembre2026**, `call_12d65838fae34f55aee3aee31ea82f69` : « Autoriser ce correctif SCI-RUNTIME-02 ». Parent frais c454af863278b0801a568437038eb4efb94db588. [Reçu des essais](../../../../docs/science/sci-runtime-02/QUALIFICATION_RECEIPT.md).
 
 ## Défaut prouvé
 Worker → projection → exercise_identity.normalize → models.exercise → app.database → get_settings. L'environnement enfant supprime DATABASE_URL ; le défaut tente mkdir('/opt/auren/var') sur source readonly. Trace réelle EROFS ; retour1 avant la captation. La suite Linux pure donne126PASS/1FAIL, sans skip. Aucun dépassement du catalogue, de CPU ou d'AS n'est démontré par cet échec.

@@ -1,5 +1,7 @@
 # SCI-RUNTIME-02 — correctif autorisé et résultats après GO
 
+Reçu préparatoire conservé ; état de livraison dans [CLOSEOUT.md](CLOSEOUT.md).
+
 26 novembre 2026, Europe/Paris. Parent `c454af863278b0801a568437038eb4efb94db588`.
 GO exact : « Autoriser ce correctif SCI-RUNTIME-02 », référence `call_12d65838fae34f55aee3aee31ea82f69`.
 
