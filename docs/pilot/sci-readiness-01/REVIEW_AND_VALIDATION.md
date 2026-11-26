@@ -41,3 +41,5 @@ Revue indépendante fraîche de ce seul delta : aucun Critical, Important ou Min
 CI initiale 45704937761 : cinq shards backend et agrégat QA verts, 1 610 mobiles + TypeScript et 77 visuels verts ; lint rouge sur ces deux seuls résultats Gitleaks, Sonar skipped. Le shard Linux 4 exécute les témoins worker sans test ignoré ; il ne qualifie pas l’image/source Python cible. Les deux HOLD opérationnels restent distincts.
 
 Vérification locale après amendement : 122 PASS/2 témoins Linux ignorés sur Darwin ; Ruff neuf, budget260≤548, protocole et OpenSpec32/32 verts. Premier appel au budget sans Ruff dans PATH échoué ; relancé avec le binaire existant et vert, sans changement de dépendance.
+
+Avant archive : le test de parité documentaire cherchait uniquement le dossier actif. Contre-exemple sur archive datée : zéro fichier trouvé (RED). Recherche active OU archive datée, unicité et égalité exacte conservées : GREEN ; 66 tests de contrat/consommateurs verts. Aucun code produit changé.

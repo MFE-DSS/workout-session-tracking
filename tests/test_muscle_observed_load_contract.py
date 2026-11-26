@@ -243,8 +243,12 @@ def test_compiled_wire_schema_matches_the_admitted_document_exactly():
     from pathlib import Path
 
     root = Path(__file__).resolve().parents[1]
-    files = list(
-        (root / "openspec/changes").rglob("sci-readiness-01-build-01/PROPOSED_RESPONSE.schema.json")
+    changes = root / "openspec/changes"
+    files = list(changes.glob("sci-readiness-01-build-01/PROPOSED_RESPONSE.schema.json"))
+    files += list(
+        (changes / "archive").glob(
+            "????-??-??-sci-readiness-01-build-01/PROPOSED_RESPONSE.schema.json"
+        )
     )
     assert len(files) == 1
     assert contracts()._SCHEMA == json.loads(files[0].read_text())
