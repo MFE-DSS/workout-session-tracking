@@ -119,6 +119,15 @@ class SourceView:
     def json(self, relative, expected=None, *, cap=None):
         return bounded_json(self.read(relative, expected, cap=cap), self.limits)
 
+    def catalogue_view(self):
+        from .catalogue_source import project_catalogue
+
+        if not hasattr(self, "_catalogue_projection"):
+            path = "data/sci/exercise_catalogue.json"
+            raw = self.read(path)
+            self._catalogue_projection = project_catalogue(raw, self.pins[path], self.limits)
+        return self._catalogue_projection
+
     @classmethod
     def local(cls, root=None, *, limits=ReadLimits(), expected=None):
         return cls(root or Path(__file__).resolve().parents[3], limits, expected)
@@ -227,7 +236,7 @@ def compose_effective(view):
     )
     legacy = view.json(BASE + "v1/policy.json", ROOT_PINS[BASE + "v1/policy.json"])
     records = {
-        r["exercise_id"]: r for r in view.json("data/sci/exercise_catalogue.json")["records"]
+        r["exercise_id"]: r for r in view.catalogue_view().document["records"]
     }
     overlays = {r["candidate_id"]: r for r in pull["candidates"]}
     candidates = {}

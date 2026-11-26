@@ -19,18 +19,6 @@ def test_data_only_effective_composition_matches_attested_reference():
 
     root = Path(__file__).resolve().parents[1]
     view = m.SourceView.local()
-    original = view.json
-
-    def semantic_json(path, *args, **kwargs):
-        if path == "data/sci/exercise_catalogue.json":
-            import json
-
-            data = json.loads(view.read(path))
-            data["records"][75]["exercise_operational"]["curation"].pop("notes")
-            return data
-        return original(path, *args, **kwargs)
-
-    view.json = semantic_json
     actual = m.compose_effective(view)
     expected = load_v2_registry(root)
     assert actual["candidates"] == thaw(expected.candidates)
@@ -361,3 +349,35 @@ def test_inventory2_extension_digest_matches_trusted_reference_and_rejects_wrong
     view.v3 = {"bundle_digest": "0" * 64}
     with pytest.raises(ValueError, match="extension_authority_mismatch"):
         m.verify_extension(view, manifest)
+
+
+def test_real_catalogue_and_inventory2_preserve_v3_authority_under_shared_budget(tmp_path):
+    from app.services.muscle_observed_load import supervisor
+    from app.services.muscle_observed_load.projection import SourceView
+    from tools.plan_calibration_runtime_bundle import build_bundle
+    from tools.science_initial_policy.v3_admission import load_v3_registry
+
+    root = Path(__file__).resolve().parents[1]
+    bundle = tmp_path / "bundle"
+    packaging = build_bundle(bundle, root)
+    local = SourceView.local(root)
+    for name in supervisor._REQUIRED:
+        local.read(name)
+    local.catalogue_view()
+    local.bundle_root = bundle
+    captured = local.bundle_for({"packaging_digest": packaging})
+    reference = load_v3_registry(root)
+    assert captured.v3["binding_digest"] == reference.binding_digest
+    assert captured.v3["bundle_digest"] == reference.bundle_digest
+    identity = "tirage-poulie-haute-prise-neutre"
+    resolution, roles = local.v3_resolution({"canonical_exercise_id": identity}, captured.v3)
+    assert resolution["canonical_exercise_id"] == identity
+    assert [row["raw_role"] for row in roles] == [
+        row["role"] for row in reference.historical.candidates[identity]["effective_roles"]
+    ]
+    assert local.budget.files <= 128 and local.budget.total <= 16777216
+    assert captured.budget is local.budget
+    # Attested source replacement cannot inherit the previously verified hash.
+    (bundle / "data/sci/exercise_catalogue.json").write_bytes(b'{"changed":true}')
+    with pytest.raises(ValueError, match="source_digest_mismatch"):
+        module().SourceView.bundle(bundle, packaging)

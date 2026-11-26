@@ -98,7 +98,7 @@ def load_runtime_profile(path, expected_digest, *, with_view=False):
         for relative, expected in pins.items():
             view.read(relative, expected)
         # Parse actual authority under the approved ceiling before a job is admitted.
-        view.json("data/sci/exercise_catalogue.json")
+        view.catalogue_view()
         return (profile, view) if with_view else profile
     except (OSError, ValueError, TypeError, KeyError, OverflowError):
         raise ObservedLoadReadError() from None
