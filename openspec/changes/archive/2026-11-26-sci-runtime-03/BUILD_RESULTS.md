@@ -15,3 +15,6 @@ Le premier essai Linux sur916cf2d a exécuté0test : harnais pytest incomplet (`
 
 ## Limites et étapes restantes
 Ce checkpoint n'est pas la qualification native du nouveau code. Les anciens prototypes/témoins rouges restent dans les preuves privées. Nouvelle archiveGit, profil et sourcepins exacts requis pour la campagneLinux. Revue indépendante, CI, merge, CI canonique et closeout restent à effectuer. Aucune activationQA/DATA/release ; lecteurdisabled.
+
+## Actualisation après campagne native et merge code
+Code7393ac1 qualifié dans le banc Linux natif : 349PASS/1skip optionneljsonschema ; Legacy5/5, V3 5/5,100faits2/2 admis, digests concordants, un parsing par sonde. V3CPU1,626–1,708s ; refus500/501 et ressources conservés. Voir docs/pilot/sci-runtime-03 pour mesures et incidents de harnais. Revue finale sans point ouvert. PR452 fusionnée en7327256 ; CI PR45891313230 completed/success (9038backend/3skips,1610mobiles+TS,77visuels), SonarERROR consultatif8smells/0bug/0vulnérabilité/0hotspot,nouvellecoverage95,8%. CI canonique en cours au moment de cette actualisation.

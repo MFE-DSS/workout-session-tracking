@@ -1,0 +1,30 @@
+{
+  "scope": "SCI-RUNTIME-03",
+  "parent": "3d4c7577e5ffd39fb59de58d1aab3bded1936edb",
+  "head": "7393ac1cd15b74764cba0c436aa9e548662e32ef",
+  "merge": "7327256d678d681a3efa170795933daae094715c",
+  "pr": 452,
+  "pr_ci": 45891313230,
+  "pr_ci_status": "completed/success",
+  "backend_passed": 9038,
+  "backend_skipped": 3,
+  "mobile_suites": 140,
+  "mobile_tests": 1610,
+  "visual_tests": 77,
+  "native_qualification": "QUALIFIED_CONTROLLED_CANDIDATE",
+  "operational_paths": "HOLD",
+  "activation": "DISABLED",
+  "sonar": {
+    "gate": "ERROR_ADVISORY",
+    "code_smells": 8,
+    "bugs": 0,
+    "vulnerabilities": 0,
+    "hotspots": 0,
+    "new_coverage": 95.78947368421052
+  },
+  "canonical_ci": 45893610967,
+  "canonical_ci_status": "PENDING_AT_RECEIPT_WRITING",
+  "closeout_state": "PREPARED_PENDING_CANONICAL_AND_CLOSEOUT_CI",
+  "archive": "2026-11-26-sci-runtime-03",
+  "archive_follow_up": "canonical code CI, closeout publication/CI, final canonical CI and local cleanup; resolve via final live receipts"
+}
