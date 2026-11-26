@@ -289,3 +289,67 @@ def test_linux_real_child_admits_actual_catalogue_and_owned_read_without_writes(
         assert "\n".join(db.iterdump()) == before
     assert m.WORKER_SLOT.acquire(blocking=False)
     m.WORKER_SLOT.release()
+
+
+def test_worker_parses_catalogue_once_per_job_and_never_between_owners(tmp_path, monkeypatch):
+    import io
+    from dataclasses import asdict
+    from datetime import UTC, datetime
+    from types import SimpleNamespace
+
+    from test_muscle_observed_load_provenance import parser_spy
+    from test_muscle_observed_load_sqlite import seed
+
+    monkeypatch.setattr(sys, "dont_write_bytecode", sys.dont_write_bytecode)
+    monkeypatch.setattr(sys, "path", sys.path.copy())
+    monkeypatch.setenv("DATABASE_URL", "sqlite:///:memory:")
+    from app.services.muscle_observed_load import worker
+    from app.services.muscle_observed_load.contracts import ObservedLoadQuery
+    from app.services.muscle_observed_load.limits import ReadLimits
+
+    m = module()
+    monkeypatch.setattr(m.sys, "platform", "linux")
+    monkeypatch.setattr(worker, "install_limits", lambda: None)  # never set parent RLIMIT
+    root = Path(__file__).resolve().parents[1]
+    db = seed(tmp_path / "synthetic.sqlite")
+    profile = dict(
+        qualification_state="QUALIFIED",
+        qualification_ref="TEST_ONLY_NOT_OPERATIONAL",
+        qualification_proof_sha256=hashlib.sha256(b"isolated unit boundary").hexdigest(),
+        fingerprint=m.fingerprint(),
+        limits=asdict(ReadLimits()),
+        source_pins={p: hashlib.sha256((root / p).read_bytes()).hexdigest() for p in m._REQUIRED},
+        http_processes=1,
+        container_memory_bytes=2147483648,
+        source_sha="3d4c7577e5ffd39fb59de58d1aab3bded1936edb",
+    )
+    raw = json.dumps(profile).encode()
+    profile_path = tmp_path / "profile.json"
+    profile_path.write_bytes(raw)
+    calls = parser_spy(monkeypatch)
+    query = ObservedLoadQuery(datetime(2026, 11, 1, tzinfo=UTC), datetime(2026, 11, 25, tzinfo=UTC))
+    for owner in [1, 2]:
+        body = m.encode_job(owner, query, datetime(2026, 11, 26, tzinfo=UTC))
+        output = io.BytesIO()
+        monkeypatch.setattr(
+            worker.sys,
+            "argv",
+            [
+                str(root / "app/services/muscle_observed_load/worker.py"),
+                str(profile_path),
+                hashlib.sha256(raw).hexdigest(),
+                "sqlite:///" + str(db),
+                "",
+            ],
+        )
+        monkeypatch.setattr(worker.sys, "stdin", SimpleNamespace(buffer=io.BytesIO(body)))
+        monkeypatch.setattr(
+            worker.sys,
+            "stdout",
+            SimpleNamespace(buffer=output, write=lambda s: output.write(s.encode())),
+        )
+        assert worker.main() == 0, output.getvalue()
+        result = json.loads(output.getvalue())
+        assert result["owner_id"] == owner
+        assert [f["reps"] for f in result["facts"]] == ([9] if owner == 1 else [8])
+        assert len(calls) == owner  # fresh parsing context per actual main invocation

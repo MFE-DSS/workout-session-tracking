@@ -189,3 +189,44 @@ def test_only_unknown_roles_produce_unknown_not_a_certain_partial(tmp_path):
     result = project(seed(tmp_path / "db"), source_transform=unknown)
     assert result["state"] == "UNKNOWN"
     assert all(z["window_result"]["documented_sets"] is None for z in result["zones"])
+
+
+def _independent_wire_digest(data):
+    import copy
+    import hashlib
+    import json
+
+    body = copy.deepcopy(data)
+    body["consistency"]["result_digest"] = "0" * 64
+    return hashlib.sha256(
+        json.dumps(
+            body, sort_keys=True, ensure_ascii=False, allow_nan=False, separators=(",", ":")
+        ).encode()
+    ).hexdigest()
+
+
+@pytest.mark.parametrize("setting", [35, 35.0, 35.5])
+def test_final_digest_describes_normalized_v3_setting(tmp_path, setting):
+    from test_muscle_observed_load_provenance import v3_case
+
+    path, _, ports, _ = v3_case(
+        tmp_path, mutate=lambda p, e, o, r: o["setting"].update(value=setting)
+    )
+
+    def use_captured_authority(sources):
+        sources.bundle_for = ports.bundle_for
+        sources.v3_resolution = ports.v3_resolution
+
+    data = project(path, source_transform=use_captured_authority)
+    assert data["facts"][0]["setting"]["value"] == setting
+    assert type(data["facts"][0]["setting"]["value"]) is float
+    assert data["facts"][0]["weight_kg"] is None
+    assert data["consistency"]["result_digest"] == _independent_wire_digest(data)
+
+
+def test_corrupt_digest_calculation_cannot_return_a_response(tmp_path, monkeypatch):
+    from app.services.muscle_observed_load import projection
+
+    monkeypatch.setattr(projection, "digest", lambda _: "f" * 64)
+    with pytest.raises(ValueError, match="result_digest_mismatch"):
+        project(seed(tmp_path / "db"))

@@ -76,8 +76,17 @@ def main():
         as_of = instant(job["as_of"])
         query = parse_query({"from": job["from"], "until": job["until"]}, VERSION, as_of=as_of)
         from app.services.muscle_observed_load.projection import SourceView, project_capture
+        from app.services.muscle_observed_load.provenance import CatalogueReadContext
 
-        sources = SourceView(root, expected=profile["source_pins"], budget=admitted_view.budget)
+        catalogue_context = CatalogueReadContext(job["owner_id"], profile_digest)
+        catalogue_context.seed(admitted_view)
+
+        sources = SourceView(
+            root,
+            expected=profile["source_pins"],
+            budget=admitted_view.budget,
+            catalogue_context=catalogue_context,
+        )
         sources.raw = dict(admitted_view.raw)
         sources.pins = dict(admitted_view.pins)
         sources.bundle_root = bundle_root

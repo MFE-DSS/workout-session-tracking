@@ -381,3 +381,202 @@ def test_real_catalogue_and_inventory2_preserve_v3_authority_under_shared_budget
     (bundle / "data/sci/exercise_catalogue.json").write_bytes(b'{"changed":true}')
     with pytest.raises(ValueError, match="source_digest_mismatch"):
         module().SourceView.bundle(bundle, packaging)
+
+
+def read_context(owner=1, profile="a" * 64):
+    cls = getattr(module(), "CatalogueReadContext", None)
+    assert cls is not None, "missing confined attested catalogue read context"
+    return cls(owner, profile)
+
+
+def parser_spy(monkeypatch):
+    from app.services.muscle_observed_load import catalogue_source
+
+    actual = catalogue_source.project_catalogue
+    calls = []
+
+    def parse(raw, expected, limits):
+        calls.append(expected)
+        return actual(raw, expected, limits)
+
+    monkeypatch.setattr(catalogue_source, "project_catalogue", parse)
+    return calls
+
+
+def test_attested_identical_bytes_parse_once_with_independent_views(tmp_path, monkeypatch):
+    import hashlib
+
+    m = module()
+    calls = parser_spy(monkeypatch)
+    context = read_context()
+    first = m.SourceView.local()
+    original = first.catalogue_view()
+    context.seed(first)
+    path = "data/sci/exercise_catalogue.json"
+    (tmp_path / "data/sci").mkdir(parents=True)
+    raw = first.read(path)
+    (tmp_path / path).write_bytes(raw)
+    expected = {path: hashlib.sha256(raw).hexdigest()}
+    second = m.SourceView(tmp_path, expected=expected, catalogue_context=context).catalogue_view()
+    assert len(calls) == 1
+    assert second.document == original.document
+    assert second.document is not original.document
+    second.document["records"][0]["exercise_id"] = "consumer-mutation"
+    original.document["records"][0]["exercise_id"] = "other-consumer-mutation"
+    third = m.SourceView(tmp_path, expected=expected, catalogue_context=context).catalogue_view()
+    assert third.document["records"][0]["exercise_id"] not in {
+        "consumer-mutation",
+        "other-consumer-mutation",
+    }
+    assert len(calls) == 1
+    (tmp_path / path).write_bytes(b'{"tampered":true}')
+    with pytest.raises(ValueError, match="source_digest_mismatch"):
+        m.SourceView(tmp_path, expected=expected, catalogue_context=context).catalogue_view()
+
+
+def test_valid_distinct_catalogue_misses_cache_and_keeps_its_version(tmp_path, monkeypatch):
+    import hashlib
+    import json
+
+    m = module()
+    calls = parser_spy(monkeypatch)
+    context = read_context()
+    local = m.SourceView.local()
+    context.seed(local)
+    path = "data/sci/exercise_catalogue.json"
+    document = json.loads(local.read(path))
+    document["catalogue_header"]["catalogue_version"] = "synthetic-historical-B"
+    raw = json.dumps(document).encode()
+    (tmp_path / "data/sci").mkdir(parents=True)
+    (tmp_path / path).write_bytes(raw)
+    result = m.SourceView(
+        tmp_path, expected={path: hashlib.sha256(raw).hexdigest()}, catalogue_context=context
+    ).catalogue_view()
+    assert result.document["catalogue_header"]["catalogue_version"] == "synthetic-historical-B"
+    assert len(calls) == 2 and calls[0] != calls[1]
+
+
+def test_profile_owner_and_authority_changes_cannot_reuse_admission(monkeypatch):
+    m = module()
+    calls = parser_spy(monkeypatch)
+    context = read_context()
+    local = m.SourceView.local()
+    context.seed(local)
+    context.bind_authority({"generation": 1})
+    m.SourceView.local(catalogue_context=context).catalogue_view()
+    assert len(calls) == 1
+    context.bind_authority({"generation": 2})
+    m.SourceView.local(catalogue_context=context).catalogue_view()
+    assert len(calls) == 2
+    with pytest.raises(ValueError, match="catalogue_context_mismatch"):
+        context.check_scope(2, "a" * 64)
+    with pytest.raises(ValueError, match="catalogue_context_mismatch"):
+        m.SourceView.local(catalogue_context=context).catalogue_view()
+    fresh = read_context(profile="b" * 64)
+    with pytest.raises(ValueError, match="catalogue_context_mismatch"):
+        fresh.check_scope(1, "a" * 64)
+
+
+def test_bundle_cache_hit_keeps_v3_authority_and_final_extension_checks(tmp_path, monkeypatch):
+    import hashlib
+    import json
+
+    from app.services.muscle_observed_load.projection import SourceView
+    from tools.plan_calibration_runtime_bundle import build_bundle
+    from tools.science_initial_policy.v3_admission import load_v3_registry
+
+    calls = parser_spy(monkeypatch)
+    context = read_context()
+    root = Path(__file__).resolve().parents[1]
+    bundle = tmp_path / "bundle"
+    packaging = build_bundle(bundle, root)
+    local = SourceView.local(catalogue_context=context)
+    local.catalogue_view()
+    local.bundle_root = bundle
+    authority = {"packaging_digest": packaging, "generation": 1}
+    captured = local.bundle_for(authority)
+    reference = load_v3_registry(root)
+    assert captured.v3["effective_science_digest"] == reference.historical.effective_science_digest
+    assert captured.v3["bundle_digest"] == reference.bundle_digest
+    assert len(calls) == 1
+    # A second full authority scan shares the original source budget; never raise it.
+    with pytest.raises(ValueError, match="source_file_limit"):
+        local.bundle_for(dict(authority, generation=2))
+    assert local.v3 is None  # a failed generation cannot leave an adoptable old view
+    assert len(calls) == 1
+
+    manifest_path = bundle / "packaging-manifest.v1.json"
+    manifest = json.loads(manifest_path.read_bytes())
+    manifest["calibration_extension_bundle_digest"] = "f" * 64
+    raw = json.dumps(manifest).encode()
+    manifest_path.write_bytes(raw)
+    fresh = read_context()
+    fresh.seed(module().SourceView.local())
+    before = len(calls)
+    with pytest.raises(ValueError, match="extension_authority_mismatch"):
+        module().SourceView.bundle(bundle, hashlib.sha256(raw).hexdigest(), catalogue_context=fresh)
+    assert len(calls) == before  # byte-attested hit still cannot admit bad final authority
+    module().SourceView.local(catalogue_context=fresh).catalogue_view()
+    assert len(calls) == before + 1  # rejection invalidates the parsing context
+
+
+def test_cache_hit_never_relaxes_json_limits(monkeypatch):
+    from app.services.muscle_observed_load.limits import ReadLimits
+
+    m = module()
+    context = read_context()
+    context.seed(m.SourceView.local())
+    with pytest.raises(ValueError, match="json_depth_limit"):
+        m.SourceView.local(
+            limits=ReadLimits(max_depth=1), catalogue_context=context
+        ).catalogue_view()
+
+
+def test_confined_cache_does_not_grow_with_distinct_historical_sources(tmp_path, monkeypatch):
+    import hashlib
+    import json
+
+    m = module()
+    context = read_context()
+    calls = parser_spy(monkeypatch)
+    template = json.loads(
+        (Path(__file__).resolve().parents[1] / "data/sci/exercise_catalogue.json").read_bytes()
+    )
+    for number in [1, 2, 3, 3, 1]:
+        template["catalogue_header"]["catalogue_version"] = "synthetic-" + str(number)
+        raw = json.dumps(template).encode()
+        root = tmp_path / str(number)
+        (root / "data/sci").mkdir(parents=True, exist_ok=True)
+        relative = "data/sci/exercise_catalogue.json"
+        (root / relative).write_bytes(raw)
+        result = m.SourceView(
+            root, expected={relative: hashlib.sha256(raw).hexdigest()}, catalogue_context=context
+        ).catalogue_view()
+        assert result.document["catalogue_header"]["catalogue_version"] == "synthetic-" + str(
+            number
+        )
+    assert len(calls) == 4  # third source is valid but never retained beyond the two-entry cap
+
+
+def test_seed_rejects_projection_with_a_divergent_source_digest():
+    from dataclasses import replace
+
+    local = module().SourceView.local()
+    local._catalogue_projection = replace(local.catalogue_view(), source_sha256="f" * 64)
+    with pytest.raises(ValueError, match="source_digest_mismatch"):
+        read_context().seed(local)
+
+
+@pytest.mark.parametrize("pin", [None, ""])
+def test_missing_bundle_pin_is_refused_before_a_warm_catalogue_hit(tmp_path, monkeypatch, pin):
+    from tools.plan_calibration_runtime_bundle import build_bundle
+
+    m = module()
+    context = read_context()
+    calls = parser_spy(monkeypatch)
+    context.seed(m.SourceView.local())
+    bundle = tmp_path / "bundle"
+    build_bundle(bundle, Path(__file__).resolve().parents[1])
+    with pytest.raises(ValueError, match="source_digest_invalid"):
+        m.SourceView.bundle(bundle, pin, catalogue_context=context)
+    assert len(calls) == 1
