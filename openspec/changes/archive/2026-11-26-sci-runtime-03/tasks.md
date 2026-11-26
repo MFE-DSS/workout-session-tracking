@@ -9,7 +9,8 @@
 
 ## Seulement après GO produit
 - [x] RED parsing doublé/digest normalisé/guards ; appliquer les six fichiers dans le scope exact.
-- [x] GREEN local, pin/non-mutation/jobs/owner/sources/V3 et digest normalisé ; validation parent native reste à exécuter.
-- [ ] Requalifier le HEAD réel natif ; contrôles scope/sécurité/OpenSpec, ciblés et broad.
-- [ ] Revue indépendante, CI protégée exacte, merge GOV-MERGE-01 et CI canonique.
-- [ ] Closeout/archive/nettoyage bornés ; conserver disabled et HOLD non résolus.
+- [x] GREEN local, pin/non-mutation/jobs/owner/sources/V3 et digest normalisé ; validation parent native consignée dans le reçu du code réel.
+- [x] Requalifier le HEAD réel natif ; contrôles scope/sécurité/OpenSpec, ciblés et broad.
+- [x] Revue indépendante, CI protégée exacte et merge code GOV-MERGE-01.
+- [ ] Suivi de livraison : vérifier CI canonique code, CI/merge closeout, CI canonique finale et nettoyage local borné ; résoudre par reçus vivants, sans réécrire cet instant de préparation.
+- [x] Préparer closeout/archive et conserver les preuves ; nettoyage du banc natif vérifié, disabled et HOLD opérationnels maintenus. Le suivi de publication et cleanup local reste ouvert ci-dessus.
