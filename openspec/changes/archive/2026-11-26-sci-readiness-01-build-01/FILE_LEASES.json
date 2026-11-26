@@ -1,9 +1,9 @@
 {
   "scope": "sci-readiness-01-build-01",
   "owner": "Codex root",
-  "date": "2026-11-25",
+  "date": "2026-11-26",
   "parent": "1f0122bf4f2d30f7c95d4975b5994d1453363bc5",
-  "state": "BUILD_ACTIVE_DEFAULT_DISABLED",
+  "state": "SHARED_CODE_RELEASED_CANONICAL_GREEN_CLOSEOUT_IN_PROGRESS",
   "shared_files": [
     "app/config.py",
     "app/routers/mobile_api.py",
@@ -14,5 +14,7 @@
   ],
   "unrelated_worktrees": "PRESERVED_NO_RESET_STASH_CLEAN_OR_PRUNE",
   "other_live_scope_agents": "none (proposal/D4 and whole-scope reviewers completed; read-only)",
-  "release_on": "canonical merge and closeout"
+  "release_on": "canonical merge and closeout",
+  "code_merge": "1be45a4f655d8edeeb18889e0bcbdf06ad35e52e",
+  "canonical_required_checks": "PASS_RUN45788108352"
 }

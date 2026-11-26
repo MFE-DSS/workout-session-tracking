@@ -21,3 +21,9 @@ Le service exige un profil serveur épinglé, une identité OS/Python/SQLite/mac
 Avant de chercher une activation, soumettre un amendement autorisant un **adaptateur sélectif des champs nécessaires du catalogue attesté**, qui laisse les notes éditoriales hors projection avant matérialisation, conserve les octets historiques/digests, et maintient les limites4096 des corps et champs effectivement admis. Il faut spécifier puis éprouver ce sélecteur ; il n’est pas implémenté par BUILD-01. L’alternative d’une hausse de plafond n’est ni appliquée ni recommandée sans nouvelle preuve.
 
 Ensuite seulement : qualifier réellement l’image Linux/Python3.11.14 concernée, son manifeste de sources, les cas nominaux/adversariaux, mémoire/temps/concurrence et plans SQL. Les permissions OPS/DATA restent distinctes. Aucun contournement pour faire passer le cas nominal.
+
+## Preuve Linux reçue — portée limitée
+
+CI PR446 sur81e5e568, run45779277494 : le shard4 exécute les témoins réels RLIMIT/parent avec Python3.11.18 ;2032PASS, aucun test ignoré dans ce shard. Le fichier worker figure dans la partition vérifiée. Les assertions prouvent limites enfant, refus d’allocation sous plafond, terminaison observée et récupération du processus ; elles ne certifient ni toute cause possible d’un SIGKILL ni l’image cible3.11.14/conteneur/concurrence/source. HOLD opérationnel inchangé.
+
+Le chemin du profil est une configuration serveur de confiance, non un paramètre HTTP. La qualification opérationnelle doit vérifier aussi ses répertoires parents : O_NOFOLLOW ne protège que le dernier composant. L’alerte Sonar13 reste ouverte après triage documenté du parcours HTTP ; aucun état d’issue n’est modifié au titre de BUILD-01.

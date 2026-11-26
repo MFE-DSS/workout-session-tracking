@@ -30,9 +30,25 @@
     "protocol": "PASS",
     "openspec_strict": "PASS",
     "bandit": "0_ISSUES_NEW_APPLICATION_MODULES",
-    "gitleaks": "PASS_REDACTED_DIFF"
+    "gitleaks": "PASS_FULL_RELEVANT_HISTORY_AND_FINAL_CI_WITH_EXACT_TWO_AUTHORIZED_EXCEPTIONS"
   },
-  "ci": "INITIAL_HEAD_BACKEND_MOBILE_VISUAL_PASS_LINT_GITLEAKS_FAIL_FINAL_HEAD_PENDING",
+  "ci": {
+    "final_pr_run": 45779277494,
+    "mandatory": "ALL_FOUR_SUCCESS",
+    "backend_passed": 8983,
+    "backend_skipped": 3,
+    "mobile_passed": 1610,
+    "mobile_suites": 140,
+    "typescript": "PASS",
+    "visual_passed": 77,
+    "canonical": {
+      "run": 45788108352,
+      "mandatory": "ALL_FOUR_SUCCESS",
+      "backend_passed": 8983,
+      "backend_skipped": 3,
+      "sonar": "SCANNER_JOB_SUCCESS_EXTERNAL_GATE_ERROR_ADVISORY"
+    }
+  },
   "independent_review": "IMPORTANT_CORRECTED_AUTHOR_RED_GREEN_NO_SECOND_REVIEW_CLAIM",
   "mapping_sha256": "72ae2e2411169653c0f496628ff2c0b31192c2f7f20fd5a27f5a09e9fce4ef8b",
   "historical_spec_preserved": true,
@@ -58,5 +74,57 @@
       "skipped": 2
     }
   },
-  "linux_ci_witness": "INITIAL_CI_SHARD4_WORKER_TESTS_EXECUTED_WITH_ZERO_TEST_SKIPS_NOT_TARGET_IMAGE_QUALIFICATION"
+  "linux_ci_witness": {
+    "state": "PASS_RUNNER_ONLY",
+    "python": "3.11.18",
+    "job": 139773493894,
+    "worker_file_in_partition": true,
+    "worker_shard_passed": 2032,
+    "worker_shard_skips": 0,
+    "target_image_qualified": false
+  },
+  "engineering_state": "CODE_MERGED_CANONICAL_VERIFIED_DOCUMENTARY_CLOSEOUT_PREPARED",
+  "pr": 446,
+  "tested_head": "81e5e568fc5389a02bb834a2857e1111029591f7",
+  "code_merge": "1be45a4f655d8edeeb18889e0bcbdf06ad35e52e",
+  "sonar_pr": {
+    "gate": "ERROR_ADVISORY",
+    "bugs": 0,
+    "vulnerabilities": 1,
+    "code_smells": 91,
+    "security_hotspots": 0,
+    "coverage": 91.6,
+    "new_coverage": 80.40421792618629,
+    "alert": 13,
+    "rule": "pythonsecurity:S8707",
+    "issue": "AaIW9UbPkQr_488ATdJK",
+    "issue_state_changed": false,
+    "review_thread_resolved_after_independent_triage": true,
+    "triage": "NO_REQUEST_CONTROLLED_PATH_FOUND_IN_EXAMINED_HTTP_FLOW; TRUSTED_SERVER_CONFIG_AND_PARENT_DIRECTORIES_REQUIRED; NOT_OPERATIONAL_QUALIFICATION"
+  },
+  "sonar_canonical_code": {
+    "analysis": "91e09d81-ad74-4627-b7a3-e76337935b52",
+    "revision": "1be45a4f655d8edeeb18889e0bcbdf06ad35e52e",
+    "gate": "ERROR_ADVISORY",
+    "bugs": 9,
+    "vulnerabilities": 9,
+    "code_smells": 750,
+    "security_hotspots": 0,
+    "coverage": 91.6,
+    "new_coverage": 91.50721539283805,
+    "global_innocuity_not_claimed": true
+  },
+  "archive": {
+    "path": "openspec/changes/archive/2026-11-26-sci-readiness-01-build-01",
+    "cli": "openspec archive sci-readiness-01-build-01 --yes",
+    "canonical_requirements_added": 5,
+    "administrative_task_pending_at_snapshot": 1,
+    "purpose_placeholder_replaced": true,
+    "strict_validation": "32/32_PASS",
+    "post_archive_local_tests": {
+      "passed": 122,
+      "skipped": 2
+    },
+    "closeout_ci_and_cleanup": "FOLLOW_FINAL_LIVE_RECEIPTS"
+  }
 }
