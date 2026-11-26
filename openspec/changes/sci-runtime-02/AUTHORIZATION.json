@@ -1,0 +1,18 @@
+{
+  "reference": "SCI-RUNTIME-02-QUALIFICATION-2026-11-26",
+  "operator_mandate": "OPERATOR_REQUEST.txt in private evidence; phase6",
+  "qualification_experiments": "AUTHORIZED",
+  "product_build": "AUTHORIZED",
+  "scope_amendment": "BUILD_AMENDMENT.md",
+  "canonical_parent": "c454af863278b0801a568437038eb4efb94db588",
+  "qa_activation": false,
+  "data": false,
+  "release": false,
+  "operator_decision": "Autoriser ce correctif SCI-RUNTIME-02",
+  "operator_decision_ref": "call_12d65838fae34f55aee3aee31ea82f69",
+  "operator_decision_date": "2026-11-26",
+  "authorized_product_files": [
+    "app/services/muscle_observed_load/worker.py",
+    "tests/test_muscle_observed_load_worker.py"
+  ]
+}

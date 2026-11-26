@@ -221,7 +221,10 @@ def test_descriptor_anchored_read_rejects_symlink_mutable_ancestors_and_false_di
 @pytest.mark.skipif(
     sys.platform != "linux", reason="Real child pipeline requires Linux; not target qualification"
 )
-def test_linux_real_child_admits_actual_catalogue_and_owned_read_without_writes(tmp_path):
+@pytest.mark.parametrize("readonly_bootstrap", [False, True])
+def test_linux_real_child_admits_actual_catalogue_and_owned_read_without_writes(
+    tmp_path, monkeypatch, readonly_bootstrap
+):
     """TEST_ONLY admission fixture: exact runner profile, never a QA qualification."""
     from dataclasses import asdict
     from datetime import UTC, datetime
@@ -233,6 +236,28 @@ def test_linux_real_child_admits_actual_catalogue_and_owned_read_without_writes(
 
     m = module()
     root = Path(__file__).resolve().parents[1]
+    # Parent ORM configuration must never select the worker's capture or bootstrap DB.
+    monkeypatch.setenv("DATABASE_URL", "sqlite:////forbidden-parent/poison.sqlite")
+    real_popen = subprocess.Popen
+
+    def guarded_popen(args, **kwargs):
+        assert "DATABASE_URL" not in kwargs["env"]
+        if readonly_bootstrap:
+            # Reproduce readonly mkdir refusal on writable CI too; the Linux qualification
+            # separately mounts the actual complete checkout readonly.
+            guard = (
+                "import sys,runpy;from pathlib import Path;"
+                "worker=sys.argv[1];sys.argv=sys.argv[1:];"
+                "blocked=str(Path(worker).resolve().parents[3]/'var');"
+                "sys.addaudithook(lambda event,args: "
+                "(_ for _ in ()).throw(RuntimeError('readonly application root')) "
+                "if event=='os.mkdir' and str(args[0])==blocked else None);"
+                "runpy.run_path(worker,run_name='__main__')"
+            )
+            args = [*args[:3], "-c", guard, *args[3:]]
+        return real_popen(args, **kwargs)
+
+    monkeypatch.setattr(m.subprocess, "Popen", guarded_popen)
     db_path = seed(tmp_path / "synthetic.sqlite")
     with __import__("sqlite3").connect(db_path) as db:
         before = "\n".join(db.iterdump())

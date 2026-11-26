@@ -26,6 +26,11 @@ def install_limits():
 def main():
     try:
         resource = install_limits()
+        import os
+
+        # Incidental ORM imports must not create persistent state in the readonly
+        # application root. The actual owned capture URI remains separate in argv.
+        os.environ["DATABASE_URL"] = "sqlite:///:memory:"
         if sys.argv[1:] == ["--qualify-cpu"]:
             while True:
                 pass  # Linux-only witness after actual RLIMIT_CPU installation.
