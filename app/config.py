@@ -28,6 +28,10 @@ class Settings(BaseSettings):
     plan_v3_creation_enabled: bool = Field(default=False)
     plan_v3_guidance_enabled: bool = Field(default=False)
     plan_v3_bundle_path: str = Field(default="")
+    # SCI-READINESS-01 BUILD-01: no operational or DATA activation by merge.
+    muscle_observed_load_enabled: bool = Field(default=False)
+    muscle_observed_load_profile_path: str = Field(default="")
+    muscle_observed_load_profile_sha256: str = Field(default="")
     nutrition_manual_controlled_test_enabled: bool = Field(default=False)
     nutrition_backend_identity: str = Field(default="")
     nutrition_signing_key: str = Field(default="")

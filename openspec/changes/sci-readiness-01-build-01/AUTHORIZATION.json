@@ -1,0 +1,40 @@
+{
+  "status": "SCI_ADMITTED_BUILD01_AUTHORIZED",
+  "date": "2026-11-25",
+  "source_canonical": "1f0122bf4f2d30f7c95d4975b5994d1453363bc5",
+  "preparation_parent": "0d4fcfa18165cef5ea2b79246a4327661c84efd5",
+  "operator_admission": {
+    "received": true,
+    "reference": "SCI-READINESS-01-ADMISSION-2026-11-25",
+    "source": "User message: AUREN \u2014 D\u00e9cision SCI-READINESS-01 et GO BUILD-01",
+    "date": "2026-11-25"
+  },
+  "go_build": true,
+  "product_apply": true,
+  "commit_push_merge": "AUTHORIZED_WITH_MANDATORY_GATES_GOV_MERGE_01",
+  "native_ui": false,
+  "ops_data_release": false,
+  "mapping_and_policy_admission": "ADMITTED_D1_D5_SIX_D4_RULES_DESCRIPTIVE_ONLY",
+  "technical_proposal": "bounded_read_only_SQLite_Linux_worker",
+  "existing_artistic_g1": "DA_READINESS_01_ARTISTIC_ONLY_UNCHANGED",
+  "go_build_reference": "SCI-READINESS-01-BUILD-01-GO-2026-11-25",
+  "runtime_activation": "HOLD_NON_QUALIFIED_DEFAULT_DISABLED",
+  "gitleaks_scope_amendment": {
+    "date": "2026-11-26",
+    "operator_reference": "SCI-BUILD01-SCOPE-AMENDMENT-2026-11-26",
+    "verified_source_sha256_count": 112,
+    "source_snapshot_canonical": "1f0122bf4f2d30f7c95d4975b5994d1453363bc5",
+    "pins_preserved": true,
+    "fingerprints": [
+      "dc6b79f8f3e3aa43a27323d8e1aa7441710a13e5:openspec/changes/sci-readiness-01-build-01/SOURCE_PINS.json:generic-api-key:10",
+      "dc6b79f8f3e3aa43a27323d8e1aa7441710a13e5:openspec/changes/sci-readiness-01-build-01/SOURCE_PINS.json:generic-api-key:9"
+    ],
+    "ignore_before_sha256": "73bb49c1391825fe49d3915457da8317e5e23ab168fa94dfcba3f9ecf32396b6",
+    "ignore_after_sha256": "df89b547b21d6d34a59a01562c6faa5d2fbc299146074a5e97731edaa404740f",
+    "runtime_changes": false,
+    "operational_holds": [
+      "CANONICAL_JSON_STRING_4302_EXCEEDS_4096",
+      "RUNTIME_PROFILE_NOT_QUALIFIED"
+    ]
+  }
+}

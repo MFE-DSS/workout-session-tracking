@@ -1,0 +1,18 @@
+{
+  "scope": "sci-readiness-01-build-01",
+  "owner": "Codex root",
+  "date": "2026-11-25",
+  "parent": "1f0122bf4f2d30f7c95d4975b5994d1453363bc5",
+  "state": "BUILD_ACTIVE_DEFAULT_DISABLED",
+  "shared_files": [
+    "app/config.py",
+    "app/routers/mobile_api.py",
+    "tests/test_sci_exposure.py",
+    "docs/strategy/AUREN_PRODUCT_SCIENCE_DEPENDENCIES.md",
+    "docs/strategy/SPEC_REGISTRY.md",
+    "openspec/specs/mobile/feature-migration-map/inventory.yaml"
+  ],
+  "unrelated_worktrees": "PRESERVED_NO_RESET_STASH_CLEAN_OR_PRUNE",
+  "other_live_scope_agents": "none (proposal/D4 and whole-scope reviewers completed; read-only)",
+  "release_on": "canonical merge and closeout"
+}

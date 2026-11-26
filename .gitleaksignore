@@ -1,3 +1,7 @@
 # Reviewed Git revision in the product brief, not a credential.
 # Exact historical occurrence only; scanner rules and other findings remain active.
 640e5bafdf63ac051e1ecf6cd757ff4071d76732:docs/MOBILE_UIUX_PO_DESIGNER_BRIEF_2026_11_05.md:generic-api-key:8
+
+# Reviewed public source-file SHA256 values, not credentials. Exact historical occurrences only.
+dc6b79f8f3e3aa43a27323d8e1aa7441710a13e5:openspec/changes/sci-readiness-01-build-01/SOURCE_PINS.json:generic-api-key:9
+dc6b79f8f3e3aa43a27323d8e1aa7441710a13e5:openspec/changes/sci-readiness-01-build-01/SOURCE_PINS.json:generic-api-key:10
