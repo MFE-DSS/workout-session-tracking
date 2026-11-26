@@ -43,3 +43,11 @@ CI initiale 45704937761 : cinq shards backend et agrégat QA verts, 1 610 mobile
 Vérification locale après amendement : 122 PASS/2 témoins Linux ignorés sur Darwin ; Ruff neuf, budget260≤548, protocole et OpenSpec32/32 verts. Premier appel au budget sans Ruff dans PATH échoué ; relancé avec le binaire existant et vert, sans changement de dépendance.
 
 Avant archive : le test de parité documentaire cherchait uniquement le dossier actif. Contre-exemple sur archive datée : zéro fichier trouvé (RED). Recherche active OU archive datée, unicité et égalité exacte conservées : GREEN ; 66 tests de contrat/consommateurs verts. Aucun code produit changé.
+
+## Relecture avant merge et alerte Sonar — 26 novembre
+
+HEAD final `81e5e568`, CI45779277494 : 8 983 backend passants/3 ignorés par les gardes existantes, 1 610 mobiles/140 suites + TypeScript, 77 visuels ; quatre checks protégés verts. Shard worker Linux Python3.11.18 : 2 032 PASS sans skip. Cette preuve ne qualifie pas l’image cible3.11.14.
+
+L’alerte Sonar13 (`pythonsecurity:S8707`, issue `AaIW9UbPkQr_488ATdJK`) est examinée avant merge, pas ignorée parce que consultative. Revue indépendante limitée à ce flux : aucun Critical/Important sur le parcours HTTP examiné. Le profil et son digest proviennent des Settings serveur ; les cinq paramètres de chemin essayés sont rejetés422, le job stdin ne porte aucun chemin. Le fichier est effectivement ouvert avant hash, sous limites ; O_NOFOLLOW ne couvre que le dernier composant. La confiance dans la configuration et les répertoires parents doit donc être qualifiée au déploiement. Aucun état d’issue, seuil, règle ou code n’a été changé. Le fil de revue est clos avec ce constat, l’alerte reste ouverte ; ce n’est pas une approbation de CLI générique ou d’activation. [Réponse de revue](https://github.com/MFE-DSS/workout-session-tracking/pull/446#discussion_r4705926141).
+
+Sonar PR446 : **ERROR consultatif**,0bug/1vulnérabilité signalée/91smells/0hotspot ; couverture91,6%, nouvelle80,4042%. Aucune déclaration d’innocuité générale de cette dette. Avis supplémentaire favorable sur le locator d’archive : unicité et égalité exacte conservées, pas de constat.
