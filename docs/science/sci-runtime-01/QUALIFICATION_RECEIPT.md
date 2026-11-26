@@ -11,7 +11,7 @@
 | Runtime cible | **HOLD** | Docker local ne répond pas ; aucune campagne Linux3.11.14 exécutée ; SQLite cible et image complète avec le lecteur non qualifiés |
 | Sécurité | **Triage borné, conditions de confiance ouvertes** | Pas d'injection de chemin HTTP démontrée ; ancêtres/permissions de la configuration opérationnelle non qualifiés |
 | Lecteur complet | **NOT_QUALIFIED**, disabled | Ni l'expérience Mac ni les anciennes CI Linux3.11.18 ne lèvent les deux HOLD |
-| Correctif proposé | **GO BUILD PENDING** | Un seul [amendement précis](../../../openspec/changes/sci-runtime-01/BUILD_AMENDMENT.md), pas une nouvelle architecture |
+| Correctif proposé | **GO BUILD PENDING** | Un seul [amendement précis](../../../openspec/changes/archive/2026-11-26-sci-runtime-01/BUILD_AMENDMENT.md), pas une nouvelle architecture |
 
 ## A — cause exacte et autorités conservées
 
