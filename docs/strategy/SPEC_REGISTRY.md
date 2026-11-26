@@ -1110,3 +1110,9 @@ Admission descriptive D1–D5/six règles D4 et GO backend distinct enregistrés
 ### SCI BUILD-01 — intégration technique du 26 novembre 2026
 
 Code PR446, HEAD81e5e568, merge1be45a4 : quatre contrôles protégés et CI canonique45788108352 passants. Archive `openspec/changes/archive/2026-11-26-sci-readiness-01-build-01`, cinq exigences dans `openspec/specs/science/documented-muscular-exposure/spec.md`. Lecteur désactivé, deux HOLD opérationnels indépendants conservés. Reçu : `docs/pilot/sci-readiness-01/CLOSEOUT.md`. Le suivi administratif de publication/CI/nettoyage de cette archive est résolu par les reçus finaux, pas par une déclaration anticipée de service opérationnel.
+
+### SCI-RUNTIME-01 — préparation du 26 novembre 2026
+
+Parent revérifié9ef96e39 ; BUILD-01/#446/#447 restent clos. [Amendement unique proposé](../../openspec/changes/sci-runtime-01/BUILD_AMENDMENT.md) : vue catalogue spécialisée avec hash intégral et harness Linux isolé. **ANALYSIS_AUTHORIZED / PRODUCT_BUILD_PENDING / NO_ACTIVATION.** [Reçu des expériences](../science/sci-runtime-01/QUALIFICATION_RECEIPT.md) : parités Legacy/V2/V3 data-only en copie privée,113/128 sources et3235395/16777216octets ; aucune qualification Linux cible déduite. Catalogue produit HOLD et runtime HOLD, lecteur NOT_QUALIFIED/default disabled ; aucun produit, mobile, OVH, SCI allocation ou release modifié. PILOT reste un acte privé indépendant.
+
+SCI-RUNTIME-01 — GO exact du26novembre2026 enregistré dans BUILD_AUTHORIZATION.md, parent9ef96e39. Vue sélective implémentée et quatre consommateurs raccordés ;124tests lecteur/API PASS/3LinuxSKIP surMac,186broadPASS/1skip, protocole/OpenSpec/Ruff/budget/Bandit passants. Revue indépendante sansCritical/Important, deux mineurs conservés. Catalogue/parité vérifiés en code ; runtime et sécurité opérationnelle HOLD, lecteur disabled/NOT_QUALIFIED. PR/CI/merge pas encore attestés à cet instant.

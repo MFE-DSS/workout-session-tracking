@@ -26,7 +26,7 @@ from .provenance import canonical_time, digest, qualify_fact
 class SourceView(ByteSourceView):
     def _legacy_resolver(self):
         if not hasattr(self, "_resolver"):
-            doc = self.json("data/sci/exercise_catalogue.json")
+            doc = self.catalogue_view().document
             records = tuple(_freeze(row) for row in doc["records"])
             index = MappingProxyType({r["exercise_id"]: r for r in records})
             _check_identities(index)
@@ -88,7 +88,7 @@ class SourceView(ByteSourceView):
     def v3_resolution(self, mapping, effective):
         identity = mapping["canonical_exercise_id"]
         # Historical roles and identities originate in the captured effective bundle.
-        record = self.v3.json("data/sci/exercise_catalogue.json")
+        record = self.v3.catalogue_view().document
         row = next(r for r in record["records"] if r["exercise_id"] == identity)
         candidate = effective["candidates"][identity]
         resolution = dict(

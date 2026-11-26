@@ -36,7 +36,17 @@ def test_feature_is_default_off_and_returns_generic_unavailable(client):
 
 @pytest.mark.parametrize(
     "suffix",
-    ["&owner_id=2", "&from=2026-11-01T00:00:00Z", "&time_zone=Europe/Paris", "&cursor=anything"],
+    [
+        "&owner_id=2",
+        "&from=2026-11-01T00:00:00Z",
+        "&time_zone=Europe/Paris",
+        "&cursor=anything",
+        "&profile_path=../../outside",
+        "&runtime_profile=../../outside",
+        "&muscle_observed_load_profile_path=../../outside",
+        "&database_url=sqlite:///outside",
+        "&bundle_root=../../outside",
+    ],
 )
 def test_query_extras_and_duplicates_rejected_before_work(client, suffix):
     _, headers = mounted(client)
