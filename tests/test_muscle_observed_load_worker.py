@@ -300,6 +300,9 @@ def test_worker_parses_catalogue_once_per_job_and_never_between_owners(tmp_path,
     from test_muscle_observed_load_provenance import parser_spy
     from test_muscle_observed_load_sqlite import seed
 
+    monkeypatch.setattr(sys, "dont_write_bytecode", sys.dont_write_bytecode)
+    monkeypatch.setattr(sys, "path", sys.path.copy())
+    monkeypatch.setenv("DATABASE_URL", "sqlite:///:memory:")
     from app.services.muscle_observed_load import worker
     from app.services.muscle_observed_load.contracts import ObservedLoadQuery
     from app.services.muscle_observed_load.limits import ReadLimits

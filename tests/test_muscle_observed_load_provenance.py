@@ -565,3 +565,18 @@ def test_seed_rejects_projection_with_a_divergent_source_digest():
     local._catalogue_projection = replace(local.catalogue_view(), source_sha256="f" * 64)
     with pytest.raises(ValueError, match="source_digest_mismatch"):
         read_context().seed(local)
+
+
+@pytest.mark.parametrize("pin", [None, ""])
+def test_missing_bundle_pin_is_refused_before_a_warm_catalogue_hit(tmp_path, monkeypatch, pin):
+    from tools.plan_calibration_runtime_bundle import build_bundle
+
+    m = module()
+    context = read_context()
+    calls = parser_spy(monkeypatch)
+    context.seed(m.SourceView.local())
+    bundle = tmp_path / "bundle"
+    build_bundle(bundle, Path(__file__).resolve().parents[1])
+    with pytest.raises(ValueError, match="source_digest_invalid"):
+        m.SourceView.bundle(bundle, pin, catalogue_context=context)
+    assert len(calls) == 1

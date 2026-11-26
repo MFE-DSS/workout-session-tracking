@@ -224,6 +224,12 @@ class SourceView:
 
     @classmethod
     def _bundle(cls, root, packaging_digest, limits, budget, catalogue_context):
+        if (
+            type(packaging_digest) is not str
+            or len(packaging_digest) != 64
+            or any(char not in "0123456789abcdef" for char in packaging_digest)
+        ):
+            raise ValueError("source_digest_invalid")
         view = cls(root, limits, budget=budget, catalogue_context=catalogue_context)
         manifest = view.json("packaging-manifest.v1.json", packaging_digest, cap=131072)
         if manifest["contract_version"] != "plan-v3-private-science-bundle/1.0.0" or manifest.get(
