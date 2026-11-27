@@ -628,5 +628,6 @@ def test_v3_context_cannot_hide_contradictory_identity_or_unknown_properties(tmp
     with capture(path) as c:
         fact = module().qualify_fact(c, list(c.candidates())[0], sources, as_of=now).fact
     assert fact["provenance"]["source_status"] == "UNKNOWN"
-    assert fact["context"] is None and fact["contributions"] == []
+    assert fact["context"] is None
+    assert fact["contributions"] == []
     assert "CONTRADICTORY_EPISODE" in fact["provenance"]["reasons"]

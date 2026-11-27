@@ -166,7 +166,8 @@ def test_actual_inventory2_completed_set_context_and_mixed_readback(
     with SessionLocal() as db:
         session = db.get(WorkoutSession, sid)
         owner = session.user_id
-        assert session.status == "completed" and not session.excluded_from_stats
+        assert session.status == "completed"
+        assert not session.excluded_from_stats
         assert sum(len(e["sets"]) for e in execution["exercises"]) == 14
         original = [(s.id, s.completed_at, s.weight_kg) for s in db.scalars(select(SetLog))]
     out = read_owned(owner, science_bundle)
@@ -181,9 +182,11 @@ def test_actual_inventory2_completed_set_context_and_mixed_readback(
         assert fact["key"]["session_id"] == sid
         assert fact["resolution"]["canonical_exercise_id"] == identity
         assert fact["context"] == {k: observation["context"][k] for k in PUBLIC_CONTEXT}
-        assert fact["setting"] == observation["setting"] and fact["reps"] == 9
+        assert fact["setting"] == observation["setting"]
+        assert fact["reps"] == 9
         p = fact["provenance"]
-        assert p["source_status"] == "QUALIFIED" and p["binding_digest"] == execution["binding_digest"]
+        assert p["source_status"] == "QUALIFIED"
+        assert p["binding_digest"] == execution["binding_digest"]
         assert (
             p["effective_operation"]["op_id"] == p["origin_operation"]["op_id"] == receipt["op_id"]
         )
