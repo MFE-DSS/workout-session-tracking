@@ -13,7 +13,7 @@
 - [x] Qualifier les chemins/montages/ACL et remplacements non privilégiés du banc ; future configuration QA HOLD.
 - [x] Rejouer campagne nominale/adversariale sur image réelle, sans overlay produit.
 - [x] Relire indépendamment preuves et émettre les cinq verdicts.
-- [ ] SCI-ACTIVATE-01 exact : différé par le vrai défaut V3 ; frontière des trois paramètres/lanceur/profil/montage/rollback consignée, aucune activation.
+- [x] Consigner le HOLD de SCI-ACTIVATE-01 et sa frontière : aucune activation autorisée ni effectuée.
 - [x] Conservation/nettoyage borné et reçu final, limites et finding ouverts conservés.
 
 ## Défaut trouvé sur le paquet
@@ -26,5 +26,11 @@
 - [x] Unitaires provenance38PASS et broad109PASS/4SKIP existants ; revue indépendante et sécurité locale.
 - [x] Terminer le parcours intégré corrigé :1 PASS/267,52s.
 - [x] Achever la campagne native : frontière/digestPASS ; qualification opérationnelleHOLD, V3/mixte4/7 chacun, SIGXCPU préservés.
-- [ ] Publier le HEAD final, CI protégée, merge/CI canonique, closeout et cleanup borné.
-- [ ] Lever la qualification de l’image opérationnelle reconstruite sous son GO propre ; lecteur DISABLED.
+- [x] Publier le HEAD final35952b2, vérifier les11jobs CI46034244806 et merger PR454 par0612232.
+- [x] Vérifier CI canonique46037607200 :11jobs completed/success.
+- [ ] Publier ce closeout, vérifier sa CI et terminer son cleanup Git borné.
+
+## Gates ultérieures hors du périmètre livré
+- Qualification runtime fiable : HOLD, correctif worker proposé séparément sans GO.
+- Image reconstruite et chemins opérationnels : HOLD ; nouvelle opération cloud non autorisée.
+- SCI-ACTIVATE-01 : NO, lecteur DISABLED. Aucune activation, donnée réelle ou release implicite.
