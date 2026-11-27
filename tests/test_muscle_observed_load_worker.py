@@ -599,3 +599,39 @@ def test_parent_refuses_bad_child_output_reaps_and_releases_slot(monkeypatch, fa
     assert children[0].stdin.closed
     assert m.WORKER_SLOT.acquire(blocking=False)
     m.WORKER_SLOT.release()
+
+
+def test_entry_refuses_flush_after_emitting_complete_valid_dto(worker_job, tmp_path):
+    """Even an independently valid complete wire response is refused after flush failure."""
+    assert worker_job.run() == 0
+    raw = worker_job.output.getvalue()
+    module().ObservedLoadResponse.model_validate(json.loads(raw))
+    payload = tmp_path / "valid-dto.json"
+    payload.write_bytes(raw)
+    worker = Path(__file__).resolve().parents[1] / "app/services/muscle_observed_load/worker.py"
+    probe = r'''
+import os, runpy, sys
+from pathlib import Path
+worker, payload = sys.argv[1:]
+raw = Path(payload).read_bytes()
+class BrokenFlush:
+    def flush(self):
+        raise OSError('synthetic flush failure after complete valid DTO')
+def finished_main():
+    assert os.write(1, raw) == len(raw)
+    return 0
+def substitute(frame, event, arg):
+    if frame.f_code.co_filename == worker and event == 'line' and 'main' in frame.f_globals:
+        frame.f_globals['main'] = finished_main
+        sys.settrace(None)
+    return substitute
+sys.stdout = BrokenFlush()
+sys.settrace(substitute)
+runpy.run_path(worker, run_name='__main__')
+'''
+    child = subprocess.run(
+        [sys.executable, "-I", "-c", probe, str(worker), str(payload)],
+        capture_output=True, timeout=5, check=False,
+    )
+    assert child.stdout == raw
+    assert child.returncode != 0

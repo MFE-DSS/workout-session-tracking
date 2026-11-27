@@ -3,6 +3,6 @@
 - [x] Préserver RED de terminaison et témoins d’erreurs.
 - [x] Implémenter le seul correctif worker et vérifier GREEN.
 - [x] Exécuter targeted/broad/sécurité/OpenSpec selon check_scope.
-- [ ] Requalifier le code final sur Linux/amd64 natif à budgets inchangés, ou conserver HOLD exact.
+- [x] Requalifier le code final sur Linux/amd64 natif à budgets inchangés, ou conserver HOLD exact.
 - [ ] Revue indépendante, PR/CI du HEAD final, merge/CI canonique.
 - [ ] Closeout, archive et nettoyage borné après conservation.
