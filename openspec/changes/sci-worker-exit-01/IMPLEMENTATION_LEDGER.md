@@ -29,3 +29,10 @@ Matrice déclarée :Legacy7,Legacy1005,V310,mixte10010,500/501deuxchacun,chaîne
 Finalisation des preuves : oracle d’isolation du snapshotSQL indépendant B=999réps/id4 corrigé uniquementdansleharness. A/B/vide ensuitePASS ; ancienneerreur conservée. Témoin ajouté deDTOcompletréel puisflushéchoué : refusstatut1/reap/slot. Finalbroad161PASS/4SKIPLinuxPy3.11.14 ;targeted23PASS/4SKIPPy3.14.7. Aucun nouveau produit depuis13211bc.
 
 Revue indépendante :Importantcorrigé par témoinDTOcompletpuisstatut(signal/flush). REDmutantmémoire2FAILattendus/GREENréel163PASS4SKIP,nouveau témoinLinux5casPASS avec vrai slotacquis/libéré. Un mineur précision slotdirect résolu parcemêmeparcours. Produitidentique13211bc.
+
+
+## État vérifié après qualification
+
+La campagne native et la revue sont terminées : 32/32 cas nominaux admis, 38 digests vérifiés en incluant les six résultats UNKNOWN conservateurs. Les refus historiques et adversariaux sont conservés. Le code produit reste identique à 13211bc ; le broad final comporte 163 PASS / 4 SKIP Linux sur Mac.
+
+Le nettoyage du banc est terminé : 25 conteneurs et 4 volumes propres au scope supprimés après export ; les 10 conteneurs préexistants, volumes et services sont inchangés. Reçu privé CLEANUP_RECEIPT.json. Les gates encore ouvertes sont la publication, la CI réelle, le merge et le closeout Git. Image opérationnelle NON REQUALIFIÉE, lecteur DISABLED.

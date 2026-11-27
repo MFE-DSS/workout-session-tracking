@@ -4,5 +4,7 @@
 - [x] Implémenter le seul correctif worker et vérifier GREEN.
 - [x] Exécuter targeted/broad/sécurité/OpenSpec selon check_scope.
 - [x] Requalifier le code final sur Linux/amd64 natif à budgets inchangés, ou conserver HOLD exact.
-- [ ] Revue indépendante, PR/CI du HEAD final, merge/CI canonique.
-- [ ] Closeout, archive et nettoyage borné après conservation.
+- [x] Revue indépendante et correction RED→GREEN de son Important de preuve.
+- [ ] PR/CI du HEAD final, merge/CI canonique.
+- [x] Conserver les preuves et nettoyer les seuls conteneurs/volumes du banc.
+- [ ] Closeout, archive et nettoyage Git borné après conservation.
