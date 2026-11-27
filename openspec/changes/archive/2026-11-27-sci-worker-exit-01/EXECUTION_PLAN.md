@@ -20,10 +20,10 @@ Produit : worker.py uniquement ; tests : test_muscle_observed_load_worker.py. CP
 ### Task 1: Terminaison contrôlée et preuves
 **Files:** worker.py, tests/test_muscle_observed_load_worker.py.
 **Interfaces:** main() retourne0/1 ; supervisor.collect_child conserve exitcode/time/output ; parent DTO strict et owner/window.
-- [ ] Écrire test de teardown coûteux au vrai point d’entrée et erreurs déterministes (flush, pipe, validation, close). Expected: RED pour fin/flush/digest non gardés, témoins déjà sûrs verts.
-- [ ] Exécuter check_scope avant pytest ; conserver RED complet.
-- [ ] Ajouter minimum de contrôle et finalisation uniquement dans worker.py.
-- [ ] Rejouer le module et broad lecteur ; Expected: PASS, skipsLinux locaux explicités.
-- [ ] Requalification native avec fixtures canoniques exportées14V3/mixte100, cas Legacy/adversariaux ; Expected: sorties0/digests sûrs et aucun dépassement nominal, sinon HOLD.
-- [ ] Revue indépendante du diff complet ; fixes en scope RED→GREEN.
+- [x] Écrire test de teardown coûteux au vrai point d’entrée et erreurs déterministes (flush, pipe, validation, close). Expected: RED pour fin/flush/digest non gardés, témoins déjà sûrs verts.
+- [x] Exécuter check_scope avant pytest ; conserver RED complet.
+- [x] Ajouter minimum de contrôle et finalisation uniquement dans worker.py.
+- [x] Rejouer le module et broad lecteur ; Expected: PASS, skipsLinux locaux explicités.
+- [x] Requalification native avec fixtures canoniques exportées14V3/mixte100, cas Legacy/adversariaux ; Expected: sorties0/digests sûrs et aucun dépassement nominal, sinon HOLD.
+- [x] Revue indépendante du diff complet ; fixes en scope RED→GREEN.
 - [ ] Commit/push/PR/CI exacte puis merge autorisé et closeout ; aucun commitUI.

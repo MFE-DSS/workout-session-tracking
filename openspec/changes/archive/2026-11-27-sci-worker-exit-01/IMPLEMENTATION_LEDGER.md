@@ -36,3 +36,6 @@ Revue indépendante :Importantcorrigé par témoinDTOcompletpuisstatut(signal/fl
 La campagne native et la revue sont terminées : 32/32 cas nominaux admis, 38 digests vérifiés en incluant les six résultats UNKNOWN conservateurs. Les refus historiques et adversariaux sont conservés. Le code produit reste identique à 13211bc ; le broad final comporte 163 PASS / 4 SKIP Linux sur Mac.
 
 Le nettoyage du banc est terminé : 25 conteneurs et 4 volumes propres au scope supprimés après export ; les 10 conteneurs préexistants, volumes et services sont inchangés. Reçu privé CLEANUP_RECEIPT.json. Les gates encore ouvertes sont la publication, la CI réelle, le merge et le closeout Git. Image opérationnelle NON REQUALIFIÉE, lecteur DISABLED.
+
+
+Code PR456 HEAD741d971, merge3aef9d1. CI PR46067424247 et canonique46069395764 réellement completed/success11jobs,9064backend/3SKIP,1610mobiles+TS,77visuels. Sonar PR/canoniqueERROR consultatif ; S5754 maintenabilité au point d’entrée laisséOPEN et triagé, aucun changementseuil/règle. ArchiveCLI27novembre,1exigence ajoutée ; publication/CI closeout et cleanupGit restent ouverts à cet instant.

@@ -29,7 +29,7 @@ Les anciens Legacy5/5,Legacy1003/3,V3etmixte4/7, SIGXCPU et témoin post-atexit 
 - Readbackdes14identitésSET/reçus/révisions/contextesetsources conservé,machine/PER_IMPLEMENTsansconversionmasse.
 - IsolationA/B/comptevide :1/1/0faits,réponsesA/BPARTIALetvideEMPTY,DBinchangée,digests/slotsPASS. L’oracle initial d’isolation reprenait à tort la fixturecanonique8réps/id9999 ;le snapshot exporté contient999réps/id4. Échec de banc conservé et oracle corrigé depuisSQL indépendant,sanschangementproduit.
 
-Un témoin additionnel émet un DTO complet réellement produit puis échoue au flush : statut1 et refus du parent malgré des octets complets, reap et slot libéré. Tests locaux avant revue161PASS/4SKIPLinux, dont ce cas ajouté après le premier broad160PASS.
+Un témoin additionnel émet un DTO complet réellement produit puis échoue au flush : statut1 et refus du parent malgré des octets complets, avec reap. Ce premier témoin ne prouve pas une libération après acquisition ; cette preuve appartient au parcours read_owned décrit ci-dessous. Tests locaux avant revue161PASS/4SKIPLinux, dont ce cas ajouté après le premier broad160PASS.
 
 ## Sécurité et portée
 1819chemins/parents/permissions/ACLdu banc vérifiés,mutationsnonprivilégiéesrefusées. Ces preuves ne certifientpas unfuturmontageQA ni unadministrateurroot. S8707reste suivi séparément,nonclos. Le rapport inspect_runtime seul conserve sonHOLD générique ; la présente campagne qualifie seulement ce candidat monté et ses essais réels. L’image embarquée anciencode ne devient pasrequalifiée.
