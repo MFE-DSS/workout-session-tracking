@@ -23,6 +23,19 @@ def install_limits():
     return resource
 
 
+def _bounded_output(data, *, sort_keys=False):
+    encoder = json.JSONEncoder(
+        ensure_ascii=False, allow_nan=False, separators=(",", ":"), sort_keys=sort_keys
+    )
+    output = bytearray()
+    for chunk in encoder.iterencode(data):
+        encoded = chunk.encode("utf-8")
+        if len(output) + len(encoded) > 1048576:
+            raise ValueError("output_limit")
+        output.extend(encoded)
+    return output
+
+
 def main():
     try:
         resource = install_limits()
@@ -56,7 +69,12 @@ def main():
 
         root = Path(__file__).resolve().parents[3]
         sys.path.insert(0, str(root))
-        from app.services.muscle_observed_load.contracts import VERSION, instant, parse_query
+        from app.services.muscle_observed_load.contracts import (
+            VERSION,
+            ObservedLoadResponse,
+            instant,
+            parse_query,
+        )
         from app.services.muscle_observed_load.limits import ReadLimits
         from app.services.muscle_observed_load.sqlite_source import bounded_json, open_owned_capture
         from app.services.muscle_observed_load.supervisor import load_runtime_profile
@@ -99,15 +117,19 @@ def main():
                 as_of=as_of,
                 runtime_profile_digest=profile_digest,
             )
-        # iterencode bounds output without first creating an unbounded serialized string.
-        encoder = json.JSONEncoder(ensure_ascii=False, allow_nan=False, separators=(",", ":"))
-        output = bytearray()
-        for chunk in encoder.iterencode(response.model_dump()):
-            encoded = chunk.encode("utf-8")
-            if len(output) + len(encoded) > 1048576:
-                raise ValueError("output_limit")
-            output.extend(encoded)
-        sys.stdout.buffer.write(output)
+        # The capture has exited (including its required close) before any output.
+        # Recheck the actual normalized DTO at the process boundary, not just its producer.
+        import hashlib
+
+        data = ObservedLoadResponse.model_validate(response.model_dump()).model_dump()
+        expected = data["consistency"]["result_digest"]
+        data["consistency"]["result_digest"] = "0" * 64
+        if hashlib.sha256(_bounded_output(data, sort_keys=True)).hexdigest() != expected:
+            raise ValueError("result_digest_mismatch")
+        data["consistency"]["result_digest"] = expected
+        output = _bounded_output(data)
+        if sys.stdout.buffer.write(output) != len(output):
+            raise OSError("incomplete_output")
         return 0
     except Exception:
         # No paths, SQL, body measurements, credentials or worker stderr in API errors.
@@ -116,4 +138,15 @@ def main():
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    import os
+
+    status = 1
+    try:
+        result = main()
+        sys.stdout.flush()
+        status = 0 if result == 0 else 1
+    except BaseException:
+        status = 1
+    # main has unwound its context managers; only complete, flushed output can succeed.
+    # Avoid unrelated interpreter teardown after the bounded one-shot job is finished.
+    os._exit(status)
