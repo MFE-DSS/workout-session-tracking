@@ -35,3 +35,12 @@ Ruling : le binding du fait doit être comparé au binding d’exécution retour
 ### Préparation du checkpoint local et du banc
 Le run Python3.11.14 initial termine effectivement avec38 PASS et1 échec de l’assertion de test erronée (digest de politique au lieu du binding d’exécution),588,10s. Aucune tentative de signal ne l’a atteint : il avait déjà terminé normalement. Le test corrigé est rejoué intégralement sur Python3.14.7. Le checkpoint local sert à pinner les octets de code du banc ; il ne constitue ni publication, ni fin de vérification, ni qualification. Aucun push avant ses résultats effectifs et la campagne native.
 Le broad3.11.14 a terminé exit0 après sa collecte finale GC lente ; une répétition devenue inutile a été interrompue sans changement de test.
+
+### Garde disque avant banc
+Après création du payload privé39Mio, le Mac ne présente plus que20950204416octets libres (19,511Gio), contre21474836480requis : manque524632064octets. Précondition de mutation OPERATIONAL_DELTA§9 non satisfaite. Aucune création distante ni transfert de cette nouvelle campagne ; payload conservé, garde non abaissée. Demande de libération1Gio à l’opérateur pendant poursuite des contrôles indépendants.
+Relecture complémentaire indépendante de l’assertion binding : pairing execution.binding_digest/provenance.binding_digest confirmé ; aucun autre décalage identifié.
+
+### GREEN intégré et reprise du banc
+Le test complet corrigé passe sur Python3.14.7 :1 PASS,267,52s. Il vérifie14 SET issus des vrais services, reçus rejoués exacts, FINISH, identités et rôles attestés, contexte public fermé, digest indépendant, historique mixte100 et compte vide, observations historiques inchangées. Avec38 unitaires et109 broad,148 tests PASS ; quatre SKIP Linux préexistants restent nommés.
+L’espace Mac est remonté à21,798Gio sur nouvelle mesure, sans nettoyage supplémentaire par cette passe. Le garde20Gio passe ; nouvelle source26c6356 montée readonly sur l’image existante dans un banc neuf autorisé. Cela ne qualifie pas une nouvelle image de déploiement.
+Gitleaks du commit exact1ac401f..26c6356 : PASS ; les trois findings historiques hors delta restent consignés sans exception nouvelle.

@@ -20,4 +20,11 @@
 - [x] Construire la vraie chaîne inventory2 → START →14SET → FINISH et conserver les refus.
 - [x] Localiser le défaut contexte6propriétés/DTO5propriétés et faire relire la preuve.
 - [x] Soumettre BUILD_AMENDMENT.md sans application produit.
-- [ ] Obtenir le GO distinct, appliquer et requalifier ; lecteur NOT_QUALIFIED/DISABLED jusque-là.
+- [x] Enregistrer le GO V3 explicite et son périmètre exact à trois fichiers.
+- [x] Préserver RED unitaire et vrai parcours inventory2 →14SET/FINISH.
+- [x] Appliquer projection publique explicite après validation intégrale, sans élargissement DTO.
+- [x] Unitaires provenance38PASS et broad109PASS/4SKIP existants ; revue indépendante et sécurité locale.
+- [x] Terminer le parcours intégré corrigé :1 PASS/267,52s.
+- [x] Achever la campagne native : frontière/digestPASS ; qualification opérationnelleHOLD, V3/mixte4/7 chacun, SIGXCPU préservés.
+- [ ] Publier le HEAD final, CI protégée, merge/CI canonique, closeout et cleanup borné.
+- [ ] Lever la qualification de l’image opérationnelle reconstruite sous son GO propre ; lecteur DISABLED.
