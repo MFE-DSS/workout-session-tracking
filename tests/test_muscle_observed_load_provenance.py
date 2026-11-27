@@ -580,3 +580,54 @@ def test_missing_bundle_pin_is_refused_before_a_warm_catalogue_hit(tmp_path, mon
     with pytest.raises(ValueError, match="source_digest_invalid"):
         m.SourceView.bundle(bundle, pin, catalogue_context=context)
     assert len(calls) == 1
+
+
+@pytest.mark.parametrize("with_identity", [False, True])
+@pytest.mark.parametrize("semantics", ["MACHINE_DISPLAY_KG", "PER_IMPLEMENT"])
+def test_v3_public_context_is_explicit_projection_after_full_authority(
+    tmp_path, with_identity, semantics
+):
+    def change(payload, evaluated, observation, receipt):
+        observation["context"]["load_semantics"] = semantics
+        if with_identity:
+            observation["context"]["canonical_exercise_id"] = "identity"
+
+    path, capture, sources, now = v3_case(tmp_path, mutate=change)
+    with capture(path) as c:
+        fact = module().qualify_fact(c, list(c.candidates())[0], sources, as_of=now).fact
+    assert fact["provenance"]["source_status"] == "QUALIFIED"
+    assert set(fact["context"]) == {
+        "context_ref",
+        "equipment_ref",
+        "realization_ref",
+        "side",
+        "load_semantics",
+    }
+    assert fact["resolution"]["canonical_exercise_id"] == "identity"
+    assert fact["context"]["load_semantics"] == semantics
+    assert fact["weight_kg"] is None
+    assert fact["setting"] == {"kind": "MASS_KG", "value": 35, "unit": "kg"}
+
+
+@pytest.mark.parametrize(
+    "extra",
+    [
+        {"canonical_exercise_id": "contradictory"},
+        {"canonical_exercise_id": None},
+        {"canonical_exercise_id": "identity", "unknown": "not admitted"},
+        {"unknown": "not admitted"},
+    ],
+)
+def test_v3_context_cannot_hide_contradictory_identity_or_unknown_properties(tmp_path, extra):
+    def change(payload, evaluated, observation, receipt):
+        observation["context"].update(extra)
+
+    # All stored digests and prescription/receipt comparisons remain internally
+    # consistent: the independent admitted binding identity is the authority.
+    path, capture, sources, now = v3_case(tmp_path, mutate=change)
+    with capture(path) as c:
+        fact = module().qualify_fact(c, list(c.candidates())[0], sources, as_of=now).fact
+    assert fact["provenance"]["source_status"] == "UNKNOWN"
+    assert fact["context"] is None
+    assert fact["contributions"] == []
+    assert "CONTRADICTORY_EPISODE" in fact["provenance"]["reasons"]

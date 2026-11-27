@@ -566,6 +566,24 @@ def qualify_fact(capture, candidate, sources, *, as_of):
             context, setting, estimated, adjusted = _receipt_chain(
                 capture, c, slot, provenance, at, as_of
             )
+            # Keep the full stored context through receipt/digest verification.
+            # The public DTO carries canonical identity only in resolution.
+            public_fields = (
+                "context_ref",
+                "equipment_ref",
+                "realization_ref",
+                "side",
+                "load_semantics",
+            )
+            if set(context) not in (
+                set(public_fields),
+                set(public_fields) | {"canonical_exercise_id"},
+            ) or (
+                "canonical_exercise_id" in context
+                and context["canonical_exercise_id"] != mapping["canonical_exercise_id"]
+            ):
+                raise ValueError("CONTRADICTORY_EPISODE")
+            context = {key: context[key] for key in public_fields}
             # Acquisition implementation version is not persisted: no physical-time assertion.
             reasons.append("UNKNOWN_ACQUISITION_SOURCE")
             if estimated:
