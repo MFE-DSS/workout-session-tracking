@@ -29,7 +29,7 @@ Les anciens Legacy5/5,Legacy1003/3,V3etmixte4/7, SIGXCPU et témoin post-atexit 
 - Readbackdes14identitésSET/reçus/révisions/contextesetsources conservé,machine/PER_IMPLEMENTsansconversionmasse.
 - IsolationA/B/comptevide :1/1/0faits,réponsesA/BPARTIALetvideEMPTY,DBinchangée,digests/slotsPASS. L’oracle initial d’isolation reprenait à tort la fixturecanonique8réps/id9999 ;le snapshot exporté contient999réps/id4. Échec de banc conservé et oracle corrigé depuisSQL indépendant,sanschangementproduit.
 
-Un témoin additionnel émet un DTO complet réellement produit puis échoue au flush : statut1 et refus du parent malgré des octets complets, reap et slot libéré. Tests locaux finaux161PASS/4SKIPLinux, dont ce cas ajouté après le premier broad160PASS.
+Un témoin additionnel émet un DTO complet réellement produit puis échoue au flush : statut1 et refus du parent malgré des octets complets, reap et slot libéré. Tests locaux avant revue161PASS/4SKIPLinux, dont ce cas ajouté après le premier broad160PASS.
 
 ## Sécurité et portée
 1819chemins/parents/permissions/ACLdu banc vérifiés,mutationsnonprivilégiéesrefusées. Ces preuves ne certifientpas unfuturmontageQA ni unadministrateurroot. S8707reste suivi séparément,nonclos. Le rapport inspect_runtime seul conserve sonHOLD générique ; la présente campagne qualifie seulement ce candidat monté et ses essais réels. L’image embarquée anciencode ne devient pasrequalifiée.
@@ -37,3 +37,8 @@ Un témoin additionnel émet un DTO complet réellement produit puis échoue au 
 Deux défauts de permissions du harness neuf ont empêché les premiers lancements ;ils sont conservés comme échecs de préparation, pas comptés comme essais nominaux. Seuls UID/modes de nos copies etvolumeharness ont été corrigés,sanscapacité supplémentaire.
 
 Preuves privées : /Users/martinfeldmann/auren-review/sci-worker-exit-01-evidence-20261127/,notammentNATIVE_MATRIX_SUMMARY.json,native-results/*.log,HISTORICAL_EVIDENCE_PINS.json. Conservation/nettoyage et comparaisonservices à achever avant reçu final.
+
+## Revue et correction de preuve
+Revue indépendante fraîche surbb6452b :aucunCriticalproduit ;unImportant de preuve (JSON{}avant signal masquait le contrôle du statut). Correction dans le seul test autorisé :DTOcomplet concordant propriétaire/fenêtre/as_of/profil,digestrecalculé,contrôlepositifpuisSIGXCPU/SIGTERM/flush. Les en-têtes sontfixésentests pour rendre les octets complets identiques.
+RED :deuxéchecs attendusDIDNOTRAISE contre un mutantmémoire du seul contrôleexitcode du superviseur ;aucun fichiersupervisor modifié. GREEN :163PASS/4SKIPLinux,sortie0,broadfinal. Native AUTHORITATIVE_STATUS :contrôlecompletexit0admis,JSONincompletexit0refusé,SIGXCPU-24/SIGTERM-15/flush1refusés,reap/pipes/slot après acquisitionréellePASS.
+Mineur de formulation corrigé :le premier collect_child direct vérifiait seulement que le slot était disponible ;le nouveau parcoursread_owned prouve réellement sa libération. AucunImportant restant après cette passe ;aucune modificationproduitdepuis13211bc.

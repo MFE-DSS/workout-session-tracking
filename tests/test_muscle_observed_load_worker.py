@@ -563,37 +563,95 @@ def test_worker_never_accepts_incomplete_output_write(worker_job, monkeypatch, f
     assert worker_job.run(output) != 0
 
 
-@pytest.mark.parametrize("fault", ["incomplete_json", "sigxcpu", "sigterm"])
-def test_parent_refuses_bad_child_output_reaps_and_releases_slot(monkeypatch, fault):
+@pytest.mark.parametrize(
+    "fault", ["complete", "incomplete_json", "sigxcpu", "sigterm", "flush_after_dto"]
+)
+def test_parent_refuses_bad_child_output_reaps_and_releases_slot(
+    worker_job, tmp_path, monkeypatch, fault
+):
     import signal
     from datetime import UTC, datetime
+    from types import SimpleNamespace
 
     from app.services.muscle_observed_load.contracts import ObservedLoadQuery, ObservedLoadReadError
 
+    assert worker_job.run() == 0
+    payload = tmp_path / "complete-response.json"
+    payload.write_bytes(worker_job.output.getvalue())
     m = module()
     real_popen = subprocess.Popen
     children = []
-    code = "import os;os.write(1,b'{\"facts\":')"
-    if fault != "incomplete_json":
-        number = signal.SIGXCPU if fault == "sigxcpu" else signal.SIGTERM
-        code = f"import os;os.write(1,b'{{}}');os.kill(os.getpid(),{int(number)})"
+    worker = Path(__file__).resolve().parents[1] / "app/services/muscle_observed_load/worker.py"
+    code = r'''
+import hashlib, json, os, runpy, signal, sys
+from pathlib import Path
+payload, fault, worker = sys.argv[1:]
+job = json.load(sys.stdin)
+data = json.loads(Path(payload).read_bytes())
+data['owner_id'] = job['owner_id']
+data['as_of'] = job['as_of']
+data['window'] = {'from':job['from'], 'until':job['until'], 'time_zone':'UTC'}
+data['consistency']['runtime_profile_digest'] = '0' * 64
+data['consistency']['result_digest'] = '0' * 64
+data['consistency']['result_digest'] = hashlib.sha256(json.dumps(
+    data, sort_keys=True, ensure_ascii=False, allow_nan=False, separators=(',', ':')
+).encode()).hexdigest()
+raw = json.dumps(data, ensure_ascii=False, allow_nan=False, separators=(',', ':')).encode()
+if fault == 'flush_after_dto':
+    class BrokenFlush:
+        def flush(self):
+            raise OSError('synthetic flush failure after complete valid DTO')
+    def finished_main():
+        assert os.write(1, raw) == len(raw)
+        return 0
+    def substitute(frame, event, arg):
+        if frame.f_code.co_filename == worker and event == 'line' and 'main' in frame.f_globals:
+            frame.f_globals['main'] = finished_main
+            sys.settrace(None)
+        return substitute
+    sys.stdout = BrokenFlush()
+    sys.settrace(substitute)
+    runpy.run_path(worker, run_name='__main__')
+else:
+    if fault == 'incomplete_json':
+        raw = b'{"facts":'
+    assert os.write(1, raw) == len(raw)
+    if fault in ('sigxcpu', 'sigterm'):
+        os.kill(os.getpid(), signal.SIGXCPU if fault == 'sigxcpu' else signal.SIGTERM)
+'''
 
     def child_factory(*args, **kwargs):
         child = real_popen(
-            [sys.executable, "-I", "-c", code], stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
+            [sys.executable, "-I", "-c", code, str(payload), fault, str(worker)],
+            stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
         )
         children.append(child)
         return child
 
-    monkeypatch.setattr(sys, "platform", "linux")
     monkeypatch.setattr(m.subprocess, "Popen", child_factory)
-    with pytest.raises(ObservedLoadReadError):
-        m.read_owned_muscle_observed_load(
-            1, ObservedLoadQuery(datetime(2026, 11, 1, tzinfo=UTC), datetime(2026, 11, 25, tzinfo=UTC)),
-            runtime_profile=("/synthetic/profile", "0" * 64), database_url="sqlite:///synthetic",
+    # Stable job headers make the complete control and signal payloads identical.
+    monkeypatch.setattr(m, "datetime", SimpleNamespace(
+        now=lambda _tz: datetime(2026, 11, 26, tzinfo=UTC)
+    ))
+    query = ObservedLoadQuery(datetime(2026, 11, 1, tzinfo=UTC), datetime(2026, 11, 25, tzinfo=UTC))
+
+    def read():
+        return m.read_owned_muscle_observed_load(
+            1, query, runtime_profile=("/synthetic/profile", "0" * 64),
+            database_url="sqlite:///synthetic",
         )
+
+    if fault == "complete":
+        response = read().model_dump()
+        assert response["owner_id"] == 1
+        assert response["facts"][0]["reps"] == 9
+    else:
+        with pytest.raises(ObservedLoadReadError):
+            read()
     assert len(children) == 1
+    expected = {"sigxcpu": -signal.SIGXCPU, "sigterm": -signal.SIGTERM,
+                "flush_after_dto": 1}.get(fault, 0)
+    assert children[0].returncode == expected
     assert children[0].poll() is not None
     assert children[0].stdout.closed
     assert children[0].stdin.closed

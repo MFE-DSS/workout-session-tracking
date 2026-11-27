@@ -27,3 +27,5 @@ Deux défauts de packaging ont été conservés : payload600uid1000 illisible pa
 Matrice déclarée :Legacy7,Legacy1005,V310,mixte10010,500/501deuxchacun,chaîneabsente/préfixeancien/texteoversizeddeuxchacun,bundleeffectifabsentdeux. Les dixV3etdixmixtes sont admis,exit0 etdigests valides ; les refus500/501 restentSIGXCPU. Résumé complet après acquisition des reçus.
 
 Finalisation des preuves : oracle d’isolation du snapshotSQL indépendant B=999réps/id4 corrigé uniquementdansleharness. A/B/vide ensuitePASS ; ancienneerreur conservée. Témoin ajouté deDTOcompletréel puisflushéchoué : refusstatut1/reap/slot. Finalbroad161PASS/4SKIPLinuxPy3.11.14 ;targeted23PASS/4SKIPPy3.14.7. Aucun nouveau produit depuis13211bc.
+
+Revue indépendante :Importantcorrigé par témoinDTOcompletpuisstatut(signal/flush). REDmutantmémoire2FAILattendus/GREENréel163PASS4SKIP,nouveau témoinLinux5casPASS avec vrai slotacquis/libéré. Un mineur précision slotdirect résolu parcemêmeparcours. Produitidentique13211bc.
