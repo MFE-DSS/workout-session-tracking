@@ -9,3 +9,6 @@ CPU/AS Linux et nouvelle image restent hors autorisation et HOLD. Cent START act
 ## Delta de précision des tests après CI initiale
 
 HEAD9b90618 :11jobs CI success,9074backend/3SKIP existants,1610mobiles+TypeScript,77visuels. SonarERROR uniquement pour3CODE_SMELL de tests (S5778×2,S9073), couverture nouvelle100%,duplication0%,bug/vulnérabilité nouvelle0. Les tests ont été resserrés : deux lectures autorisées doivent réussir avant le refus de la troisième ; cache amorcé avant l'erreur d'échéance ; assertions préparatoires séparées. Produit inchangé. Relecture indépendante de ce delta : aucun finding ;24SQLite repassés. Nouvelle CI requise avant merge, aucune ancienne CI réutilisée comme verdict de ce HEAD.
+
+## Closeout documentaire
+Revue indépendante en lecture seule de l’archive et du registre sur parent7f05ba1a : aucun Critical, Important ou Minor. Acte GO, preuves, chiffres CI/Sonar, leases libérés, CI canonique encore en cours et limites Linux/image/activation concordants ; aucune revendication CLOSED+CLEANED anticipée. Aucun test relancé par le relecteur.

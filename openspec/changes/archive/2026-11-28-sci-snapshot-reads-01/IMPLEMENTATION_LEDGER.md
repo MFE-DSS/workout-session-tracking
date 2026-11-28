@@ -18,3 +18,6 @@ Ruff ciblé/budget et Bandit passent ; annotations B608 historiques inchangées.
 
 ## CI initiale et précision des témoins
 Run46127205138 au HEAD9b90618 :11jobs réussis ;9074tests backend/3SKIP existants,1610mobiles+TS,77visuels. Gate SonarERROR consultatif pour3remarques de tests ; aucun nouveau bug/vulnérabilité,100%couverture nouvelle et0%duplication. Seuls les tests SQLite ont été renforcés pour désigner l'appel exact et la ressource refusée. Produit inchangé,24tests repassés et delta relu sans finding. Nouvelle CI du HEAD final encore nécessaire. Aucune règle/gate/issue modifiée administrativement.
+
+## Livraison réelle
+PR459,HEAD0e0008ce :CI46129030460 success11jobs,9074backend/3SKIP,1610mobiles+TS,77visuels. SonarOK/100%nouveau/0issue. Merge7f05ba1a arbre identique. CI canonique46130918222 en cours, suite complète SHADOW ; archive/CI/cleanup suivis séparément, aucun résultat anticipé.
