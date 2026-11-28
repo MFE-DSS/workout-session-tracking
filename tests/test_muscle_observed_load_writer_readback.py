@@ -3,6 +3,7 @@
 import hashlib
 import json
 import os
+import sqlite3
 from datetime import UTC, datetime, timedelta
 
 from tests.test_plan_cal_01_owned import Journey, plan_bundle, science_bundle, setup_runtime
@@ -255,3 +256,210 @@ def test_actual_inventory2_completed_set_context_and_mixed_readback(
             for s in db.scalars(select(SetLog).where(SetLog.id.in_([x[0] for x in original])))
         ]
         assert actual == original
+
+
+def structural_v3_history(path, science_bundle):
+    """One hundred direct structural fixtures, never 100 permitted engine STARTs.
+
+    SCI versions/roles come from the real attested bundle. Evaluation-request
+    fingerprints are explicitly synthetic; no current engine evaluation is claimed.
+    """
+    from test_muscle_observed_load_sqlite import seed
+
+    from app.services.muscle_observed_load.provenance import (
+        V3_AUTHORITY_FIELDS,
+        SourceView,
+        digest,
+    )
+
+    seed(path, 100)
+    effective = SourceView.bundle(*science_bundle).v3
+    identity = "tirage-poulie-haute-prise-neutre"
+    candidate = effective["candidates"][identity]
+    context = dict(
+        context_ref="synthetic:room",
+        equipment_ref="synthetic:machine",
+        realization_ref=candidate["realization_ref"],
+        side="BILATERAL",
+        load_semantics="MACHINE_DISPLAY_KG",
+    )
+    slot = dict(
+        slot_id="synthetic-slot",
+        intent_id=candidate["intent_id"],
+        selected={"canonical_exercise_id": identity},
+        prescription={"context": context, "dose": {"work_sets": 1}},
+    )
+    authority = {key: "synthetic-request:" + key for key in V3_AUTHORITY_FIELDS}
+    for key in [
+        "binding_ref",
+        "binding_digest",
+        "bundle_digest",
+        "effective_science_digest",
+        "engine_version",
+        "policy_version",
+    ]:
+        authority[key] = effective[key]
+    scientific_session = {"slots": [slot]}
+    evaluated = dict(
+        authority,
+        authority_generation=1,
+        candidate_plan={"sessions": [scientific_session], "allocation_ref": "synthetic-allocation"},
+    )
+    with sqlite3.connect(path) as db:
+        db.executescript(
+            "CREATE TABLE first_plan_execution_bindings(session_id INTEGER PRIMARY KEY,"
+            "owner_id INTEGER,execution_profile_version TEXT,scientific_session_id TEXT,"
+            "evaluation_id TEXT,binding_digest TEXT,immutable_payload_json TEXT);"
+            "CREATE TABLE first_plan_evaluations(id TEXT PRIMARY KEY,owner_id INTEGER,"
+            "authority_generation INTEGER,result_json TEXT);"
+            "CREATE TABLE first_plan_runtime_authorities(profile_key TEXT PRIMARY KEY,"
+            "generation INTEGER,state TEXT,publication_json TEXT,packaging_digest TEXT,"
+            "approval_ref TEXT);"
+        )
+        db.execute("DELETE FROM first_plan_set_observations")
+        db.execute(
+            "UPDATE workout_sessions SET template_slug_snapshot=? WHERE user_id=1",
+            ("science:v3:first-session",),
+        )
+        db.execute("UPDATE set_logs SET completed_at='2026-11-02 00:00:00' WHERE id<9999")
+        db.execute(
+            "UPDATE session_exercises SET exercise_name_snapshot=? WHERE id<9999",
+            ("Synthetic historical V3 fixture",),
+        )
+        db.execute(
+            "INSERT INTO first_plan_evaluations VALUES('shared-evaluation',1,1,?)",
+            (json.dumps(evaluated),),
+        )
+        publication = {
+            key: effective[key]
+            for key in [
+                "registry_digest",
+                "binding_digest",
+                "bundle_digest",
+                "effective_science_digest",
+            ]
+        }
+        db.execute(
+            "INSERT INTO first_plan_runtime_authorities VALUES(?,1,'ACTIVE',?,?,?)",
+            (
+                "first-session-runtime/3.0.0",
+                json.dumps(publication),
+                science_bundle[1],
+                "SYNTHETIC_STRUCTURAL_FIXTURE_ONLY",
+            ),
+        )
+        for i in range(1, 101):
+            payload = dict(
+                authority=authority,
+                authority_generation=1,
+                allocation_ref="synthetic-allocation",
+                scientific_session=scientific_session,
+                mapping=[
+                    dict(
+                        se_id=i,
+                        canonical_exercise_id=identity,
+                        slot_id=slot["slot_id"],
+                        intent_id=candidate["intent_id"],
+                        set_ids=[i],
+                    )
+                ],
+            )
+            db.execute(
+                "INSERT INTO first_plan_execution_bindings VALUES(?,1,?,?,?,?,?)",
+                (
+                    i,
+                    "first-plan-execution/3.0.0",
+                    "synthetic-session",
+                    "shared-evaluation",
+                    digest(payload),
+                    json.dumps(payload),
+                ),
+            )
+            observation = dict(
+                context=context,
+                setting={"kind": "MASS_KG", "value": 35, "unit": "kg"},
+                reps=9,
+                completed=True,
+                performed_at="2026-11-02T00:00:00Z",
+                performed_at_estimated=True,
+            )
+            op = f"synthetic-structural-{i}"
+            receipt = dict(
+                state="APPLIED",
+                session_id=i,
+                set_id=i,
+                op_id=op,
+                applied_revision=1,
+                performed_at=observation["performed_at"],
+                performed_at_adjusted=False,
+            )
+            body = dict(session_id=i, set_id=i, expected_revision=0, observation=observation)
+            db.execute(
+                "INSERT INTO first_plan_set_observations VALUES(?,1,?,?,?,1,0,?,?,?,?,?)",
+                (
+                    op,
+                    i,
+                    i,
+                    i,
+                    op,
+                    digest(body),
+                    json.dumps(observation),
+                    json.dumps(receipt),
+                    "2026-11-02 00:01:00",
+                ),
+            )
+        assert db.execute("PRAGMA integrity_check").fetchone()[0] == "ok"
+    # Finish the fixture's writer before a byte-for-byte read-only witness;
+    # a delayed WAL checkpoint is not a reader mutation.
+    db.close()
+
+
+def read_structural_v3(path, science_bundle):
+    from pathlib import Path
+
+    from app.services.muscle_observed_load.contracts import ObservedLoadQuery
+    from app.services.muscle_observed_load.limits import ReadLimits
+    from app.services.muscle_observed_load.projection import SourceView, project_capture
+    from app.services.muscle_observed_load.provenance import CatalogueReadContext
+    from app.services.muscle_observed_load.sqlite_source import open_owned_capture
+
+    admitted = SourceView.local()
+    context = CatalogueReadContext(1, "0" * 64)
+    context.seed(admitted)
+    source = SourceView(
+        Path(__file__).resolve().parents[1], budget=admitted.budget, catalogue_context=context
+    )
+    source.raw, source.pins = dict(admitted.raw), dict(admitted.pins)
+    source.bundle_root = str(science_bundle[0])
+    until = datetime(2026, 11, 25, tzinfo=UTC)
+    query = ObservedLoadQuery(datetime(2026, 11, 1, tzinfo=UTC), until)
+    with open_owned_capture("sqlite:///" + str(path), 1, query) as capture:
+        out = project_capture(
+            capture, query, source, ReadLimits(), as_of=until, runtime_profile_digest="0" * 64
+        ).model_dump()
+        return out, dict(capture.budget.used)
+
+
+def test_structural_100_v3_facts_fit_existing_sql_budget_without_authority_shortcut(
+    tmp_path, science_bundle
+):
+    path = tmp_path / "structural-v3.sqlite"
+    structural_v3_history(path, science_bundle)
+    before = hashlib.sha256(path.read_bytes()).hexdigest()
+    out, used = read_structural_v3(path, science_bundle)
+    assert len(out["facts"]) == 100
+    assert all(f["provenance"]["profile"] == "V3" for f in out["facts"])
+    assert all(f["provenance"]["source_status"] == "QUALIFIED" for f in out["facts"])
+    assert all(f["temporal"]["performed_at_estimated"] for f in out["facts"])
+    assert all(f["weight_kg"] is None for f in out["facts"])
+    assert used["statements"] < 4096
+    verify_digest(out)
+    assert hashlib.sha256(path.read_bytes()).hexdigest() == before
+    # A subsequent capture must reject a changed authority, not reuse the old verdict.
+    with sqlite3.connect(path) as writer:
+        writer.execute("UPDATE first_plan_runtime_authorities SET generation=2")
+    changed, _ = read_structural_v3(path, science_bundle)
+    assert len(changed["facts"]) == 100
+    assert all(f["provenance"]["source_status"] != "QUALIFIED" for f in changed["facts"])
+    assert changed["state"] == "UNKNOWN"
+    verify_digest(changed)

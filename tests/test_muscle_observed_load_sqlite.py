@@ -1,6 +1,7 @@
 """Real disposable SQLite: bounded candidates and a single read snapshot."""
 
 import importlib
+import json
 import sqlite3
 from datetime import UTC, datetime
 from pathlib import Path
@@ -45,6 +46,7 @@ def seed(path: Path, sessions=1):
         db.execute(
             "INSERT INTO first_plan_set_observations VALUES ('op',1,1,1,1,1,0,'op','digest','{}','{}','2026-11-02 00:01:00')"
         )
+    db.close()
     return path
 
 
@@ -172,3 +174,175 @@ def test_setup_statements_are_in_global_budget(tmp_path):
     path = seed(tmp_path / "db")
     with capture(path) as c:
         assert c.budget.used["statements"] >= 2
+
+
+def seed_authority_reads(path):
+    seed(path)
+    with sqlite3.connect(path) as db:
+        db.executescript(
+            "CREATE TABLE first_plan_evaluations(id TEXT PRIMARY KEY,owner_id INTEGER,"
+            "authority_generation INTEGER,result_json TEXT);"
+            "CREATE TABLE first_plan_runtime_authorities(profile_key TEXT PRIMARY KEY,"
+            "generation INTEGER,state TEXT,publication_json TEXT,packaging_digest TEXT,"
+            "approval_ref TEXT);"
+            "CREATE TABLE first_plan_execution_bindings(session_id INTEGER PRIMARY KEY);"
+        )
+        for name, owner in [("shared", 1), ("foreign", 2), ("second", 1), ("third", 1)]:
+            db.execute(
+                "INSERT INTO first_plan_evaluations VALUES(?,?,1,?)",
+                (name, owner, json.dumps({"nested": {"owner": owner, "version": 1}})),
+            )
+        db.execute(
+            "INSERT INTO first_plan_runtime_authorities VALUES(?,1,'ACTIVE',?,?,?)",
+            ("first-session-runtime/3.0.0", '{"nested":{"version":1}}', "pin", "test-only"),
+        )
+    db.close()
+    return path
+
+
+def test_repeated_snapshot_authority_reads_preserve_budget_and_independent_values(tmp_path):
+    path = seed_authority_reads(tmp_path / "authority.sqlite")
+    with capture(path) as c:
+        assert c.has_table("first_plan_execution_bindings")
+        evaluation = c.evaluation_for("shared")
+        authority = c.runtime_authority()
+        used = dict(c.budget.used)
+        evaluation["result"]["nested"]["version"] = 99
+        evaluation["reasons"].append("CALLER_MUTATION")
+        authority["publication"]["nested"]["version"] = 99
+        authority["reasons"].append("CALLER_MUTATION")
+        # A cache hit must also be independent, not just the first returned row.
+        hit = c.evaluation_for("shared")
+        hit["result"]["nested"]["version"] = 88
+        hit["reasons"].append("CACHE_HIT_MUTATION")
+        hit = c.runtime_authority()
+        hit["publication"]["nested"]["version"] = 88
+        hit["reasons"].append("CACHE_HIT_MUTATION")
+        for _ in range(10):
+            assert c.has_table("first_plan_execution_bindings")
+            assert c.evaluation_for("shared") == {
+                "authority_generation": 1,
+                "reasons": [],
+                "id": "shared",
+                "result": {"nested": {"owner": 1, "version": 1}},
+            }
+            assert c.runtime_authority() == {
+                "generation": 1,
+                "state": "ACTIVE",
+                "publication": {"nested": {"version": 1}},
+                "packaging_digest": "pin",
+                "approval_ref": "test-only",
+                "reasons": [],
+            }
+        assert c.budget.used == used
+
+
+def test_authority_cache_is_confined_to_owner_and_transaction_snapshot(tmp_path):
+    path = seed_authority_reads(tmp_path / "snapshots.sqlite")
+    with capture(path) as first:
+        assert first.evaluation_for("shared")["result"]["nested"]["version"] == 1
+        assert first.runtime_authority()["generation"] == 1
+        assert first.evaluation_for("foreign") is None
+        with sqlite3.connect(path) as writer:
+            writer.execute(
+                "UPDATE first_plan_evaluations SET result_json=? WHERE id='shared'",
+                ('{"nested":{"owner":1,"version":2}}',),
+            )
+            writer.execute("UPDATE first_plan_runtime_authorities SET generation=2")
+        assert first.evaluation_for("shared")["result"]["nested"]["version"] == 1
+        assert first.runtime_authority()["generation"] == 1
+    with capture(path) as next_snapshot:
+        assert next_snapshot.evaluation_for("shared")["result"]["nested"]["version"] == 2
+        assert next_snapshot.runtime_authority()["generation"] == 2
+    with capture(path, owner=2) as foreign:
+        assert foreign.evaluation_for("shared") is None
+        assert foreign.evaluation_for("foreign")["result"]["nested"]["owner"] == 2
+
+
+def test_absent_authority_reads_stay_absent_in_same_snapshot(tmp_path):
+    path = seed_authority_reads(tmp_path / "missing.sqlite")
+    with sqlite3.connect(path) as writer:
+        writer.execute("DELETE FROM first_plan_runtime_authorities")
+    with capture(path) as c:
+        assert c.evaluation_for("later") is None
+        assert c.runtime_authority() is None
+        assert c.has_table("exercise_aliases") is False
+        used = dict(c.budget.used)
+        with sqlite3.connect(path) as writer:
+            writer.execute("INSERT INTO first_plan_evaluations VALUES('later',1,1,'{}')")
+            writer.execute(
+                "INSERT INTO first_plan_runtime_authorities VALUES(?,1,'ACTIVE','{}','p','a')",
+                ("first-session-runtime/3.0.0",),
+            )
+            writer.execute("CREATE TABLE exercise_aliases(normalized TEXT,exercise_id INTEGER)")
+        assert c.evaluation_for("later") is None
+        assert c.runtime_authority() is None
+        assert c.has_table("exercise_aliases") is False
+        assert c.budget.used == used
+    with capture(path) as c:
+        assert c.evaluation_for("later")["result"] == {}
+        assert c.runtime_authority()["generation"] == 1
+        assert c.has_table("exercise_aliases")
+
+
+def test_authority_reuse_is_bounded_without_skipping_real_read_limits(tmp_path):
+    from app.services.muscle_observed_load.limits import BudgetExceeded, ReadLimits
+
+    path = seed_authority_reads(tmp_path / "bounded.sqlite")
+    with capture(path, limits=ReadLimits(sessions=2)) as c:
+        for identity in ["shared", "second", "third"]:
+            assert c.evaluation_for(identity)["id"] == identity
+        used = c.budget.used["statements"]
+        assert c.evaluation_for("shared")["id"] == "shared"
+        assert c.evaluation_for("second")["id"] == "second"
+        assert c.budget.used["statements"] == used
+        assert c.evaluation_for("third")["id"] == "third"
+        assert c.budget.used["statements"] > used
+    with capture(path, limits=ReadLimits(statements=12)) as c:
+        assert c.evaluation_for("shared")["id"] == "shared"
+        assert c.evaluation_for("second")["id"] == "second"
+        with pytest.raises(BudgetExceeded) as error:
+            c.evaluation_for("third")
+        assert error.value.resource == "statements"
+
+
+@pytest.mark.parametrize("fail_in_capture", [False, True])
+def test_closed_capture_cannot_serve_cached_authority(tmp_path, fail_in_capture):
+    from app.services.muscle_observed_load.contracts import ObservedLoadReadError
+
+    path = seed_authority_reads(tmp_path / "closed.sqlite")
+    try:
+        with capture(path) as c:
+            assert c.evaluation_for("shared")
+            assert c.runtime_authority()
+            assert c.has_table("first_plan_execution_bindings")
+            if fail_in_capture:
+                raise RuntimeError("synthetic abort")
+    except RuntimeError:
+        assert fail_in_capture
+    for read in [
+        lambda: c.evaluation_for("shared"),
+        c.runtime_authority,
+        lambda: c.has_table("first_plan_execution_bindings"),
+    ]:
+        with pytest.raises(ObservedLoadReadError):
+            read()
+
+
+@pytest.mark.parametrize("kind", ["table", "evaluation", "runtime"])
+def test_cached_reads_do_not_bypass_capture_deadline(tmp_path, kind):
+    from app.services.muscle_observed_load.limits import BudgetExceeded
+
+    path = seed_authority_reads(tmp_path / "expired.sqlite")
+    with capture(path) as c:
+        read = {
+            "table": lambda: c.has_table("first_plan_execution_bindings"),
+            "evaluation": lambda: c.evaluation_for("shared"),
+            "runtime": c.runtime_authority,
+        }[kind]
+        assert read()
+        # Synthetic expiry of this read budget, without touching TIME-01 clocks.
+        c.budget.started -= 2
+        with pytest.raises(BudgetExceeded) as error:
+            read()
+        assert error.value.resource == "time"
