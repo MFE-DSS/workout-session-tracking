@@ -286,8 +286,7 @@ def test_absent_authority_reads_stay_absent_in_same_snapshot(tmp_path):
 
 
 def test_authority_reuse_is_bounded_without_skipping_real_read_limits(tmp_path):
-    from app.services.muscle_observed_load.contracts import ObservedLoadReadError
-    from app.services.muscle_observed_load.limits import ReadLimits
+    from app.services.muscle_observed_load.limits import BudgetExceeded, ReadLimits
 
     path = seed_authority_reads(tmp_path / "bounded.sqlite")
     with capture(path, limits=ReadLimits(sessions=2)) as c:
@@ -299,10 +298,12 @@ def test_authority_reuse_is_bounded_without_skipping_real_read_limits(tmp_path):
         assert c.budget.used["statements"] == used
         assert c.evaluation_for("third")["id"] == "third"
         assert c.budget.used["statements"] > used
-    with pytest.raises(ObservedLoadReadError):
-        with capture(path, limits=ReadLimits(statements=12)) as c:
-            for identity in ["shared", "second", "third"]:
-                c.evaluation_for(identity)
+    with capture(path, limits=ReadLimits(statements=12)) as c:
+        assert c.evaluation_for("shared")["id"] == "shared"
+        assert c.evaluation_for("second")["id"] == "second"
+        with pytest.raises(BudgetExceeded) as error:
+            c.evaluation_for("third")
+        assert error.value.resource == "statements"
 
 
 @pytest.mark.parametrize("fail_in_capture", [False, True])
@@ -312,7 +313,8 @@ def test_closed_capture_cannot_serve_cached_authority(tmp_path, fail_in_capture)
     path = seed_authority_reads(tmp_path / "closed.sqlite")
     try:
         with capture(path) as c:
-            assert c.evaluation_for("shared") and c.runtime_authority()
+            assert c.evaluation_for("shared")
+            assert c.runtime_authority()
             assert c.has_table("first_plan_execution_bindings")
             if fail_in_capture:
                 raise RuntimeError("synthetic abort")
@@ -329,17 +331,18 @@ def test_closed_capture_cannot_serve_cached_authority(tmp_path, fail_in_capture)
 
 @pytest.mark.parametrize("kind", ["table", "evaluation", "runtime"])
 def test_cached_reads_do_not_bypass_capture_deadline(tmp_path, kind):
-    from app.services.muscle_observed_load.contracts import ObservedLoadReadError
+    from app.services.muscle_observed_load.limits import BudgetExceeded
 
     path = seed_authority_reads(tmp_path / "expired.sqlite")
-    with pytest.raises(ObservedLoadReadError):
-        with capture(path) as c:
-            read = {
-                "table": lambda: c.has_table("first_plan_execution_bindings"),
-                "evaluation": lambda: c.evaluation_for("shared"),
-                "runtime": c.runtime_authority,
-            }[kind]
-            assert read()
-            # Synthetic expiry of this read budget, without touching TIME-01 clocks.
-            c.budget.started -= 2
+    with capture(path) as c:
+        read = {
+            "table": lambda: c.has_table("first_plan_execution_bindings"),
+            "evaluation": lambda: c.evaluation_for("shared"),
+            "runtime": c.runtime_authority,
+        }[kind]
+        assert read()
+        # Synthetic expiry of this read budget, without touching TIME-01 clocks.
+        c.budget.started -= 2
+        with pytest.raises(BudgetExceeded) as error:
             read()
+        assert error.value.resource == "time"

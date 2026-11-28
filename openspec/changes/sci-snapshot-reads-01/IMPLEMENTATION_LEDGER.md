@@ -15,3 +15,6 @@ Deux présences de tables internes maximum ; évaluations bornées au plafond se
 Les budgets SQL4096,VM2M,CPU2/3s,AS512Mio,wall3s et JSON/sortie sont intacts. Le gain de SQL ne prouve pas le budget CPU/AS de l'image corrigée. L'image opérationnelle1f81d5b8 reste inchangée et le lecteur DISABLED / qualification opérationnelle HOLD. Aucun run cloud, montage candidat, transfert ou changement OVH exécuté.
 
 Ruff ciblé/budget et Bandit passent ; annotations B608 historiques inchangées. OpenSpec strict et protocole documentaire passent. Revue indépendante du diff entier : aucun finding bloquant ou mineur à corriger. Publication et CI exacte restent à finaliser.
+
+## CI initiale et précision des témoins
+Run46127205138 au HEAD9b90618 :11jobs réussis ;9074tests backend/3SKIP existants,1610mobiles+TS,77visuels. Gate SonarERROR consultatif pour3remarques de tests ; aucun nouveau bug/vulnérabilité,100%couverture nouvelle et0%duplication. Seuls les tests SQLite ont été renforcés pour désigner l'appel exact et la ressource refusée. Produit inchangé,24tests repassés et delta relu sans finding. Nouvelle CI du HEAD final encore nécessaire. Aucune règle/gate/issue modifiée administrativement.
