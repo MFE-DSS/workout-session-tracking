@@ -7,6 +7,7 @@ import math
 import sqlite3
 from collections import Counter
 from contextlib import contextmanager
+from copy import deepcopy
 from pathlib import Path
 
 from sqlalchemy.engine import make_url
@@ -126,6 +127,10 @@ class OwnedReadCapture:
         self._operations = {}
         self._bindings = {}
         self._graphs = {}
+        # Snapshot-local raw reads only, never a cached scientific verdict.
+        self._table_presence = {}
+        self._evaluations = {}
+        self._runtime_rows = {}
         self.exclusions = Counter()
         self.sentinels = 0
         self.frontiers = 0
@@ -326,12 +331,18 @@ class OwnedReadCapture:
         return result
 
     def has_table(self, table):
-        return (
+        self.budget.deadline()
+        if table in self._table_presence:
+            return self._table_presence[table]
+        present = (
             self.rows(
                 "SELECT 1 FROM sqlite_master WHERE type=? AND name=?", ("table", table)
             ).fetchone()
             is not None
         )
+        if table in {"exercise_aliases", "first_plan_execution_bindings"}:
+            self._table_presence[table] = present
+        return present
 
     def alias_name(self, normalized):
         if not self.has_table("exercise_aliases"):
@@ -383,11 +394,16 @@ class OwnedReadCapture:
         return result
 
     def evaluation_for(self, evaluation_id):
+        self.budget.deadline()
+        if evaluation_id in self._evaluations:
+            return deepcopy(self._evaluations[evaluation_id])
         row = self.rows(
             "SELECT rowid,CASE WHEN typeof(owner_id)='integer' THEN owner_id END,CASE WHEN typeof(authority_generation)='integer' THEN authority_generation END FROM first_plan_evaluations WHERE id=?",
             (evaluation_id,),
         ).fetchone()
         if row is None or row[1] != self.owner_id:
+            if len(self._evaluations) < self.budget.limits.sessions:
+                self._evaluations[evaluation_id] = None
             return None
         result = {"authority_generation": row[2], "reasons": []}
         for column in ("id", "result_json"):
@@ -400,14 +416,21 @@ class OwnedReadCapture:
             )
             result[column.removesuffix("_json")] = value
             result["reasons"].extend(errors)
+        if len(self._evaluations) < self.budget.limits.sessions:
+            self._evaluations[evaluation_id] = deepcopy(result)
         return result
 
     def runtime_authority(self):
+        self.budget.deadline()
+        key = "first-session-runtime/3.0.0"
+        if key in self._runtime_rows:
+            return deepcopy(self._runtime_rows[key])
         row = self.rows(
             "SELECT rowid,CASE WHEN typeof(generation)='integer' THEN generation END FROM first_plan_runtime_authorities WHERE profile_key=?",
             ("first-session-runtime/3.0.0",),
         ).fetchone()
         if row is None:
+            self._runtime_rows[key] = None
             return None
         result = {"generation": row[1], "reasons": []}
         for column in ("state", "publication_json", "packaging_digest", "approval_ref"):
@@ -420,6 +443,7 @@ class OwnedReadCapture:
             )
             result[column.removesuffix("_json")] = value
             result["reasons"].extend(errors)
+        self._runtime_rows[key] = deepcopy(result)
         return result
 
     def graph_for(self, session_id):
@@ -455,12 +479,20 @@ def open_owned_capture(database_url, owner_id, query, limits=ReadLimits()):
     connection = sqlite3.connect(
         path.as_uri() + "?mode=ro", uri=True, timeout=0.1, isolation_level=None
     )
+    capture = None
     try:
         budget.take("statements", 2)
         connection.execute("PRAGMA query_only=ON")
         connection.execute("BEGIN")
-        yield OwnedReadCapture(connection, owner_id, query, limits, budget)
+        capture = OwnedReadCapture(connection, owner_id, query, limits, budget)
+        yield capture
     except BudgetExceeded as exc:
         raise ObservedLoadReadError() from exc
     finally:
-        connection.close()
+        try:
+            connection.close()
+        finally:
+            if capture is not None:
+                capture._table_presence.clear()
+                capture._evaluations.clear()
+                capture._runtime_rows.clear()

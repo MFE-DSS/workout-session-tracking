@@ -1,0 +1,18 @@
+{
+  "scope": "sci-snapshot-reads-01",
+  "branch": "fix/sci-snapshot-reads-01",
+  "status": "ACTIVE",
+  "owner": "Codex SCI SQL bounded correction",
+  "canonical_parent": "c8b413efa027467600654a445521ca8e564b4384",
+  "files": [
+    "app/services/muscle_observed_load/sqlite_source.py",
+    "tests/test_muscle_observed_load_sqlite.py",
+    "tests/test_muscle_observed_load_writer_readback.py"
+  ],
+  "prior_reader_leases": "archived/released; unrelated worktrees preserved",
+  "source_sha256": {
+    "app/services/muscle_observed_load/sqlite_source.py": "f87bf94659bd0819704fc397df63d421b91820cdf1403db33cdb55ea3951be44",
+    "tests/test_muscle_observed_load_sqlite.py": "1304a3f8dffc7706efb08f48c55158074f95addacdeffdd03c3591ab274351be",
+    "tests/test_muscle_observed_load_writer_readback.py": "ea4bdf611785ca760d5e03aefcf45b9813bbaf5119c2327558cc75392a3715eb"
+  }
+}
